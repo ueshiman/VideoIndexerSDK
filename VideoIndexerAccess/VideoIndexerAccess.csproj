@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageTags>Video Indexer;azure AI</PackageTags>
+    <Description>VideoIndexerAccessのAPIを抽象化したlibrary</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\taten\OneDrive\画像\AirTurn02-240x240.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.AutoActivation" Version="9.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
+    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.2" />
+  </ItemGroup>
+	
+  <PropertyGroup>
+	<Version>1.0.1-alpha05.2</Version>
+	<PackageReleaseNotes>Azure AI Video アクセス SDK </PackageReleaseNotes>
+	<PackageIcon>AirTurn02-240x240.jpg</PackageIcon>
+	<SignAssembly>False</SignAssembly>
+	<Title>Video Indexer Access</Title>
+	<IncludeSymbols>True</IncludeSymbols>
+	<Company>LLC Beans</Company><!-- 新しいバージョン番号 -->
+	<!-- NuGet メタデータ -->
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageProjectUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</PackageProjectUrl>
+	<RepositoryUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</RepositoryUrl>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<Copyright>Copyright (c) 2025 Ueshiman</Copyright>
+	<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
+  </PropertyGroup>
+
+</Project>

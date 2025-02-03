@@ -1,0 +1,32 @@
+﻿<Window
+    x:Class="VideoIndexPoc2.Windows.ListWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dataModel="using:VideoIndexerAccess.Repositories.DataModel"
+    mc:Ignorable="d"
+    Title="Video Indexer - List Window">
+
+    <Grid>
+        <ListView x:Name="VideoListView" Margin="10" Loaded="VideoListView_OnLoadedWindow_LoadedAsync">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="dataModel:VideoListDataModel">
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <!-- Thumbnail Image -->
+                        <!--<Image Source="{x:Bind ThumbnailUrl}" Width="120" Height="90" Margin="5"/>-->
+
+                        <!-- Metadata Details -->
+                        <StackPanel Orientation="Vertical" Margin="5" PointerPressed="DataStackPanel_PointerPressedp">
+                            <TextBlock Text="{x:Bind Name}" FontWeight="Bold" FontSize="16" Name="Name" />
+                            <TextBlock Text="{x:Bind DurationInSeconds}" FontSize="14"/>
+                            <TextBlock Text="{x:Bind Description}" FontSize="12"/>
+                            <TextBlock Text="{x:Bind AccountId}" FontSize="12" Name="AccountId"/>
+                            <TextBlock Text="{x:Bind Id}" FontSize="12" Name="Id"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

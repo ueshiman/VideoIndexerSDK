@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="VideoIndexPoc2.Windows.ItemWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dataModel="using:VideoIndexerAccess.Repositories.DataModel"
+    xmlns:apiModel="using:VideoIndexerAccessCore.VideoIndexerClient.ApiModel"
+    mc:Ignorable="d"
+    Title="Video Item Viewer">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="10" Margin="10">
+            <TextBlock Text="Video Item Details" FontSize="20" FontWeight="Bold" />
+
+            <!-- 表示リスト -->
+            <ListView  ItemsSource="{x:Bind VideoItems}" SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="dataModel:VideoItemDataModel">
+                        <StackPanel Spacing="10" Margin="5" BorderThickness="1" BorderBrush="Gray">
+                            <TextBlock Text="Basic Information" FontWeight="Bold" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Account ID:" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind AccountId}" Grid.Column="1" />
+                                    <TextBlock Text="ID:" Grid.Row="1" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind Id}" Grid.Row="1" Grid.Column="1" />
+                                    <TextBlock Text="Name:" Grid.Row="2" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind Name}" Grid.Row="2" Grid.Column="1" />
+                                    <TextBlock Text="Description:" Grid.Row="3" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind Description}" Grid.Row="3" Grid.Column="1" />
+                                    <TextBlock Text="User Name:" Grid.Row="4" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind UserName}" Grid.Row="4" Grid.Column="1" />
+                                    <TextBlock Text="Created:" Grid.Row="5" Grid.Column="0" />
+                                    <TextBlock Text="{x:Bind Created}" Grid.Row="5" Grid.Column="1" />
+                                    <Button Content="ビデオをDownload" Margin="5" Click="OnDownloadButtonClick" CommandParameter="{x:Bind Id}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Summarized Insights -->
+                            <Expander Header="Summarized Insights">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Name:" />
+                                    <TextBlock Text="{x:Bind Name}" />
+                                    <TextBlock Text="Privacy Mode:" />
+                                    <TextBlock Text="{x:Bind PrivacyMode}" />
+                                    <TextBlock Text="Duration:" />
+                                    <TextBlock Text="Faces:" />
+                                    <ItemsControl ItemsSource="{x:Bind SummarizedInsights.Faces}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="apiModel:FaceApiModel">
+                                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                                    <TextBlock Text="{x:Bind Name}" />
+                                                    <TextBlock Text="{x:Bind AppearanceCount}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Videos -->
+                            <Expander Header="Videos">
+                                <ItemsControl ItemsSource="{x:Bind Videos}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="apiModel:ItemVideoApiModel">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <TextBlock Text="ID:" />
+                                                <TextBlock Text="{x:Bind id}" />
+                                                <TextBlock Text="State:" />
+                                                <TextBlock Text="{x:Bind state}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Expander>
+
+                            <!-- Social -->
+                            <Expander Header="Social">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Liked by User:" />
+                                    <TextBlock Text="{x:Bind Social.LikedByUser}" />
+                                    <TextBlock Text="Likes:" />
+                                    <TextBlock Text="{x:Bind Social.Likes}" />
+                                    <TextBlock Text="Views:" />
+                                    <TextBlock Text="{x:Bind Social.Views}" />
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- ボタンを追加 -->
+                            <Button Content="テスト" Margin="5" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
+    
