@@ -20,11 +20,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.AutoActivation" Version="9.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.2" />
+    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.4" />
   </ItemGroup>
 	
   <PropertyGroup>
-	<Version>1.0.1-alpha05.2</Version>
+	<Version>1.0.1-alpha05.4</Version>
 	<PackageReleaseNotes>Azure AI Video アクセス SDK </PackageReleaseNotes>
 	<PackageIcon>AirTurn02-240x240.jpg</PackageIcon>
 	<SignAssembly>False</SignAssembly>
