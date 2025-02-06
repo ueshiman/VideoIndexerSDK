@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>VideoIndexPoc2</RootNamespace>
+    <RootNamespace>VideoIndexerExperiment2</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
@@ -12,16 +12,6 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Repositories\**" />
-    <Compile Remove="VideoIndexerClient\**" />
-    <EmbeddedResource Remove="Repositories\**" />
-    <EmbeddedResource Remove="VideoIndexerClient\**" />
-    <None Remove="Repositories\**" />
-    <None Remove="VideoIndexerClient\**" />
-    <Page Remove="Repositories\**" />
-    <Page Remove="VideoIndexerClient\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -59,9 +49,6 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <WebView2EnableCsWinRTProjection>False</WebView2EnableCsWinRTProjection>
-  </PropertyGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -78,12 +65,5 @@
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-    <DefaultLanguage>ja-jp</DefaultLanguage>
   </PropertyGroup>
-  <ItemGroup>
-    <PRIResource Remove="VideoIndexerClient\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Remove="Repositories\**" />
-  </ItemGroup>
 </Project>

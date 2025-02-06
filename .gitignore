@@ -373,3 +373,4 @@ FodyWeavers.xsd
 /TestGetTokenAsync
 /VideoIndexPoc/VideoIndexPocTests
 /VideoIndexPoc2/VideoIndexerClient/access.txt
+/nuget.txt

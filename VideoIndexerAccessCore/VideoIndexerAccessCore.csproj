@@ -13,8 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="VideoIndexerClient\IVideoIndexerClient.cs" />
-    <Compile Remove="VideoIndexerClient\VideoIndexerClient.cs" />
+    <Compile Remove="VideoIndexerClient\bin\**" />
+    <EmbeddedResource Remove="VideoIndexerClient\bin\**" />
+    <None Remove="VideoIndexerClient\bin\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +32,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.2</Version>
+	<Version>1.0.1-alpha05.4</Version>
 	<IncludeSymbols>True</IncludeSymbols><!-- 新しいバージョン番号 -->
 	  <!-- NuGet メタデータ -->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
