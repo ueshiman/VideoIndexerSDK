@@ -25,6 +25,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.AddVideoIndexerConfiguration();
             services.AddVideoIndexerFileAccess();
             services.AddVideoIndexerHttpAccess();
+            services.AddAccountApi();
 
             return services;
         }
@@ -38,6 +39,13 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IVideoItemApiAccess, VideoIndexApiAccess>();
             services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
             services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAccountApi(this IServiceCollection services)
+        {
+            services.TryAddTransient<IAccountMigrationStatus, IAccountMigrationStatus>();
 
             return services;
         }
