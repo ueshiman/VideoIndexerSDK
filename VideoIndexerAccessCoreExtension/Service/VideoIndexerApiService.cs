@@ -45,7 +45,7 @@ namespace VideoIndexerAccessCoreExtension.Service
 
         public static IServiceCollection AddAccountApi(this IServiceCollection services)
         {
-            services.TryAddTransient<IAccountMigrationStatus, IAccountMigrationStatus>();
+            services.TryAddTransient<IAccountMigrationStatusApiAccess, IAccountMigrationStatusApiAccess>();
 
             return services;
         }

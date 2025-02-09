@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoIndexerAccessCoreExten
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoIndexerAccessExtension", "VideoIndexerAccessExtension\VideoIndexerAccessExtension.csproj", "{7A2F9B29-76D0-4E83-8A11-868189497902}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoIndexerAccessCoreTests", "VideoIndexerAccessCoreTests\VideoIndexerAccessCoreTests.csproj", "{DCC26CFB-01D3-4B4A-96ED-46450371232F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -108,6 +110,18 @@ Global
 		{7A2F9B29-76D0-4E83-8A11-868189497902}.Release|x64.Build.0 = Release|Any CPU
 		{7A2F9B29-76D0-4E83-8A11-868189497902}.Release|x86.ActiveCfg = Release|Any CPU
 		{7A2F9B29-76D0-4E83-8A11-868189497902}.Release|x86.Build.0 = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|x64.Build.0 = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Debug|x86.Build.0 = Debug|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|ARM64.Build.0 = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|x64.ActiveCfg = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|x64.Build.0 = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|x86.ActiveCfg = Release|Any CPU
+		{DCC26CFB-01D3-4B4A-96ED-46450371232F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,31 +13,25 @@ using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
     // アカウント移行ステータスを取得するためのクラス
-    public class AccountMigrationStatus : IAccountMigrationStatus
+    public class AccountMigrationStatusApiAccess : IAccountMigrationStatusApiAccess
     {
-        private readonly ILogger<AccountApiAccess> _logger;
-        private const string ParamName = "JsonSerializer.Deserialize<Account>(jsonResponseBody)";
-        private ApiAccountModel? _account;
+        //private readonly string _paramName = "JsonSerializer.Deserialize<Account>(jsonResponseBody)";
+        private readonly ILogger<AccountMigrationStatusApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
-        private readonly IAccountTokenProviderDynamic _accountTokenProvider;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
-        private readonly string _baseUrl;
-
         // コンストラクタ
-        public AccountMigrationStatus(ILogger<AccountApiAccess> logger, ApiAccountModel? account, IDurableHttpClient? durableHttpClient, IAccountTokenProviderDynamic accountTokenProvider, IApiResourceConfigurations apiResourceConfigurations)
-        {
-            _baseUrl = _apiResourceConfigurations.ApiEndpoint;
 
+
+        // アカウント移行ステータスを非同期で取得するメソッド
+        public AccountMigrationStatusApiAccess(ILogger<AccountMigrationStatusApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        {
             _logger = logger;
-            _account = account;
             _durableHttpClient = durableHttpClient;
-            _accountTokenProvider = accountTokenProvider;
             _apiResourceConfigurations = apiResourceConfigurations;
         }
 
-        // アカウント移行ステータスを非同期で取得するメソッド
-        public async Task<AccountMigrationStatusModel?> GetAccountMigrationStatusAsync(string location, string accountId, string accessToken = null)
+        public async Task<ApiAccountMigrationStatusModel?> GetAccountMigrationStatusAsync(string location, string accountId, string? accessToken = null)
         {
             try
             {
@@ -57,9 +51,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         // JSONレスポンスをデシリアライズするメソッド
-        public AccountMigrationStatusModel? DeserializeResponse(string jsonString)
+        public ApiAccountMigrationStatusModel? DeserializeResponse(string jsonString)
         {
-            return JsonSerializer.Deserialize<AccountMigrationStatusModel>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<ApiAccountMigrationStatusModel>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         // アカウント移行ステータスのJSONを非同期で取得するメソッド
@@ -67,7 +61,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                var url = $"{_baseUrl}/{location}/Accounts/{accountId}/AMSAssetsMigration";
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/AMSAssetsMigration";
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     url += "?accessToken=" + Uri.EscapeDataString(accessToken);

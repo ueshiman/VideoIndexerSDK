@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
     // アカウントの移行ステータスを表すモデルクラス
-    public class AccountMigrationStatusModel
+    public class ApiAccountMigrationStatusModel
     {
         // 移行ステータス
         public int Status { get; set; }
