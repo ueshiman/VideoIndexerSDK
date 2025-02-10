@@ -11,24 +11,29 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
+using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
     public class ProjectMigrationApiAccess
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
+
         private readonly ILogger<ProjectMigrationApiAccess> _logger;
+        private readonly IDurableHttpClient? _durableHttpClient;
+        private readonly IApiResourceConfigurations _apiResourceConfigurations;
+
+        public ProjectMigrationApiAccess(ILogger<ProjectMigrationApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        {
+            _logger = logger;
+            _durableHttpClient = durableHttpClient;
+            _apiResourceConfigurations = apiResourceConfigurations;
+        }
 
         /// <summary>
         /// ProjectMigrationClient クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public ProjectMigrationApiAccess(string baseUrl, HttpClient httpClient, ILogger<ProjectMigrationApiAccess> logger)
-        {
-            _baseUrl = baseUrl;
-            _httpClient = httpClient;
-            _logger = logger;
-        }
+
 
         /// <summary>
         /// プロジェクトのマイグレーション情報を取得します。
@@ -44,7 +49,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         public async Task<string> FetchProjectMigrationJsonAsync(string location, string accountId, string projectId, string accessToken)
         {
-            var requestUrl = $"{_baseUrl}/{location}/Accounts/{accountId}/ProjectAMSAssetMigrations/{projectId}";
+            var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/ProjectAMSAssetMigrations/{projectId}";
 
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -61,7 +66,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             try
             {
-                var response = await _httpClient.SendAsync(request);
+                var httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+
+                var response = await httpClient.SendAsync(request);
 
                 if (response.IsSuccessStatusCode)
                 {
