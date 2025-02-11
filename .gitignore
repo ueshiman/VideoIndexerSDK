@@ -374,3 +374,4 @@ FodyWeavers.xsd
 /VideoIndexPoc/VideoIndexPocTests
 /VideoIndexPoc2/VideoIndexerClient/access.txt
 /nuget.txt
+/VideoIndexerAccessCore/VideoIndexerClient/ApiAccess/VideoIndexerApiAccess.cs
