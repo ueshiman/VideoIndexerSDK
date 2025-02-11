@@ -12,8 +12,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     public class ApiProjectMigrationModel
     {
         public int status;
-        public string name;
-        public string details;
-        public string projectId;
+        public string? name;
+        public string? details;
+        public string? projectId;
     }
 }

@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="VideoIndexerClient\ApiAccess\VideoIndexerApiAccess.cs" />
     <Compile Remove="VideoIndexerClient\IVideoIndexerClient.cs" />
     <Compile Remove="VideoIndexerClient\VideoIndexerClient.cs" />
   </ItemGroup>
