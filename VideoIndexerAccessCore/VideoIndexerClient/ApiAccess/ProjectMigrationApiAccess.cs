@@ -41,6 +41,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// プロジェクトのマイグレーション情報を取得します。
+        /// Get Project Migration
+        /// Try it Get project migration
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
