@@ -2,9 +2,9 @@
 
 public partial class ApiPagingInfoModel
 {
-    public int PageSize { get; set; }
-    public int Skip { get; set; }
-    public bool Done { get; set; }
-    public int TotalCount { get; set; }
-    
+    public int pageSize { get; set; }
+    public int skip { get; set; }
+    public bool done { get; set; }
+    public int? totalCount { get; set; }
+
 }
