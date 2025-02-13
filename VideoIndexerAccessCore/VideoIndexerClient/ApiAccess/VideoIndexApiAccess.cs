@@ -10,7 +10,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
     /// <summary>
     /// API Access レイヤーなのでAPIと一対一の機能を提供
     /// </summary>
-    public class VideoIndexApiAccess : IVideoItemApiAccess
+    public class VideoIndexApiAccess : IVideoIndexApiAccess
     {
         private readonly ILogger<VideoIndexApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;

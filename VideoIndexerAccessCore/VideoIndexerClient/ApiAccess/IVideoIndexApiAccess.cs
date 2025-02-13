@@ -5,7 +5,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 /// <summary>
 /// ビデオアイテムAPIへのアクセスを提供するインターフェース
 /// </summary>
-public interface IVideoItemApiAccess
+public interface IVideoIndexApiAccess
 {
     /// <summary>
     /// ビデオアイテムのJSONを非同期で取得する

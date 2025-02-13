@@ -10,7 +10,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
     /// <summary>
     /// プロジェクトのマイグレーション情報を取得するためのクラス
     /// </summary>
-    public partial class ProjectMigrationApiAccess
+    public partial class ProjectMigrationApiAccess : IProjectMigrationApiAccess
     {
         private readonly ILogger<ProjectMigrationApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -184,7 +184,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="skip">スキップする項目数</param>
         /// <param name="states">状態フィルター</param>
         /// <returns>プロジェクトのマイグレーションデータの JSON 文字列</returns>
-        private async Task<string> GetProjectMigrationsJsonAsync(string location, string accountId, string accessToken, int? pageSize = null, int? skip = null, string[]? states = null)
+        public async Task<string> GetProjectMigrationsJsonAsync(string location, string accountId, string accessToken, int? pageSize = null, int? skip = null, string[]? states = null)
         {
             _logger.LogInformation("Starting GetProjectMigrationsJsonAsync for accountId: {AccountId}", accountId);
             var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/ProjectAMSAssetMigrations?accessToken={accessToken}";
@@ -233,7 +233,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">JSON 文字列</param>
         /// <returns>プロジェクトのマイグレーション情報のリスト</returns>
-        private ApiProjectsMigrations ParseJsonResponse(string jsonResponse)
+        public ApiProjectsMigrations ParseJsonResponse(string jsonResponse)
         {
             _logger.LogInformation("Starting ParseJsonResponse");
             try

@@ -109,11 +109,8 @@ public class VideoMigrationApiAccess
             if (states != null && states.Count > 0) queryParams.Add($"states={string.Join(",", states)}");
             if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
 
-            if (queryParams.Count > 0)
-            {
-                requestUrl += "?" + string.Join("&", queryParams);
-            }
-
+            if (queryParams.Count > 0) requestUrl += "?" + string.Join("&", queryParams);
+            
             _logger.LogInformation("Sending request to {RequestUrl}", requestUrl);
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);

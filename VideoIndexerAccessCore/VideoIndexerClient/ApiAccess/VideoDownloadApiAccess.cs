@@ -32,15 +32,17 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="region">リージョン</param>
         /// <param name="accountId">アカウント ID</param>
         /// <param name="videoId">ビデオ ID</param>
-        /// <param name="accessToken">アクセス トークン</param>
+        /// <param name="accessToken">アクセス トークン（オプション）</param>
         /// <returns>ビデオのダウンロードURL</returns>
-        public async Task<string> GetVideoDownloadUrl(string region, string accountId, string videoId, string accessToken)
+        public async Task<string> GetVideoDownloadUrl(string region, string accountId, string videoId, string? accessToken = null)
         {
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
 
             _logger.LogInformation("Requesting download URL for video {VideoId} in account {AccountId} with region {Region}.", videoId, accountId, region);
 
-            var response = await httpClient.GetAsync($"{_apiResourceConfigurations.ApiEndpoint}/{region}/Accounts/{accountId}/Videos/{videoId}/SourceFile/DownloadUrl?accessToken={accessToken}");
+            var url = $"{_apiResourceConfigurations.ApiEndpoint}/{region}/Accounts/{accountId}/Videos/{videoId}/SourceFile/DownloadUrl" + (string.IsNullOrEmpty(accessToken) ? "" : $"?accessToken={Uri.EscapeDataString(accessToken)}");
+
+            var response = await httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
@@ -64,7 +66,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="format">サムネイル形式 (Jpeg / Base64)</param>
         /// <param name="accessToken">アクセス トークン</param>
         /// <returns>サムネイルのデータ</returns>
-        public async Task<string> GetVideoThumbnail(string location, string accountId, string videoId, string thumbnailId, string? format = null, string? accessToken = null)
+        public async Task<string> GetVideoThumbnailUrl(string location, string accountId, string videoId, string thumbnailId, string? format = null, string? accessToken = null)
         {
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
 
@@ -75,7 +77,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             {
                 url += "?";
                 if (!string.IsNullOrEmpty(format)) url += $"format={format}&";
-                if (!string.IsNullOrEmpty(accessToken)) url += $"accessToken={accessToken}";
+                if (!string.IsNullOrEmpty(accessToken)) url += $"accessToken={Uri.EscapeDataString(accessToken)}";
                 url = url.TrimEnd('&');
             }
 
