@@ -139,7 +139,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             HttpClient client = _httpClientFactory.CreateClient();
 
-            _logger.LogInformation($"Listing videos in account {accountId} with parameters: location={location}, createdAfter={createdAfter}, createdBefore={createdBefore}, pageSize={pageSize}, skip={skip}, partitions={string.Join(",", partitions ?? Array.Empty<string>())}, accessToken={(string.IsNullOrEmpty(accessToken) ? "Not Provided" : "Provided")}");
+            _logger.LogInformation($"Listing videos in account {accountId} with parameters: location={location}, createdAfter={createdAfter}, createdBefore={createdBefore}, pageSize={pageSize}, skip={skip}, partitions={string.Join(",", partitions ?? [])}, accessToken={(string.IsNullOrEmpty(accessToken) ? "Not Provided" : "Provided")}");
 
             var url = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos?{(string.IsNullOrEmpty(createdAfter) ? "" : $"createdAfter={createdAfter}&")}{(string.IsNullOrEmpty(createdBefore) ? "" : $"createdBefore={createdBefore}&")}{(pageSize.HasValue ? $"pageSize={pageSize.Value}&" : "")}{(skip.HasValue ? $"skip={skip.Value}&" : "")}{(partitions != null && partitions.Length > 0 ? $"partitions={string.Join(",", partitions)}&" : "")}{(string.IsNullOrEmpty(accessToken) ? "" : $"accessToken={accessToken}&")}".TrimEnd('&');
 

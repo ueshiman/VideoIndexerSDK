@@ -103,8 +103,6 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
                 _logger.LogError("Request failed with status code {response.StatusCode}: {await response.Content.ReadAsStringAsync()}", response.StatusCode, await response.Content.ReadAsStringAsync());
                 throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
-
-                return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
             {

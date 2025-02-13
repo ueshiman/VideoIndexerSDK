@@ -1,19 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
-using System.Net.Http.Headers;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
@@ -49,7 +39,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="projectId">プロジェクトID</param>
         /// <param name="accessToken">アクセストークン</param>
         /// <returns>プロジェクトのマイグレーション情報</returns>
-        public async Task<ApiProjectMigrationModel> GetProjectMigrationAsync(string location, string accountId, string projectId, string accessToken = null)
+        public async Task<ApiProjectMigrationModel> GetProjectMigrationAsync(string location, string accountId, string projectId, string? accessToken = null)
         {
             _logger.LogInformation("Starting GetProjectMigrationAsync for accountId: {AccountId}, projectId: {ProjectId}", accountId, projectId);
             try
@@ -79,7 +69,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="projectId">プロジェクトID</param>
         /// <param name="accessToken">アクセストークン</param>
         /// <returns>プロジェクトのマイグレーションデータの JSON 文字列</returns>
-        public async Task<string> GetProjectMigrationJsonAsync(string location, string accountId, string projectId, string accessToken)
+        public async Task<string> GetProjectMigrationJsonAsync(string location, string accountId, string projectId, string? accessToken)
         {
             _logger.LogInformation("Starting GetProjectMigrationJsonAsync for accountId: {AccountId}, projectId: {ProjectId}", accountId, projectId);
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/ProjectAMSAssetMigrations/{projectId}";

@@ -28,6 +28,10 @@
     <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VideoIndexerAccessCore\VideoIndexerAccessCore.csproj" />
+  </ItemGroup>
+
 
   <PropertyGroup>
 	<Version>1.0.1-alpha05.2</Version>

@@ -11,7 +11,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiVideoMigrationsListModel
     {
-        public List<ApiVideoMigrationModel> results { get; set; }
-        public ApiPagingInfoModel nextPage { get; set; }
+        public List<ApiVideoMigrationModel> results { get; set; } = new List<ApiVideoMigrationModel>();
+        public ApiPagingInfoModel? nextPage { get; set; }
     }
 }

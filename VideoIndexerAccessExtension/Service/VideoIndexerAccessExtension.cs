@@ -79,7 +79,11 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<ISpeakernumberoffragments1Mapper, Speakernumberoffragments1Mapper>();
         services.TryAddTransient<ISpeakerwordcount1Mapper, Speakerwordcount1Mapper>();
         services.TryAddTransient<IStatistics1Mapper, Statistics1Mapper>();
-
+        services.TryAddTransient<IProjectMigrationApiAccess,ProjectMigrationApiAccess>();
+        services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
+        services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
+        services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
+        
         return services;
     }
 

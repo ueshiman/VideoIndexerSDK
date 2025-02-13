@@ -36,7 +36,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IVideoListParser, VideoListParser>();
             services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
             services.TryAddTransient<IVideoItemParser, VideoItemParser>();
-            services.TryAddTransient<IVideoItemApiAccess, VideoIndexApiAccess>();
+            services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
             services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
             services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
 

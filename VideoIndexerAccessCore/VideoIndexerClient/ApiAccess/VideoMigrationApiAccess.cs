@@ -33,7 +33,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// Web API にリクエストを送信し、レスポンスを文字列で取得する。
         /// </summary>
-        private async Task<string> FetchJsonResponseAsync(string location, string accountId, string videoId, string accessToken = null)
+        private async Task<string> FetchJsonResponseAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/VideoAMSAssetMigrations/{videoId}";
             if (!string.IsNullOrEmpty(accessToken))
@@ -79,7 +79,7 @@ public class VideoMigrationApiAccess
         /// <param name="videoId">ビデオID</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>ビデオの移行状況</returns>
-        public async Task<ApiVideoMigrationModel?> GetVideoMigrationAsync(string location, string accountId, string videoId, string accessToken = null)
+        public async Task<ApiVideoMigrationModel?> GetVideoMigrationAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
             var responseBody = await FetchJsonResponseAsync(location, accountId, videoId, accessToken);
             _logger.LogDebug("Response body: {ResponseBody}", responseBody);
@@ -90,7 +90,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// ビデオ移行の一覧を取得する。
         /// </summary>
-        public async Task<ApiVideoMigrationsListModel?> GetVideoMigrationsAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string> states = null, string accessToken = null)
+        public async Task<ApiVideoMigrationsListModel?> GetVideoMigrationsAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
             var responseBody = await FetchVideoMigrationsJsonAsync(location, accountId, pageSize, skip, states, accessToken);
             return ParseJson(responseBody);
@@ -99,7 +99,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// WebAPIからビデオ移行データを取得する。
         /// </summary>
-        private async Task<string> FetchVideoMigrationsJsonAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string> states = null, string accessToken = null)
+        private async Task<string> FetchVideoMigrationsJsonAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/VideoAMSAssetMigrations";
             var queryParams = new List<string>();
