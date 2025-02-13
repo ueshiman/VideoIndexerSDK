@@ -114,10 +114,8 @@ public class VideoMigrationApiAccess
             _logger.LogInformation("Sending request to {RequestUrl}", requestUrl);
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            }
+
+            if (!string.IsNullOrEmpty(accessToken)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             try
             {
