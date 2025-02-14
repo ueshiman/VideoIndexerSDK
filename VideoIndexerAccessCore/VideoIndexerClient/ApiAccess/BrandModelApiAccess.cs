@@ -44,11 +44,18 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
 
-            if (!(!response?.IsSuccessStatusCode ?? false)) return response;
+            if (response == null)
+            {
+                _logger.LogError("Response is null.");
+                throw new InvalidOperationException("Response is null.");
+            }
+
+            if (response.IsSuccessStatusCode) return response;
+
+            var errorContent = await response.Content.ReadAsStringAsync(); // ここでエラーメッセージを取得
             _logger.LogError("Throwing HttpRequestException due to unsuccessful status code: {StatusCode}", response.StatusCode);
             throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorContent}");
 
-        }
         }
     }
 }
