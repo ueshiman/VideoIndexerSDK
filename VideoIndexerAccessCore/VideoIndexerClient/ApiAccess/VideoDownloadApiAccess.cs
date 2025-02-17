@@ -72,7 +72,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             _logger.LogInformation("Requesting thumbnail {ThumbnailId} for video {VideoId} in account {AccountId} with location {Location}.", thumbnailId, videoId, accountId, location);
 
-            var url = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}";
+            var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}";
             if (!string.IsNullOrEmpty(format) || !string.IsNullOrEmpty(accessToken))
             {
                 url += "?";

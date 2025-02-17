@@ -11,8 +11,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 /// <summary>
 /// ビデオの移行状況を取得するクライアント。
 /// </summary>
-public class VideoMigrationApiAccess
-    {
+public class VideoMigrationApiAccess : IVideoMigrationApiAccess
+{
         private readonly ILogger<VideoMigrationApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
@@ -33,7 +33,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// Web API にリクエストを送信し、レスポンスを文字列で取得する。
         /// </summary>
-        private async Task<string> FetchJsonResponseAsync(string location, string accountId, string videoId, string? accessToken = null)
+        public async Task<string> FetchJsonResponseAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/VideoAMSAssetMigrations/{videoId}";
             if (!string.IsNullOrEmpty(accessToken))
@@ -99,7 +99,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// WebAPIからビデオ移行データを取得する。
         /// </summary>
-        private async Task<string> FetchVideoMigrationsJsonAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
+        public async Task<string> FetchVideoMigrationsJsonAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/VideoAMSAssetMigrations";
             var queryParams = new List<string>();
@@ -145,7 +145,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// JSON文字列をApiVideoMigrationsListModelオブジェクトに変換する。
         /// </summary>
-        private static ApiVideoMigrationsListModel? ParseJson(string json)
+        public static ApiVideoMigrationsListModel? ParseJson(string json)
         {
             return JsonSerializer.Deserialize<ApiVideoMigrationsListModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
@@ -153,7 +153,7 @@ public class VideoMigrationApiAccess
         /// <summary>
         /// JSONレスポンスを解析する。
         /// </summary>
-        private ApiVideoMigrationModel? ParseJsonResponse(string json)
+        public ApiVideoMigrationModel? ParseJsonResponse(string json)
         {
             return JsonSerializer.Deserialize<ApiVideoMigrationModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }

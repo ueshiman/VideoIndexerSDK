@@ -50,7 +50,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _logger.LogInformation("Requesting video item JSON for video {VideoId} in account {AccountId} with location {Location}.", videoId, accountId, location);
 
                 // アクセストークンをクエリパラメータに追加
-                var response = await httpClient.GetAsync($"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={accessToken}");
+                var response = await httpClient.GetAsync($"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Index?accessToken={accessToken}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -101,7 +101,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             // クエリが空の項目は除外
             queryParams = queryParams.Where(kv => !string.IsNullOrEmpty(kv.Value)).ToDictionary(kv => kv.Key, kv => kv.Value);
 
-            var builder = new UriBuilder($"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Index");
+            var builder = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Index");
             var query = HttpUtility.ParseQueryString(builder.Query);
 
             foreach (var param in queryParams) query[param.Key] = param.Value;

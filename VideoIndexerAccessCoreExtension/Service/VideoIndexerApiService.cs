@@ -33,12 +33,15 @@ namespace VideoIndexerAccessCoreExtension.Service
         public static IServiceCollection AddVideoIndexerApi(this IServiceCollection services)
         {
             services.TryAddTransient<IAccounApitAccess, AccountApiAccess>();
+            services.TryAddTransient<IBrandModelApiAccess, BrandModelApiAccess>();
+            services.TryAddTransient<IProjectMigrationApiAccess, ProjectMigrationApiAccess>();
+            services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
+            services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
+            services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
+            services.TryAddTransient<IVideoItemParser, VideoItemParser>();
             services.TryAddTransient<IVideoListParser, VideoListParser>();
             services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
-            services.TryAddTransient<IVideoItemParser, VideoItemParser>();
-            services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
-            services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
-            services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
+            services.TryAddTransient<IVideoMigrationApiAccess, VideoMigrationApiAccess>();
 
             return services;
         }
