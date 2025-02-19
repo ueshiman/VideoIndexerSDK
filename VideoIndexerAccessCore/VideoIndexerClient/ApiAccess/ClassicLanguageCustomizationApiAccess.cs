@@ -14,7 +14,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 /// Azure Video Indexer API クライアント
 /// 指定されたモデルのトレーニングをキャンセルする機能を提供する。
 /// </summary>
-public class ClassicLanguageCustomizationApiAccess
+public class ClassicLanguageCustomizationApiAccess : IClassicLanguageCustomizationApiAccess
 {
     private readonly ILogger<BrandModelApiAccess> _logger;
     private readonly IDurableHttpClient? _durableHttpClient;
@@ -347,7 +347,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <param name="json">JSON形式のレスポンス</param>
     /// <returns>パースされた ApiCustomLanguageModel オブジェクト</returns>
     /// <exception cref="JsonException">JSONのパースに失敗した場合にスローされる</exception>
-    private ApiCustomLanguageModel ParseLanguageModelJson(string json)
+    public ApiCustomLanguageModel ParseLanguageModelJson(string json)
     {
         return JsonSerializer.Deserialize<ApiCustomLanguageModel>(json) ?? throw new JsonException("Failed to parse JSON response.");
     }
@@ -452,7 +452,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// APIからJSONデータを取得する
     /// </summary>
-    private async Task<string> GetLanguageModelFileDataJsonAsync(string path, string location, string accountId, string? accessToken = null)
+    public async Task<string> GetLanguageModelFileDataJsonAsync(string path, string location, string accountId, string? accessToken = null)
     {
         var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/{path}" + (accessToken != null ? $"?accessToken={accessToken}" : "");
 
@@ -487,7 +487,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// 言語モデルのファイルデータをデシリアライズする
     /// </summary>
-    private ApiLanguageModelFileDataModel? DeserializeLanguageModelFileData(string jsonData)
+    public ApiLanguageModelFileDataModel? DeserializeLanguageModelFileData(string jsonData)
     {
         try
         {
@@ -523,7 +523,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// APIからJSONデータを取得する
     /// </summary>
-    private async Task<string> FetchJsonAsync(string location, string accountId, string accessToken)
+    public async Task<string> FetchJsonAsync(string location, string accountId, string accessToken)
     {
         var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Language?accessToken={accessToken}";
 
@@ -556,7 +556,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// 言語モデルの一覧データをデシリアライズする
     /// </summary>
-    private List<ApiLanguageModelDataModel>? DeserializeLanguageModels(string jsonData)
+    public List<ApiLanguageModelDataModel>? DeserializeLanguageModels(string jsonData)
     {
         try
         {
@@ -589,7 +589,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// API に POST リクエストを送信する
     /// </summary>
-    private async Task<string> PostJsonAsync(string location, string accountId, string modelId, string accessToken)
+    public async Task<string> PostJsonAsync(string location, string accountId, string modelId, string accessToken)
     {
         var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Language/{modelId}/Train?accessToken={accessToken}";
 
@@ -623,7 +623,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// 言語モデルのデータをデシリアライズする
     /// </summary>
-    private ApiLanguageModelDataModel? DeserializeLanguageModel(string jsonData)
+    public ApiLanguageModelDataModel? DeserializeLanguageModel(string jsonData)
     {
         try
         {
@@ -674,7 +674,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <param name="fileUrls">リモートファイルのURLリスト（オプション）</param>
     /// <param name="filePaths">ローカルファイルのパスリスト（オプション）</param>
     /// <returns>APIレスポンスのJSON文字列</returns>
-    private async Task<string> PutFormDataAsync(string location, string accountId, string modelId, string accessToken, string? modelName, bool? enable, Dictionary<string, string>? fileUrls, Dictionary<string, string>? filePaths)
+    public async Task<string> PutFormDataAsync(string location, string accountId, string modelId, string accessToken, string? modelName, bool? enable, Dictionary<string, string>? fileUrls, Dictionary<string, string>? filePaths)
     {
         using var formData = new MultipartFormDataContent();
 
@@ -765,7 +765,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// API から指定された言語モデルファイルの JSON データを取得する。
     /// </summary>
-    private async Task<string> FetchLanguageModelFileJsonAsync(string location, string accountId, string modelId, string fileId, string? accessToken, string? fileName, bool? enable)
+    public async Task<string> FetchLanguageModelFileJsonAsync(string location, string accountId, string modelId, string fileId, string? accessToken, string? fileName, bool? enable)
     {
         HttpResponseMessage? response;
         try
@@ -809,7 +809,7 @@ public class ClassicLanguageCustomizationApiAccess
     /// <summary>
     /// 取得した JSON データをパースし、言語モデルファイルの情報をオブジェクトとして返す。
     /// </summary>
-    private ApiLanguageModelFileDataModel? ParseLanguageModelFileJson(string jsonData)
+    public ApiLanguageModelFileDataModel? ParseLanguageModelFileJson(string jsonData)
     {
         try
         {
