@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "VideoIndexerExperiment2 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "VideoIndexerExperiment2 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
