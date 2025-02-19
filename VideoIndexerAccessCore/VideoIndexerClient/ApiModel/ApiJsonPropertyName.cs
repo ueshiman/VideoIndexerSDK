@@ -3,7 +3,7 @@
 /// <summary>
 /// プロジェクト移行の状態を表す列挙型。
 /// </summary>
-public enum ProjectMigrationState
+public enum ApiProjectMigrationState
 {
     NotStarted = 0,
     Pending = 1,

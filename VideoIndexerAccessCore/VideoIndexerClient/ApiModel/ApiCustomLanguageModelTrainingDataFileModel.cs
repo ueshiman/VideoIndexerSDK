@@ -5,9 +5,9 @@
 /// </summary>
 public class ApiCustomLanguageModelTrainingDataFileModel
 {
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public bool Enable { get; set; }
-    public string Creator { get; set; } = string.Empty;
-    public string CreationTime { get; set; } = string.Empty;
+    public string? id { get; set; }
+    public string? name { get; set; }
+    public bool? enable { get; set; }
+    public string? creator { get; set; }
+    public string? creationTime { get; set; }
 }
