@@ -32,6 +32,7 @@ namespace VideoIndexerAccessCoreExtension.Service
 
         public static IServiceCollection AddVideoIndexerApi(this IServiceCollection services)
         {
+            services.TryAddTransient<ISecureLogMessageBuilder, SecureLogMessageBuilder>();
             services.TryAddTransient<IAccounApitAccess, AccountApiAccess>();
             services.TryAddTransient<IBrandModelApiAccess, BrandModelApiAccess>();
             services.TryAddTransient<IProjectMigrationApiAccess, ProjectMigrationApiAccess>();
@@ -42,6 +43,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IVideoListParser, VideoListParser>();
             services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
             services.TryAddTransient<IVideoMigrationApiAccess, VideoMigrationApiAccess>();
+            services.TryAddTransient<ICustomLogosApiAccess, CustomLogosApiAccess>();
 
             return services;
         }
