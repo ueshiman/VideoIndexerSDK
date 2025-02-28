@@ -103,6 +103,7 @@ namespace VideoIndexPoc2
                     //            Delay = TimeSpan.FromSeconds(2),
                     //            BackoffType = DelayBackoffType.Exponential
                     //        });
+                    105
 
                     //        // Refer to https://www.pollydocs.org/strategies/timeout.html#defaults for timeout defaults
                     //        builder.AddTimeout(TimeSpan.FromSeconds(5));
