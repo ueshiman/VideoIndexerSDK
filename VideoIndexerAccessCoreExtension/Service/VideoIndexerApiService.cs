@@ -44,6 +44,8 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
             services.TryAddTransient<IVideoMigrationApiAccess, VideoMigrationApiAccess>();
             services.TryAddTransient<ICustomLogosApiAccess, CustomLogosApiAccess>();
+            services.TryAddTransient<IIndexingApiAccess, IndexingApiAccess>();
+            services.TryAddTransient<IJobsApiAccess, JobsApiAccess>();
 
             return services;
         }

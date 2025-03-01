@@ -8,12 +8,13 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class IndexingApiAccess
+    public class IndexingApiAccess : IIndexingApiAccess
     {
         private readonly ILogger<IndexingApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -309,85 +310,295 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="location">リクエストを送信する Azure リージョン。</param>
         /// <param name="accountId">Video Indexer サービスに関連付けられたアカウント ID。</param>
         /// <param name="videoId">インデックスを更新する対象のビデオ ID。</param>
-        /// <param name="patchOperations">適用する JSON Patch ドキュメント。</param>
+        /// <param name="patchOperations">適用する JSON Patch 操作のリスト。</param>
         /// <param name="language">(オプション) インデックスを取得する言語。</param>
         /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
-        /// <returns>更新が成功した場合は true、失敗した場合は false を返します。</returns>
-        public async Task<bool> UpdateVideoIndexJsonAsync(string location, string accountId, string videoId, List<object> patchOperations, string? language = null, string? accessToken = null)
+        /// <returns>更新が成功した場合はレスポンスの JSON を返し、失敗した場合は null を返します。</returns>
+        public async Task<string?> UpdateVideoIndexJsonAsync(
+            string location,
+            string accountId,
+            string videoId,
+            List<ApiPatchOperationModel> patchOperations,
+            string? language = null,
+            string? accessToken = null)
         {
+
             HttpResponseMessage? response;
             try
             {
-                // APIのベースURLを構築
+                // Construct the base URL for the API request
                 var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Index";
                 var query = HttpUtility.ParseQueryString(string.Empty);
 
-                // 言語パラメータの設定
-                if (!string.IsNullOrEmpty(language))
-                {
-                    query["language"] = language;
-                }
+                // Add language parameter if specified
+                if (!string.IsNullOrEmpty(language)) query["language"] = language;
 
-                // クエリ文字列の組み立て
                 var baseQueryString = query.ToString();
                 var accessTokenKey = "accessToken";
 
-                // マスク前のクエリ文字列
+                // Construct final query string including access token
                 var finalQueryString = baseQueryString;
                 if (!string.IsNullOrEmpty(accessToken))
                 {
-                    finalQueryString += string.IsNullOrEmpty(finalQueryString)
-                        ? $"{accessTokenKey}={accessToken}"
-                        : $"&{accessTokenKey}={accessToken}";
+                    finalQueryString += string.IsNullOrEmpty(finalQueryString) ? $"{accessTokenKey}={accessToken}" : $"&{accessTokenKey}={accessToken}";
                 }
 
-                // マスク後のクエリ文字列
+                // Create a masked query string for logging (hiding access token value)
                 var maskedQueryString = baseQueryString;
                 if (!string.IsNullOrEmpty(accessToken))
                 {
-                    maskedQueryString += string.IsNullOrEmpty(maskedQueryString)
-                        ? $"{accessTokenKey}=***"
-                        : $"&{accessTokenKey}=***";
+                    maskedQueryString += string.IsNullOrEmpty(maskedQueryString) ? $"{accessTokenKey}=****" : $"&{accessTokenKey}=****";
                 }
 
-                // URLの組み立て
                 var url = string.IsNullOrEmpty(finalQueryString) ? baseUrl : $"{baseUrl}?{finalQueryString}";
                 var maskedUrl = string.IsNullOrEmpty(maskedQueryString) ? baseUrl : $"{baseUrl}?{maskedQueryString}";
 
                 _logger.LogInformation("Request URL: {MaskedUrl}", maskedUrl);
 
-                // HTTPリクエストの準備
+                // Serialize patch operations to JSON
                 var jsonContent = JsonSerializer.Serialize(patchOperations);
                 using var request = new HttpRequestMessage(HttpMethod.Patch, url)
                 {
                     Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
                 };
 
+                // Send the HTTP PATCH request
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
                 response = await httpClient.SendAsync(request);
-                if (response is null) throw new HttpRequestException("The response was null.");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation("Video index updated successfully for video {VideoId}.", videoId);
-                    return true;
-                }
-
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogError("Failed to update video index for video {VideoId}. Status Code: {StatusCode}, Error: {ErrorContent}", videoId, response.StatusCode, errorContent);
-                return false;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "HTTP request error: Failed to update video index for video {VideoId}.", videoId);
+                _logger.LogError(ex, "HTTP request error: Failed to update video index (Video ID: {VideoId})", videoId);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error: An error occurred while updating video index for video {VideoId}.", videoId);
+                _logger.LogError(ex, "Unexpected error: An error occurred while updating video index (Video ID: {VideoId})", videoId);
                 throw;
+            }
+
+            // responseがnullなら例外を
+            if (response == null) throw new HttpRequestException("The response was null.");
+
+            // Handle successful response
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Video index updated successfully (Video ID: {VideoId})", videoId);
+                return responseContent;
+            }
+
+            // Log response on failure
+            var errorContent = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Failed to update video index (Video ID: {VideoId}, Status Code: {StatusCode}, Error Content: {ErrorContent})", videoId, response.StatusCode, errorContent);
+            throw new HttpRequestException($"UpdateVideoIndex Request failed with status {response.StatusCode}: {errorContent}");
+        }
+
+        /// <summary>
+        /// UpdateVideoIndexJsonAsync のレスポンス JSON をプレーンクラスにパースするメソッド。
+        /// </summary>
+        /// <typeparam name="T">パース対象のプレーンクラスの型。</typeparam>
+        /// <param name="json">JSON 文字列。</param>
+        /// <returns>パースされたオブジェクト、または null (パース失敗時)。</returns>
+        public T? ParseVideoIndexResponse<T>(string json) where T : class
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<T>(json);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse video index response JSON.");
+                return null;
             }
         }
 
+        /// <summary>
+        /// UpdateVideoIndexJsonAsync のレスポンス JSON を VideoIndexResponse にパースするメソッド。
+        /// </summary>
+        /// <param name="json">JSON 文字列。</param>
+        /// <returns>パースされた VideoIndexResponse オブジェクト、または null (パース失敗時)。</returns>
+        public ApiVideoIndexResponseModel? ParseVideoIndexResponse(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiVideoIndexResponseModel>(json);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse video index response JSON.");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// ビデオインデックスの更新を行い、レスポンスをプレーンクラスに変換して返すメソッド。
+        /// </summary>
+        /// <param name="location">リクエストを送信する Azure リージョン。</param>
+        /// <param name="accountId">Video Indexer サービスに関連付けられたアカウント ID。</param>
+        /// <param name="videoId">インデックスを更新する対象のビデオ ID。</param>
+        /// <param name="patchOperations">適用する JSON Patch 操作のリスト。</param>
+        /// <param name="language">(オプション) インデックスを取得する言語。</param>
+        /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
+        /// <returns>更新が成功した場合は VideoIndexResponse を返し、失敗した場合は null を返します。</returns>
+        public async Task<ApiVideoIndexResponseModel?> UpdateVideoIndexAsync(
+            string location,
+            string accountId,
+            string videoId,
+            List<ApiPatchOperationModel> patchOperations,
+            string? language = null,
+            string? accessToken = null)
+        {
+            // ビデオインデックスの更新を実行
+            string? jsonResponse = await UpdateVideoIndexJsonAsync(location, accountId, videoId, patchOperations, language, accessToken);
+
+            if (string.IsNullOrEmpty(jsonResponse))
+            {
+                _logger.LogError("Failed to update video index or received empty response.");
+                return null;
+            }
+
+            // JSON レスポンスをプレーンクラスに変換
+            var parsedResponse = ParseVideoIndexResponse<ApiVideoIndexResponseModel>(jsonResponse);
+
+            if (parsedResponse == null)
+            {
+                _logger.LogError("Failed to parse video index response.");
+            }
+
+            return parsedResponse;
+        }
+
+        /// <summary>
+        /// 動画をアップロードし、インデックス処理を開始する
+        /// </summary>
+        /// <param name="location">Azure リージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoName">アップロードする動画の名前</param>
+        /// <param name="videoStream">動画のストリーム</param>
+        /// <param name="fileName">アップロードする動画のファイル名</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <param name="privacy">動画のプライバシーモード（Private/Public）</param>
+        /// <param name="priority">処理の優先度（Low/Normal/High）</param>
+        /// <param name="description">動画の説明</param>
+        /// <param name="partition">動画のパーティション</param>
+        /// <param name="externalId">外部 ID</param>
+        /// <param name="externalUrl">外部 URL</param>
+        /// <param name="callbackUrl">コールバック URL</param>
+        /// <param name="metadata">動画のメタデータ</param>
+        /// <param name="language">言語設定</param>
+        /// <param name="videoUrl">動画の URL</param>
+        /// <param name="indexingPreset">インデックスプリセット</param>
+        /// <param name="streamingPreset">ストリーミングプリセット</param>
+        /// <param name="personModelId">顔認識用のモデル ID</param>
+        /// <param name="sendSuccessEmail">成功時のメール送信</param>
+        /// <returns>アップロード結果の情報</returns>
+        public async Task<ApiUploadVideoResponseModel?> UploadVideoAsync(
+            string location, string accountId, string videoName, Stream videoStream, string fileName,
+            string? accessToken = null, string? privacy = null, string? priority = null, string? description = null,
+            string? partition = null, string? externalId = null, string? externalUrl = null, string? callbackUrl = null,
+            string? metadata = null, string? language = null, string? videoUrl = null, string? indexingPreset = null,
+            string? streamingPreset = null, string? personModelId = null, bool? sendSuccessEmail = null)
+        {
+            string jsonResponse = await UploadVideoToApiAsync(location, accountId, videoName, videoStream, fileName,
+                accessToken, privacy, priority, description, partition, externalId, externalUrl, callbackUrl,
+                metadata, language, videoUrl, indexingPreset, streamingPreset, personModelId, sendSuccessEmail);
+            return ParseJson<ApiUploadVideoResponseModel>(jsonResponse);
+        }
+
+        /// <summary>
+        /// JSON 文字列を指定されたオブジェクトにデシリアライズする
+        /// </summary>
+        /// <typeparam name="T">デシリアライズするオブジェクトの型</typeparam>
+        /// <param name="json">JSON 文字列</param>
+        /// <returns>デシリアライズされたオブジェクト</returns>
+        private T? ParseJson<T>(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse JSON response: {Json}", json);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// 動画を API にアップロードし、そのレスポンスを JSON として取得する
+        /// </summary>
+        /// <param name="location">Azure リージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoName">アップロードする動画の名前</param>
+        /// <param name="videoStream">動画のストリーム</param>
+        /// <param name="fileName">アップロードする動画のファイル名</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <param name="privacy">動画のプライバシーモード</param>
+        /// <param name="priority">処理の優先度</param>
+        /// <param name="description">動画の説明</param>
+        /// <param name="partition">動画のパーティション</param>
+        /// <param name="externalId">外部 ID</param>
+        /// <param name="externalUrl">外部 URL</param>
+        /// <param name="callbackUrl">コールバック URL</param>
+        /// <param name="metadata">動画のメタデータ</param>
+        /// <param name="language">言語設定</param>
+        /// <param name="videoUrl">動画の URL</param>
+        /// <param name="indexingPreset">インデックスプリセット</param>
+        /// <param name="streamingPreset">ストリーミングプリセット</param>
+        /// <param name="personModelId">顔認識用のモデル ID</param>
+        /// <param name="sendSuccessEmail">成功時のメール送信</param>
+        /// <returns>API からの JSON レスポンス</returns>
+        private async Task<string> UploadVideoToApiAsync(
+            string location, string accountId, string videoName, Stream videoStream, string fileName,
+            string? accessToken, string? privacy, string? priority, string? description,
+            string? partition, string? externalId, string? externalUrl, string? callbackUrl,
+            string? metadata, string? language, string? videoUrl, string? indexingPreset,
+            string? streamingPreset, string? personModelId, bool? sendSuccessEmail)
+        {
+            string endpoint = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos?name={Uri.EscapeDataString(videoName)}";
+            if (!string.IsNullOrEmpty(accessToken)) endpoint += $"&accessToken={accessToken}";
+            if (!string.IsNullOrEmpty(privacy)) endpoint += $"&privacy={privacy}";
+            if (!string.IsNullOrEmpty(priority)) endpoint += $"&priority={priority}";
+            if (!string.IsNullOrEmpty(description)) endpoint += $"&description={Uri.EscapeDataString(description)}";
+            if (!string.IsNullOrEmpty(partition)) endpoint += $"&partition={partition}";
+            if (!string.IsNullOrEmpty(externalId)) endpoint += $"&externalId={externalId}";
+            if (!string.IsNullOrEmpty(externalUrl)) endpoint += $"&externalUrl={Uri.EscapeDataString(externalUrl)}";
+            if (!string.IsNullOrEmpty(callbackUrl)) endpoint += $"&callbackUrl={Uri.EscapeDataString(callbackUrl)}";
+            if (!string.IsNullOrEmpty(metadata)) endpoint += $"&metadata={Uri.EscapeDataString(metadata)}";
+            if (!string.IsNullOrEmpty(language)) endpoint += $"&language={language}";
+            if (!string.IsNullOrEmpty(videoUrl)) endpoint += $"&videoUrl={Uri.EscapeDataString(videoUrl)}";
+            if (!string.IsNullOrEmpty(indexingPreset)) endpoint += $"&indexingPreset={indexingPreset}";
+            if (!string.IsNullOrEmpty(streamingPreset)) endpoint += $"&streamingPreset={streamingPreset}";
+            if (!string.IsNullOrEmpty(personModelId)) endpoint += $"&personModelId={personModelId}";
+            if (sendSuccessEmail.HasValue) endpoint += $"&sendSuccessEmail={sendSuccessEmail.Value.ToString().ToLower()}";
+
+            HttpResponseMessage? response;
+            try
+            {
+                using var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(videoStream), "file", fileName);
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                response = await httpClient.PostAsync(endpoint, content);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while posting data.");
+                throw;
+            }
+
+            // responseがnullなら例外を
+            if (response == null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
     }
+
+
 }
