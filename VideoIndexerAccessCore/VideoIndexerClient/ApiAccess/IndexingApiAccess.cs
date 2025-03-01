@@ -313,7 +313,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="language">(オプション) インデックスを取得する言語。</param>
         /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
         /// <returns>更新が成功した場合は true、失敗した場合は false を返します。</returns>
-        public async Task<bool> UpdateVideoIndexAsync(string location, string accountId, string videoId, List<object> patchOperations, string? language = null, string? accessToken = null)
+        public async Task<bool> UpdateVideoIndexJsonAsync(string location, string accountId, string videoId, List<object> patchOperations, string? language = null, string? accessToken = null)
         {
             HttpResponseMessage? response;
             try
