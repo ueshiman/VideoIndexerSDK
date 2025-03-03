@@ -74,7 +74,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 ApiAccountModel? account = JsonSerializer.Deserialize<ApiAccountModel>(jsonResponseBody) ?? throw new ArgumentNullException(ParamName);
                 //if (account == null) throw new ArgumentNullException(nameof(account));
                 VerifyValidAccount(account, accountName);
-                _logger.LogInformation($"[Account Details] Id:{account!.Properties!.Id}, Location: {account.Location}");
+                _logger.LogInformation($"[Account Details] Id:{account!.properties!.id}, location: {account.location}");
                 _account = account;
                 return account;
             }
@@ -114,7 +114,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var jsonResponseBody = await result.Content.ReadAsStringAsync();
                 ApiAccountModel? account = JsonSerializer.Deserialize<ApiAccountModel>(jsonResponseBody) ?? throw new ArgumentNullException(paramName: ParamName);
                 VerifyValidAccount(account, accountName);
-                _logger.LogInformation($"[Account Details] Id:{account!.Properties!.Id}, Location: {account.Location}");
+                _logger.LogInformation($"[Account Details] Id:{account!.properties!.id}, Location: {account.location}");
                 _account = account;
                 return account;
             }
@@ -132,7 +132,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accountName">アカウント名</param>
         private void VerifyValidAccount(ApiAccountModel account, string? accountName)
         {
-            if (string.IsNullOrWhiteSpace(account?.Location) || account.Properties == null || string.IsNullOrWhiteSpace(account.Properties.Id))
+            if (string.IsNullOrWhiteSpace(account?.location) || account.properties == null || string.IsNullOrWhiteSpace(account.properties.id))
             {
                 _logger.LogError($"{nameof(accountName)} {accountName} not found. Check {nameof(_apiResourceConfigurations.SubscriptionId)}, {nameof(_apiResourceConfigurations.ResourceGroup)}, {nameof(accountName)} are valid.");
                 throw new Exception($"Account {accountName} not found.");

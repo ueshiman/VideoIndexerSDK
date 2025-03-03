@@ -5,5 +5,5 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 public class ApiAccountProperties
 {
     [JsonPropertyName("accountId")]
-    public string? Id { get; set; }
+    public string? id { get; set; }
 }

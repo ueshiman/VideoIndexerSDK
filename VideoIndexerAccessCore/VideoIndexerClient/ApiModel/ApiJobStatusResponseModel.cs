@@ -14,27 +14,27 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
         /// <summary>
         /// ジョブの作成日時
         /// </summary>
-        public string? CreationTime { get; set; }
+        public string? creationTime { get; set; }
 
         /// <summary>
         /// ジョブの最終更新日時
         /// </summary>
-        public string? LastUpdateTime { get; set; }
+        public string? lastUpdateTime { get; set; }
 
         /// <summary>
         /// ジョブの進行状況（0-100%）
         /// </summary>
-        public int? Progress { get; set; }
+        public int? progress { get; set; }
 
         /// <summary>
         /// ジョブの種類
         /// </summary>
-        public string? JobType { get; set; }
+        public string? jobType { get; set; }
 
         /// <summary>
         /// ジョブの現在の状態
         /// </summary>
-        public int? State { get; set; }
+        public int? state { get; set; }
     }
 
 }

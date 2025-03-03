@@ -46,8 +46,8 @@
 
     public class FaceApiModel
     {
-        public string? Name { get; set; }
-        public int? AppearanceCount { get; set; }
+        public string? name { get; set; }
+        public int? appearanceCount { get; set; }
     }
 
     public class DurationApiModel

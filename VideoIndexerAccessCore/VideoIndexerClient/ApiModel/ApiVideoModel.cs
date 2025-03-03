@@ -5,8 +5,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 public class ApiVideoModel
 {
     [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    public string? id { get; set; }
 
     [JsonPropertyName("state")]
-    public string? State { get; set; }
+    public string? state { get; set; }
 }

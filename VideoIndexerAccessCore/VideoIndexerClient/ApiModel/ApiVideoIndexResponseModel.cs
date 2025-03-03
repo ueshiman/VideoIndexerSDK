@@ -11,16 +11,16 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiVideoIndexResponseModel
     {
-        public string? AccountId { get; set; }
-        public string? Id { get; set; }
-        public string? Name { get; set; }
-        public string? UserName { get; set; }
-        public string? Created { get; set; }
-        public bool? IsOwned { get; set; }
-        public bool? IsEditable { get; set; }
-        public bool? IsBase { get; set; }
-        public int? DurationInSeconds { get; set; }
-        public string? Duration { get; set; }
-        public List<ApiVideoDetailsModel>? Videos { get; set; }
+        public string? accountId { get; set; }
+        public string? id { get; set; }
+        public string? name { get; set; }
+        public string? userName { get; set; }
+        public string? created { get; set; }
+        public bool? isOwned { get; set; }
+        public bool? isEditable { get; set; }
+        public bool? isBase { get; set; }
+        public int? durationInSeconds { get; set; }
+        public string? duration { get; set; }
+        public List<ApiVideoDetailsModel>? videos { get; set; }
     }
 }

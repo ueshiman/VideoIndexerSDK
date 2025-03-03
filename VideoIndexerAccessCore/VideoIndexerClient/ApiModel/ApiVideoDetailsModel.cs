@@ -11,10 +11,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiVideoDetailsModel
     {
-        public string? PublishedUrl { get; set; }
-        public string? ViewToken { get; set; }
-        public string? State { get; set; }
-        public string? ProcessingProgress { get; set; }
-        public string? FailureMessage { get; set; }
+        public string? publishedUrl { get; set; }
+        public string? viewToken { get; set; }
+        public string? state { get; set; }
+        public string? processingProgress { get; set; }
+        public string? failureMessage { get; set; }
     }
 }
