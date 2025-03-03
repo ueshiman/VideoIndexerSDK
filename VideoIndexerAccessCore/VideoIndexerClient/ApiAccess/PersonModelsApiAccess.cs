@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
@@ -120,7 +121,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// API へリクエストを送信し、新しい Person を作成する
         /// </summary>
-        private async Task<string> FetchCreatePersonJsonAsync(
+        public async Task<string> FetchCreatePersonJsonAsync(
             string location, string accountId, string personModelId, string? name = null, string? description = null, string? accessToken = null)
         {
             try
@@ -158,7 +159,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// JSON レスポンスを解析し、新しく作成された Person の情報を取得する
         /// </summary>
-        private ApiPersonModel? ParseCreatePersonJson(string jsonResponse)
+        public ApiPersonModel? ParseCreatePersonJson(string jsonResponse)
         {
             try
             {
@@ -187,33 +188,6 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
-    }
-
-
-    /// <summary>
-    /// API のレスポンスをマッピングするための Person クラス
-    /// </summary>
-    public class ApiPersonModel
-    {
-        public string? Id { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public Face? SampleFace { get; set; } // sampleFace を追加
-        public int ImageCount { get; set; }
-        public double Score { get; set; }
-        public string? LastModified { get; set; }
-        public string? LastModifierName { get; set; }
-    }
-
-    /// <summary>
-    /// API のレスポンスで含まれる SampleFace 情報を表すクラス
-    /// </summary>
-    public class Face
-    {
-        public string? Id { get; set; }
-        public string? State { get; set; } // 例: "Ok"
-        public string? SourceType { get; set; } // 例: "UploadedPicture"
-        public string? SourceVideoId { get; set; }
     }
 }
 
