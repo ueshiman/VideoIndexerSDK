@@ -68,15 +68,8 @@ public class BrandModelApiAccess : IBrandModelApiAccess
             throw;
         }
 
-        // responseがnullなら例外を発生
-        if (response == null)
-        {
-            _logger.LogError("Response is null");
-            throw new HttpRequestException("Response is null");
-        }
-
         // responseがnullなら例外を
-        if (response == null) throw new HttpRequestException("The response was null.");
+        if (response is null) throw new HttpRequestException("The response was null.");
 
         // ステータスコードをチェック、成功ならレスポンスを返す
         if (response.IsSuccessStatusCode) return response;
