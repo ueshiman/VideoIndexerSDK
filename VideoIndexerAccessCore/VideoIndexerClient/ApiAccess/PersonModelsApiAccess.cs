@@ -731,12 +731,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="nameFilter">名前フィルター (オプション)</param>
         /// <param name="accessToken">APIのアクセストークン (オプション)</param>
         /// <returns>人物モデルのリスト</returns>
-        public async Task<List<ApiCustomPersonModel>> GetPersonModelsAsync(
-            string location,
-            string accountId,
-            string personNamePrefix = null,
-            string nameFilter = null,
-            string accessToken = null)
+        public async Task<List<ApiCustomPersonModel>> GetPersonModelsAsync(string location, string accountId, string personNamePrefix = null, string nameFilter = null, string accessToken = null)
         {
             try
             {
