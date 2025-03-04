@@ -30,12 +30,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         public async Task<ApiJobStatusResponseModel?> GetJobStatusAsync(string location, string accountId, string jobId, string? accessToken = null)
         {
             // API エンドポイントの組み立て
-            string endpoint = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Jobs/{jobId}";
-
-            if (!string.IsNullOrEmpty(accessToken))
-            {
-                endpoint += $"?accessToken={accessToken}";
-            }
+            string endpoint = BuildEndpoint(location, accountId, jobId, accessToken);
+            string logEndpoint = BuildEndpoint(location, accountId, jobId, accessToken, true);
 
             try
             {
@@ -45,9 +41,25 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error while fetching job status."); // エラーログを記録
+                _logger?.LogError(ex, "Error while fetching job status. : {logEndpoint}", logEndpoint); // エラーログを記録
                 return null;
             }
+        }
+
+        /// <summary>
+        /// エンドポイント URL を構築する
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="jobId">ジョブ ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <param name="forLogging">ログ用のフラグ</param>
+        /// <returns>構築されたエンドポイント URL</returns>
+        private string BuildEndpoint(string location, string accountId, string jobId, string? accessToken, bool forLogging = false)
+        {
+            string endpoint = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Jobs/{jobId}";
+            if (!string.IsNullOrEmpty(accessToken)) endpoint += $"?accessToken={(forLogging ? "***" : accessToken)}";
+            return endpoint;
         }
 
         /// <summary>
@@ -74,7 +86,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (HttpRequestException ex)
             {
-                _logger?.LogError(ex, "HTTP request failed: {Url}", url); // HTTP エラーをログに記録
+                _logger?.LogError(ex, "HTTP request failed."); // HTTP エラーをログに記録
                 throw;
             }
         }
