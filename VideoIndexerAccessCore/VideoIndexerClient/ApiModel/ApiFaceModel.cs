@@ -11,9 +11,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiFaceModel
     {
-        public string? Id { get; set; }
-        public string? State { get; set; } // 例: "Ok"
-        public string? SourceType { get; set; } // 例: "UploadedPicture"
-        public string? SourceVideoId { get; set; }
+        public string? id { get; set; }
+        public string? state { get; set; } // 例: "Ok"
+        public string? sourceType { get; set; } // 例: "UploadedPicture"
+        public string? sourceVideoId { get; set; }
     }
 }

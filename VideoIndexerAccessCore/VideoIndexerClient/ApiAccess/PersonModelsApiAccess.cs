@@ -198,7 +198,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accessToken">API への認証用アクセストークン (オプション)</param>
         /// <returns>API からの JSON レスポンス文字列</returns>
         /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
-        private async Task<string> FetchCreatePersonModelJsonAsync(
+        public async Task<string> FetchCreatePersonModelJsonAsync(
             string location, string accountId, string? name = null, string? accessToken = null)
         {
             try
@@ -239,7 +239,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="jsonResponse">API から取得した JSON レスポンス</param>
         /// <returns>作成された Person Model の情報を含む ApiCustomPersonModel オブジェクト</returns>
         /// <exception cref="JsonException">JSON の解析に失敗した場合</exception>
-        private ApiCustomPersonModel? ParseCreatePersonModelJson(string jsonResponse)
+        public ApiCustomPersonModel? ParseCreatePersonModelJson(string jsonResponse)
         {
             try
             {

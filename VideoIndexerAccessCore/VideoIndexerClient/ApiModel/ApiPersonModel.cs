@@ -12,13 +12,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiPersonModel
     {
-        public string? Id { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public ApiFaceModel? SampleFace { get; set; } // sampleFace を追加
-        public int ImageCount { get; set; }
-        public double Score { get; set; }
-        public string? LastModified { get; set; }
-        public string? LastModifierName { get; set; }
+        public string? id { get; set; }
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public ApiFaceModel? sampleFace { get; set; } // sampleFace を追加
+        public int imageCount { get; set; }
+        public double score { get; set; }
+        public string? lastModified { get; set; }
+        public string? lastModifierName { get; set; }
     }
 }
