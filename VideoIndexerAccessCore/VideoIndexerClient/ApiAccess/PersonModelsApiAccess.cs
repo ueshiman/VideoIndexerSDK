@@ -188,6 +188,95 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
+
+        /// <summary>
+        /// API にリクエストを送信し、新しい Person Model を作成する
+        /// </summary>
+        /// <param name="location">Azure のリージョン (例: trial, westus, eastasia)</param>
+        /// <param name="accountId">Video Indexer のアカウント ID (GUID 形式)</param>
+        /// <param name="name">作成する Person Model の名前 (オプション)</param>
+        /// <param name="accessToken">API への認証用アクセストークン (オプション)</param>
+        /// <returns>API からの JSON レスポンス文字列</returns>
+        /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
+        private async Task<string> FetchCreatePersonModelJsonAsync(
+            string location, string accountId, string? name = null, string? accessToken = null)
+        {
+            try
+            {
+                // API エンドポイント URL の構築
+                var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels";
+
+                var queryParams = new List<string>();
+                if (!string.IsNullOrEmpty(name)) queryParams.Add($"name={Uri.EscapeDataString(name)}");
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                if (queryParams.Count > 0)
+                {
+                    requestUrl += "?" + string.Join("&", queryParams);
+                }
+
+                // API に対して POST リクエストを送信
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.PostAsync(requestUrl, null);
+
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                response.EnsureSuccessStatusCode(); // HTTP ステータスコードがエラーなら例外をスロー
+
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError($"HTTP request error: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// JSON レスポンスを解析し、新しく作成された Person Model の情報を取得する
+        /// </summary>
+        /// <param name="jsonResponse">API から取得した JSON レスポンス</param>
+        /// <returns>作成された Person Model の情報を含む ApiCustomPersonModel オブジェクト</returns>
+        /// <exception cref="JsonException">JSON の解析に失敗した場合</exception>
+        private ApiCustomPersonModel? ParseCreatePersonModelJson(string jsonResponse)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiCustomPersonModel>(jsonResponse);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError($"JSON parsing error: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// API を呼び出し、新しい Person Model を作成する
+        /// </summary>
+        /// <param name="location">Azure のリージョン (例: trial, westus, eastasia)</param>
+        /// <param name="accountId">Video Indexer のアカウント ID (GUID 形式)</param>
+        /// <param name="name">作成する Person Model の名前 (オプション)</param>
+        /// <param name="accessToken">API への認証用アクセストークン (オプション)</param>
+        /// <returns>作成された Person Model の情報を含む ApiCustomPersonModel オブジェクト</returns>
+        /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
+        /// <exception cref="JsonException">JSON の解析に失敗した場合</exception>
+        /// <exception cref="Exception">予期しないエラーが発生した場合</exception>
+        public async Task<ApiCustomPersonModel?> CreatePersonModelAsync(
+            string location, string accountId, string? name = null, string? accessToken = null)
+        {
+            try
+            {
+                var jsonResponse = await FetchCreatePersonModelJsonAsync(location, accountId, name, accessToken);
+                return ParseCreatePersonModelJson(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unexpected error: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
 
