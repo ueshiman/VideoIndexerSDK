@@ -657,7 +657,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="sourceType">顔のソースタイプ (UploadedPicture / UploadedVideo) (オプション)</param>
         /// <param name="accessToken">APIのアクセストークン (オプション)</param>
         /// <returns>スプライト画像のURL</returns>
-        public async Task<string> GetCustomFacesSpriteAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string sourceType = null, string accessToken = null)
+        public async Task<string> GetCustomFacesSpriteAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null)
         {
             try
             {
@@ -695,7 +695,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="url">APIのURL</param>
         /// <returns>APIのJSONレスポンス</returns>
-        public async Task<string> FetchApiResponseAsync(string url)
+        public async Task<string> FetchApiResponseAsync(string? url)
         {
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             using var response = await httpClient.GetAsync(url);
@@ -731,7 +731,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="nameFilter">名前フィルター (オプション)</param>
         /// <param name="accessToken">APIのアクセストークン (オプション)</param>
         /// <returns>人物モデルのリスト</returns>
-        public async Task<List<ApiCustomPersonModel>> GetPersonModelsAsync(string location, string accountId, string personNamePrefix = null, string nameFilter = null, string accessToken = null)
+        public async Task<List<ApiCustomPersonModel>> GetPersonModelsAsync(string location, string accountId, string? personNamePrefix = null, string? nameFilter = null, string? accessToken = null)
         {
             try
             {
@@ -768,7 +768,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="url">APIのURL</param>
         /// <returns>APIのJSONレスポンス</returns>
-        private async Task<string> FetchApiPersonModelsResponseAsync(string url)
+        public async Task<string> FetchApiPersonModelsResponseAsync(string url)
         {
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             using var response = await httpClient.GetAsync(url);
@@ -785,7 +785,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIのJSONレスポンス</param>
         /// <returns>人物モデルのリスト</returns>
-        private List<ApiCustomPersonModel> ParsePersonModelsResponse(string jsonResponse)
+        public List<ApiCustomPersonModel> ParsePersonModelsResponse(string jsonResponse)
         {
             if (string.IsNullOrEmpty(jsonResponse))
             {
