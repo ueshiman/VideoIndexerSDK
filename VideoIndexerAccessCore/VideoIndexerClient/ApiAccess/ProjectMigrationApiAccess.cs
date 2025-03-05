@@ -388,6 +388,76 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             if (response is null) throw new HttpRequestException("The response was null.");
             response.EnsureSuccessStatusCode();
         }
+
+        /// <summary>
+        /// Video Indexer API からレンダリングされたプロジェクトのダウンロード URL を取得します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="projectId">ダウンロード URL を取得するプロジェクトの ID。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。API へのアクセス権限を付与する。</param>
+        /// <returns>取得したダウンロード URL を含む文字列、それ以外は null を返します。</returns>
+        public async Task<string?> GetProjectRenderedFileDownloadUrlAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await SendGetRequestForRenderedFileUrlAsync(location, accountId, projectId, accessToken);
+                return ParseDownloadUrlJson(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while retrieving project rendered file download URL.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing failed while retrieving project rendered file download URL.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving project rendered file download URL.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Video Indexer API に GET リクエストを送信し、レンダリングされたプロジェクトのダウンロード URL を取得します。
+        /// </summary>
+        private async Task<string> SendGetRequestForRenderedFileUrlAsync(string location, string accountId, string projectId, string? accessToken)
+        {
+            string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/renderedfile/downloadurl";
+            var queryParams = new List<string>();
+            if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={Uri.EscapeDataString(accessToken)}");
+
+            if (queryParams.Count > 0)
+                url += "?" + string.Join("&", queryParams);
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.GetAsync(url);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSON 文字列を解析し、ダウンロード URL を取得します。
+        /// </summary>
+        /// <param name="json">パースする JSON 文字列。</param>
+        /// <returns>ダウンロード URL を含む文字列、それ以外は null を返します。</returns>
+        private string? ParseDownloadUrlJson(string json)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                return doc.RootElement.GetProperty("downloadUrl").GetString();
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse Download URL JSON.");
+                return null;
+            }
+        }
     }
 }
 
