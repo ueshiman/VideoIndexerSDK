@@ -338,6 +338,56 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        /// <summary>
+        /// Video Indexer API でプロジェクトを削除します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="projectId">削除するプロジェクトの ID。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。API へのアクセス権限を付与する。</param>
+        /// <returns>削除が成功した場合は true、それ以外は false を返します。</returns>
+        public async Task<bool> DeleteProjectAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                await SendDeleteRequestForProjectAsync(location, accountId, projectId, accessToken);
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while deleting project.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while deleting project.");
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Video Indexer API に DELETE リクエストを送信し、プロジェクトを削除します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="projectId">削除するプロジェクトの ID。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。</param>
+        private async Task SendDeleteRequestForProjectAsync(string location, string accountId, string projectId, string? accessToken)
+        {
+            string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}";
+            var queryParams = new List<string>();
+            if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={Uri.EscapeDataString(accessToken)}");
+
+            if (queryParams.Count > 0)
+                url += "?" + string.Join("&", queryParams);
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.DeleteAsync(url);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+        }
     }
 }
 
