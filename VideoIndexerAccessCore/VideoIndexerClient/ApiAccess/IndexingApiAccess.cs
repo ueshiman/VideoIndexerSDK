@@ -123,7 +123,6 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/ReIndex";
                 var query = HttpUtility.ParseQueryString(string.Empty);
 
-                if (!string.IsNullOrEmpty(accessToken)) query["accessToken"] = accessToken;
                 if (excludedAI != null && excludedAI.Count > 0)
                 {
                     query["excludedAI"] = string.Join(",", excludedAI);
@@ -142,9 +141,16 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 if (!string.IsNullOrEmpty(logoGroupId)) query["logoGroupId"] = logoGroupId;
                 if (!string.IsNullOrEmpty(punctuationMode)) query["punctuationMode"] = punctuationMode;
 
-                var url = $"{baseUrl}?{query.ToString()}";
-                if(query.Get("accessToken") is not null) query["accessToken"] = "***";
                 var logUrl = $"{baseUrl}?{query.ToString()}";
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    logUrl += query.Count > 0 ? @"&accessToken=***" : @"?accessToken=***";
+                    query["accessToken"] = accessToken;
+                }
+                var url = $"{baseUrl}?{query.ToString()}";
+
+
+                if (!string.IsNullOrEmpty(accessToken)) query["accessToken"] = accessToken;
 
                 _logger.LogInformation("Sending request to {Url}", logUrl);
 

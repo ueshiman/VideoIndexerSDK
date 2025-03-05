@@ -38,17 +38,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <returns>APIからのレスポンスJSON (成功時は追加された顔データのリスト)</returns>
         public async Task<string> FetchPersonFacesJsonAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null)
         {
+            // APIエンドポイントのURLを組み立てる
+            var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces";
+            var requestUrl = baseUrl;
+            var loggUrl = baseUrl;
+
+            // アクセストークンが指定されている場合、URLに追加
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                requestUrl += $"?accessToken={accessToken}";
+                loggUrl += $"?accessToken={accessToken}";
+            }
             try
             {
-                // APIエンドポイントのURLを組み立てる
-                var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces";
-
-                // アクセストークンが指定されている場合、URLに追加
-                if (!string.IsNullOrEmpty(accessToken))
-                {
-                    requestUrl += $"?accessToken={accessToken}";
-                }
-
                 // リクエストボディとして送信するJSONデータを作成
                 var requestData = new { urls = imageUrls };
                 var jsonContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
@@ -67,7 +69,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"HTTP request error: {ex.Message}"); // HTTPリクエストのエラーをログに記録
+                _logger.LogError("HTTP request error: {ex.Message} {loggUrl}", ex.Message, loggUrl); // HTTPリクエストのエラーをログに記録
                 throw;
             }
         }
@@ -661,12 +663,17 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces/sprite";
-
+                string baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces/sprite";
+                var url = baseUrl;
+                var logUrl = baseUrl;
                 var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
                 if (pageSize.HasValue) queryParams["pageSize"] = pageSize.Value.ToString();
                 if (skip.HasValue) queryParams["skip"] = skip.Value.ToString();
                 if (!string.IsNullOrEmpty(sourceType)) queryParams["sourceType"] = sourceType;
+
+                if (queryParams.Count > 0) logUrl += "?" + queryParams.ToString() + (accessToken is null ? string.Empty : $"&accessToken={accessToken}");
+                else logUrl += (accessToken is null ? string.Empty : $"&accessToken={accessToken}");
+
                 if (!string.IsNullOrEmpty(accessToken)) queryParams["accessToken"] = accessToken;
 
                 if (queryParams.Count > 0)
@@ -674,7 +681,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     url += "?" + queryParams.ToString();
                 }
 
-                _logger.LogInformation("Fetching custom faces sprite from API: {Url}", url);
+                _logger.LogInformation("Fetching custom faces sprite from API: {logUrl}", logUrl);
                 string jsonResponse = await FetchApiResponseAsync(url);
                 return ParseSpriteResponse(jsonResponse);
             }
@@ -735,11 +742,16 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels";
-
+                string baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels";
+                var url = baseUrl;
+                var logUrl = baseUrl;
                 var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
                 if (!string.IsNullOrEmpty(personNamePrefix)) queryParams["personNamePrefix"] = personNamePrefix;
                 if (!string.IsNullOrEmpty(nameFilter)) queryParams["nameFilter"] = nameFilter;
+
+                if (queryParams.Count > 0) logUrl += "?" + queryParams.ToString() + (accessToken is null ? string.Empty : $"&accessToken={accessToken}");
+                else logUrl += (accessToken is null ? string.Empty : $"&accessToken={accessToken}");
+
                 if (!string.IsNullOrEmpty(accessToken)) queryParams["accessToken"] = accessToken;
 
                 if (queryParams.Count > 0)
@@ -747,7 +759,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     url += "?" + queryParams.ToString();
                 }
 
-                _logger.LogInformation("Fetching person models from API: {Url}", url);
+                _logger.LogInformation("Fetching person models from API: {logUrl}", logUrl);
                 string jsonResponse = await FetchApiPersonModelsResponseAsync(url);
                 return ParsePersonModelsResponse(jsonResponse);
             }
@@ -803,6 +815,192 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
+
+        /// <summary>
+        /// 指定された人物モデル内で指定のプレフィックスを持つすべての人物を取得します。
+        /// </summary>
+        /// <param name="location">APIのロケーション (例: "trial")</param>
+        /// <param name="accountId">ビデオインデクサーのアカウントID (GUID)</param>
+        /// <param name="personModelId">人物モデルのID (GUID)</param>
+        /// <param name="namePrefix">フィルター対象の名前のプレフィックス (オプション)</param>
+        /// <param name="nameFilter">フィルター条件 (オプション)</param>
+        /// <param name="pageSize">取得する結果の数 (オプション)</param>
+        /// <param name="skip">スキップする結果の数 (オプション)</param>
+        /// <param name="sort">ソート条件 ('name', '-score' など) (オプション)</param>
+        /// <param name="accessToken">APIのアクセストークン (オプション)</param>
+        /// <returns>人物情報のリスト</returns>
+        public async Task<List<ApiPersonModel>> GetPersonsAsync(string location, string accountId, string personModelId, string? namePrefix = null, string? nameFilter = null, int? pageSize = null, int? skip = null, string? sort = null, string? accessToken = null)
+        {
+            try
+            {
+                string baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons";
+                var url = baseUrl;
+                var logUrl = baseUrl;
+
+                var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                if (!string.IsNullOrEmpty(namePrefix)) queryParams["namePrefix"] = namePrefix;
+                if (!string.IsNullOrEmpty(nameFilter)) queryParams["nameFilter"] = nameFilter;
+                if (pageSize.HasValue) queryParams["pageSize"] = pageSize.Value.ToString();
+                if (skip.HasValue) queryParams["skip"] = skip.Value.ToString();
+                if (!string.IsNullOrEmpty(sort)) queryParams["sort"] = sort;
+
+                if (queryParams.Count > 0) logUrl += "?" + queryParams.ToString() + (accessToken is null ? string.Empty : $"&accessToken={accessToken}");
+                else logUrl += accessToken is null ? string.Empty : $"?accessToken={accessToken}";
+
+                if (!string.IsNullOrEmpty(accessToken)) queryParams["accessToken"] = accessToken;
+
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + queryParams.ToString();
+                }
+
+                _logger.LogInformation("Fetching persons from API: {logUrl}", logUrl);
+                string jsonResponse = await FetchApiPersonsResponseAsync(url);
+                return ParsePersonsResponse(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// APIからJSONレスポンスを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="url">APIのURL</param>
+        /// <returns>APIのJSONレスポンス</returns>
+        private async Task<string> FetchApiPersonsResponseAsync(string url)
+        {
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            using var response = await httpClient.GetAsync(url);
+
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを解析し、人物のリストを取得します。
+        /// </summary>
+        /// <param name="jsonResponse">APIのJSONレスポンス</param>
+        /// <returns>人物情報のリスト</returns>
+        private List<ApiPersonModel> ParsePersonsResponse(string jsonResponse)
+        {
+            if (string.IsNullOrEmpty(jsonResponse))
+            {
+                _logger.LogWarning("Empty response received from API.");
+                return new List<ApiPersonModel>();
+            }
+
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var responseObj = JsonSerializer.Deserialize<ApiListPersonsResponseModel>(jsonResponse, options);
+                return responseObj?.Results ?? new List<ApiPersonModel>();
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse API response.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定された人物モデルの名前や識別閾値を更新します。
+        /// </summary>
+        /// <param name="location">APIのロケーション (例: "trial")</param>
+        /// <param name="accountId">ビデオインデクサーのアカウントID (GUID)</param>
+        /// <param name="personModelId">人物モデルのID (GUID)</param>
+        /// <param name="newName">更新する新しいモデル名 (オプション)</param>
+        /// <param name="personIdentificationThreshold">人物識別閾値 (0.0 - 1.0) (オプション)</param>
+        /// <param name="accessToken">APIのアクセストークン (オプション)</param>
+        /// <returns>更新された人物モデル情報</returns>
+        public async Task<ApiCustomPersonModel?> UpdatePersonModelAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
+        {
+            try
+            {
+
+                string jsonResponse = await FetchApiResponseAsync(location, accountId, personModelId, newName, personIdentificationThreshold, accessToken);
+                return ParsePersonModelResponse(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// APIにPATCHリクエストを送信し、JSONレスポンスを取得します。
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="accountId"></param>
+        /// <param name="personModelId"></param>
+        /// <param name="newName"></param>
+        /// <param name="personIdentificationThreshold"></param>
+        /// <param name="accessToken"></param>
+        /// <returns>APIのJSONレスポンス</returns>
+        private async Task<string> FetchApiResponseAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
+        {
+            string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}";
+            string logUrl = url;
+
+            if (accessToken is not null)
+            {
+                url += $"accessToken={accessToken}";
+                logUrl += "accessToken=***";
+            }
+
+            var payload = new
+            {
+                name = newName,
+                personIdentificationThreshold = personIdentificationThreshold
+            };
+
+            string jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { IgnoreNullValues = true });
+
+            _logger.LogInformation("Updating person model: {logUrl} with payload: {Payload}", logUrl, jsonPayload);
+            using var request = new HttpRequestMessage(HttpMethod.Patch, url)
+            {
+                Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json")
+            };
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            using var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを解析し、更新された人物モデル情報を取得します。
+        /// </summary>
+        /// <param name="jsonResponse">APIのJSONレスポンス</param>
+        /// <returns>更新された人物モデル情報</returns>
+        private ApiCustomPersonModel? ParsePersonModelResponse(string jsonResponse)
+        {
+            if (!string.IsNullOrEmpty(jsonResponse)) return JsonSerializer.Deserialize<ApiCustomPersonModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var errorMessage = "Empty response received from API.";
+            _logger.LogWarning(errorMessage);
+            throw new NullReferenceException(errorMessage);
+        }
+
+
     }
 }
 
