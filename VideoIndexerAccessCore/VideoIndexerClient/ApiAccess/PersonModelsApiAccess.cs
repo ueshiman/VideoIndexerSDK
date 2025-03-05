@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
@@ -49,6 +44,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 requestUrl += $"?accessToken={accessToken}";
                 loggUrl += $"?accessToken={accessToken}";
             }
+
             try
             {
                 // リクエストボディとして送信するJSONデータを作成
@@ -327,16 +323,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     _logger.LogError("Face not found.");
                     throw new KeyNotFoundException("The specified face was not found.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogError("Unauthorized access.");
                     throw new UnauthorizedAccessException("Access token is not authorized.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     _logger.LogError("Too many requests. Please try again later.");
                     throw new Exception("Too many requests. Please retry later.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
                     _logger.LogError("Internal server error occurred.");
@@ -401,16 +400,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     _logger.LogError("Person not found.");
                     throw new KeyNotFoundException("The specified person was not found.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogError("Unauthorized access.");
                     throw new UnauthorizedAccessException("Access token is not authorized.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     _logger.LogError("Too many requests. Please try again later.");
                     throw new Exception("Too many requests. Please retry later.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
                     _logger.LogError("Internal server error occurred.");
@@ -471,16 +473,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     _logger.LogError("Person Model not found.");
                     throw new KeyNotFoundException("The specified Person Model was not found.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogError("Unauthorized access.");
                     throw new UnauthorizedAccessException("Access token is not authorized.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     _logger.LogError("Too many requests. Please try again later.");
                     throw new Exception("Too many requests. Please retry later.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
                     _logger.LogError("Internal server error occurred.");
@@ -543,16 +548,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     _logger.LogError("Face picture not found.");
                     throw new KeyNotFoundException("The specified face picture was not found.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogError("Unauthorized access.");
                     throw new UnauthorizedAccessException("Access token is not authorized.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     _logger.LogError("Too many requests. Please try again later.");
                     throw new Exception("Too many requests. Please retry later.");
                 }
+
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
                     _logger.LogError("Internal server error occurred.");
@@ -726,6 +734,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _logger.LogWarning("Empty response received from API.");
                 return string.Empty;
             }
+
             return jsonResponse.Trim('"'); // JSON内のURLが文字列として返るため、クオートを削除
         }
 
@@ -1058,7 +1067,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             var response = await httpClient.PutAsync(url, null);
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
 
@@ -1129,7 +1139,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             var response = await httpClient.PutAsync(url, null);
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
 
@@ -1152,4 +1163,3 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
     }
 }
-

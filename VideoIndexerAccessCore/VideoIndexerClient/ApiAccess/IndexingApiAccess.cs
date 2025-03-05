@@ -1,12 +1,6 @@
-﻿using Azure;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Web;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;

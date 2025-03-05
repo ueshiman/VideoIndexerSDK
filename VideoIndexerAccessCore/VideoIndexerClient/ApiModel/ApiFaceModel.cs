@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+﻿namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
     /// <summary>
     /// API のレスポンスで含まれる SampleFace 情報を表すクラス
