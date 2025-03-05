@@ -1005,6 +1005,80 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             return JsonSerializer.Deserialize<ApiCustomPersonModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
+
+        /// <summary>
+        /// Video Indexer API で人物情報を更新します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="personModelId">人物モデルの一意の識別子。</param>
+        /// <param name="personId">人物の一意の識別子。</param>
+        /// <param name="name">任意の新しい名前。</param>
+        /// <param name="description">任意の説明。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。</param>
+        /// <returns>更新が成功した場合は ApiPersonModel オブジェクト、それ以外は null を返します。</returns>
+        public async Task<ApiPersonModel?> UpdatePersonAsync(string location, string accountId, string personModelId, string personId, string? name = null, string? description = null, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await SendPutRequestAsync(location, accountId, personModelId, personId, name, description, accessToken);
+                return ParsePersonJson(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while updating person.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing failed while updating person.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while updating person.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Video Indexer API に PUT リクエストを送信し、JSON レスポンスを取得します。
+        /// </summary>
+        /// <returns>JSON レスポンスを文字列として返します。</returns>
+        private async Task<string> SendPutRequestAsync(string location, string accountId, string personModelId, string personId, string? name, string? description, string? accessToken)
+        {
+            string url = $"{_apiResourceConfigurations}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}";
+            var queryParams = new List<string>();
+            if (!string.IsNullOrEmpty(name)) queryParams.Add($"name={Uri.EscapeDataString(name)}");
+            if (!string.IsNullOrEmpty(description)) queryParams.Add($"description={Uri.EscapeDataString(description)}");
+            if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={Uri.EscapeDataString(accessToken)}");
+
+            if (queryParams.Count > 0)
+                url += "?" + string.Join("&", queryParams);
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.PutAsync(url, null);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSON 文字列を ApiPersonModel オブジェクトにパースします。
+        /// </summary>
+        /// <param name="json">パースする JSON 文字列。</param>
+        /// <returns>パースに成功した場合は ApiPersonModel オブジェクト、それ以外は null を返します。</returns>
+        private ApiPersonModel? ParsePersonJson(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiPersonModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse Person JSON.");
+                return null;
+            }
+        }
     }
 }
 
