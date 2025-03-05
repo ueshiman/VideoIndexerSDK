@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -251,6 +252,90 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             {
                 _logger.LogError(ex, "JSON deserialization error: {Message}", ex.Message);
                 throw new InvalidOperationException("Failed to deserialize JSON response.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Video Indexer API で新しいプロジェクトを作成します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="projectName">作成するプロジェクトの名前。</param>
+        /// <param name="videoRanges">プロジェクトに含めるビデオ範囲リスト。各ビデオの ID と時間範囲を含む。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。API へのアクセス権限を付与する。</param>
+        /// <returns>作成されたプロジェクトの情報を含む <see cref="ApiProjectModel"/> オブジェクト、それ以外は null を返します。</returns>
+        public async Task<ApiProjectModel?> CreateProjectAsync(string location, string accountId, string projectName, List<ApiVideoTimeRangeModel> videoRanges, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await SendPostRequestForCreateProjectAsync(location, accountId, projectName, videoRanges, accessToken);
+                return ParseProjectJson(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while creating project.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing failed while creating project.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while creating project.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Video Indexer API に POST リクエストを送信し、新しいプロジェクトを作成します。
+        /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="projectName">作成するプロジェクトの名前。</param>
+        /// <param name="videoRanges">プロジェクトに含めるビデオ範囲リスト。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。</param>
+        /// <returns>API からの JSON レスポンスを文字列として返します。</returns>
+        private async Task<string> SendPostRequestForCreateProjectAsync(string location, string accountId, string projectName, List<ApiVideoTimeRangeModel> videoRanges, string? accessToken)
+        {
+            string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects";
+            var queryParams = new List<string>();
+            if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={Uri.EscapeDataString(accessToken)}");
+
+            if (queryParams.Count > 0)
+                url += "?" + string.Join("&", queryParams);
+
+            var projectData = new
+            {
+                name = projectName,
+                videosRanges = videoRanges,
+                isSearchable = (bool?)null
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(projectData), System.Text.Encoding.UTF8, "application/json");
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.PostAsync(url, content);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSON 文字列を <see cref="ApiProjectModel"/> オブジェクトにパースします。
+        /// </summary>
+        /// <param name="json">パースする JSON 文字列。API から返されたレスポンス。</param>
+        /// <returns>パースに成功した場合は <see cref="ApiProjectModel"/> オブジェクト、それ以外は null を返します。</returns>
+        private ApiProjectModel? ParseProjectJson(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiProjectModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse Project JSON.");
+                return null;
             }
         }
     }
