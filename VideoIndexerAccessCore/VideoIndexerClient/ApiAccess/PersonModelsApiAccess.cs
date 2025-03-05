@@ -1000,7 +1000,97 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             throw new NullReferenceException(errorMessage);
         }
 
+        /// <summary>
+        /// 指定された人物モデルの名前や識別閾値を更新します。
+        /// </summary>
+        /// <param name="location">APIのロケーション (例: "trial")</param>
+        /// <param name="accountId">ビデオインデクサーのアカウントID (GUID)</param>
+        /// <param name="personModelId">人物モデルのID (GUID)</param>
+        /// <param name="newName">更新する新しいモデル名 (オプション)</param>
+        /// <param name="personIdentificationThreshold">人物識別閾値 (0.0 - 1.0) (オプション)</param>
+        /// <param name="accessToken">APIのアクセストークン (オプション)</param>
+        /// <returns>更新された人物モデル情報</returns>
+        public async Task<ApiCustomPersonModel?> PatchPersonModelAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await FetchApiPatchResponseAsync(location, accountId, personModelId, newName, personIdentificationThreshold, accessToken);
 
+                return ParsePatchPersonModelResponse(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// APIにPATCHリクエストを送信し、JSONレスポンスを取得します。
+        /// </summary>
+        /// <param name="location">APIのロケーション</param>
+        /// <param name="accountId">ビデオインデクサーのアカウントID</param>
+        /// <param name="personModelId">人物モデルのID</param>
+        /// <param name="newName">更新する新しいモデル名 (オプション)</param>
+        /// <param name="personIdentificationThreshold">人物識別閾値 (0.0 - 1.0) (オプション)</param>
+        /// <param name="accessToken">APIのアクセストークン</param>
+        /// <returns>APIのJSONレスポンス</returns>
+        private async Task<string> FetchApiPatchResponseAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
+        {
+            string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}";
+            var logUrl = url;
+
+            if (accessToken is not null)
+            {
+                url += $"?accessToken={accessToken}";
+                logUrl += "?accessToken=***";
+            }
+
+            var payload = new
+            {
+                name = newName,
+                personIdentificationThreshold = personIdentificationThreshold
+            };
+
+            string jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { IgnoreNullValues = true });
+
+            _logger.LogInformation("Sending PATCH request to {logUrl} with payload: {Payload}", logUrl, jsonPayload);
+
+            using var request = new HttpRequestMessage(HttpMethod.Patch, url)
+            {
+                Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json")
+            };
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            using var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを解析し、更新された人物モデル情報を取得します。
+        /// </summary>
+        /// <param name="jsonResponse">APIのJSONレスポンス</param>
+        /// <returns>更新された人物モデル情報</returns>
+        private ApiCustomPersonModel? ParsePatchPersonModelResponse(string jsonResponse)
+        {
+            if (string.IsNullOrEmpty(jsonResponse))
+            {
+                var errorMessage = "Empty response received from API.";
+                _logger.LogWarning(errorMessage);
+                throw new NullReferenceException(errorMessage);
+                //return null;
+            }
+
+            return JsonSerializer.Deserialize<ApiCustomPersonModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
     }
 }
 
