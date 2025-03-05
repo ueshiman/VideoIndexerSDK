@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net.Http;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
@@ -457,6 +458,45 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        /// <summary>
+        /// 指定されたプロジェクトのインサイトウィジェットのURLを取得する。
+        /// </summary>
+        /// <param name="location">APIのリクエストを送るAzureリージョン。</param>
+        /// <param name="accountId">プロジェクトが属するアカウントのGUID。</param>
+        /// <param name="projectId">取得するプロジェクトの一意の識別子。</param>
+        /// <param name="widgetType">(オプション) 取得するウィジェットの種類（People, Sentiments, Keywords, Search）。</param>
+        /// <param name="accessToken">(オプション) APIアクセス用のトークン。</param>
+        /// <returns>インサイトウィジェットのURLを表す文字列。</returns>
+        public async Task<string> GetProjectInsightsWidgetAsync(string location, string accountId, string projectId, string? widgetType = null, string? accessToken = null)
+        {
+            try
+            {
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/InsightsWidget";
+                var queryParams = new List<string>();
 
+                if (!string.IsNullOrEmpty(widgetType)) queryParams.Add($"widgetType={widgetType}");
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("response.Content : {result}", result);
+                var headersLocation = response.Headers.Location?.ToString();
+                _logger.LogInformation("response.Headers.Location : {headersLocation}", headersLocation);
+                return location ?? throw new Exception("No redirect URL found");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error");
+                throw;
+            }
+        }
     }
 }
