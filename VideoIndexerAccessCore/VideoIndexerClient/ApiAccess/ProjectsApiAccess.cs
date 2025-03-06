@@ -22,6 +22,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API でプロジェクトのレンダー操作をキャンセルします。
+        /// Cancel Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Cancel-Project-Render-Operation
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -53,6 +55,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API に POST リクエストを送信し、レンダー操作をキャンセルします。
+        /// Cancel Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Cancel-Project-Render-Operation
         /// </summary>
         /// <returns>JSON レスポンスを文字列として返します。</returns>
         public async Task<string> SendPostRequestForCancelRenderAsync(string location, string accountId, string projectId, string? accessToken)
@@ -73,6 +77,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON 文字列を ApiProjectRenderOperationModel オブジェクトにパースします。
+        /// Cancel Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Cancel-Project-Render-Operation
         /// </summary>
         /// <param name="json">パースする JSON 文字列。</param>
         /// <returns>パースに成功した場合は ApiProjectRenderOperationModel オブジェクト、それ以外は null を返します。</returns>
@@ -91,6 +97,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API で新しいプロジェクトを作成します。
+        /// Create Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Project
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -123,6 +131,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API に POST リクエストを送信し、新しいプロジェクトを作成します。
+        /// Create Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Project
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -157,6 +167,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON 文字列を <see cref="ApiProjectModel"/> オブジェクトにパースします。
+        /// Create Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Project
         /// </summary>
         /// <param name="json">パースする JSON 文字列。API から返されたレスポンス。</param>
         /// <returns>パースに成功した場合は <see cref="ApiProjectModel"/> オブジェクト、それ以外は null を返します。</returns>
@@ -175,6 +187,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API でプロジェクトを削除します。
+        /// Delete Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Project
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -202,6 +216,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API に DELETE リクエストを送信し、プロジェクトを削除します。
+        /// Delete Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Project
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -225,6 +241,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API からレンダリングされたプロジェクトのダウンロード URL を取得します。
+        /// Download Project Rendered File Url
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Download-Project-Rendered-File-Url
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -256,6 +274,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// Video Indexer API に GET リクエストを送信し、レンダリングされたプロジェクトのダウンロード URL を取得します。
+        /// Download Project Rendered File Url
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Download-Project-Rendered-File-Url
         /// </summary>
         public async Task<string> SendGetRequestForRenderedFileUrlAsync(string location, string accountId, string projectId, string? accessToken)
         {
@@ -276,6 +296,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON 文字列を解析し、ダウンロード URL を取得します。
+        /// Download Project Rendered File Url
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Download-Project-Rendered-File-Url
         /// </summary>
         /// <param name="json">パースする JSON 文字列。</param>
         /// <returns>ダウンロード URL を含む文字列、それ以外は null を返します。</returns>
@@ -297,6 +319,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// Video Indexer API を使用してプロジェクトのキャプションを取得します。
         /// 指定されたパラメータに基づき、特定の形式や言語でキャプションを取得できます。
+        /// Get Project Captions
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Captions
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -333,6 +357,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// Video Indexer API に GET リクエストを送信し、プロジェクトのキャプションを取得します。
         /// 指定されたパラメータを基に API へリクエストを行い、キャプションデータを取得します。
+        /// Get Project Captions
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Captions
         /// </summary>
         /// <param name="location">API 呼び出しの Azure リージョン。</param>
         /// <param name="accountId">アカウントの一意の識別子。</param>
@@ -371,6 +397,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのインデックスを取得する。
+        /// Get Project Index
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Index
         /// </summary>
         /// <param name="location">APIのリクエストを送るAzureリージョン。</param>
         /// <param name="accountId">プロジェクトが属するアカウントのGUID。</param>
@@ -401,6 +429,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API へリクエストを送信し、JSON レスポンスを取得する。
+        /// Get Project Index
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Index
         /// </summary>
         /// <returns>API のレスポンス（JSON 形式）を文字列として返す。</returns>
         public async Task<string> FetchProjectIndexJsonAsync(string location, string accountId, string projectId, string? language, bool? reTranslate, string? includedInsights, string? excludedInsights, bool? includeSummarizedInsights, string? accessToken)
@@ -441,6 +471,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON レスポンスをパースし、オブジェクトに変換する。
+        /// Get Project Index
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Index
         /// </summary>
         /// <param name="json">API から取得した JSON データ。</param>
         /// <returns>パースされた <see cref="ApiProjectIndexModel"/> オブジェクト。</returns>
@@ -460,6 +492,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのインサイトウィジェットのURLを取得する。
+        /// Get Project Insights Widget
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Insights-Widget
         /// </summary>
         /// <param name="location">APIのリクエストを送るAzureリージョン。</param>
         /// <param name="accountId">プロジェクトが属するアカウントのGUID。</param>
@@ -504,6 +538,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのプレイヤーウィジェットのURLを取得する。
+        /// Get Project Player Widget
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Player-Widget
         /// </summary>
         /// <param name="location">APIのリクエストを送るAzureリージョン。</param>
         /// <param name="accountId">プロジェクトが属するアカウントのGUID。</param>
@@ -547,6 +583,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのレンダー操作のステータスを取得する。
+        /// Get Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Render-Operation
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">対象のアカウントID (GUID)</param>
@@ -569,6 +607,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのレンダー操作のJSONデータを取得する。
+        /// Get Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Render-Operation
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">対象のアカウントID (GUID)</param>
@@ -606,6 +646,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSONデータを ApiProjectRenderOperationModel にパースする。
+        /// Get Project Render Operation
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Render-Operation
         /// </summary>
         /// <param name="json">JSON 文字列</param>
         /// <returns>パースされた ApiProjectRenderOperationModel オブジェクト</returns>
@@ -617,6 +659,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのサムネイルのURLを取得する。
+        /// Get Project Thumbnail
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Thumbnail
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">対象のアカウントID (GUID)</param>
@@ -640,6 +684,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトのサムネイルのURLを取得する。
+        /// Get Project Thumbnail
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Thumbnail
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">対象のアカウントID (GUID)</param>
@@ -686,6 +732,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたアカウントのプロジェクト一覧を取得する。
+        /// List Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Projects
         /// </summary>
         /// <param name="location">Azureのリージョン。</param>
         /// <param name="accountId">アカウントのID（GUID形式）。</param>
@@ -711,7 +759,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたアカウントのプロジェクト一覧をJSON形式で取得する。
-        /// </summary>
+        /// List Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Projects        /// </summary>
         /// <param name="location">Azureのリージョン。</param>
         /// <param name="accountId">アカウントのID（GUID形式）。</param>
         /// <param name="createdAfter">指定された日付以降に作成されたプロジェクトをフィルタリング。</param>
@@ -749,12 +798,92 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
         /// <summary>
         /// JSONレスポンスを `ApiProjectSearchResultModel` に変換する。
-        /// </summary>
+        /// List Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Projects  /// </summary>
         /// <param name="jsonResponse">APIから取得したJSONレスポンス。</param>
         /// <returns>マッピングされた `ApiProjectSearchResultModel` オブジェクト。</returns>
         public ApiProjectSearchResultModel MapToApiProjectSearchResultModel(string jsonResponse)
         {
             return JsonSerializer.Deserialize<ApiProjectSearchResultModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }) ?? new ApiProjectSearchResultModel();
+        }
+
+        // Render Project
+
+        /// <summary>
+        /// プロジェクトのレンダリングを開始し、結果を取得する非同期メソッド
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">アカウントID (GUID)</param>
+        /// <param name="projectId">プロジェクトID</param>
+        /// <param name="accessToken">オプションのアクセストークン (Bearer トークンとして利用可能)</param>
+        /// <param name="sendCompletionEmail">レンダリング完了時にメール通知を送信するかのフラグ</param>
+        /// <returns>レンダリング結果のオブジェクトを返す</returns>
+        public async Task<ApiProjectRenderResponseModel> RenderProjectAsync(string location, string accountId, string projectId, string? accessToken = null, bool sendCompletionEmail = false)
+        {
+            try
+            {
+                string jsonResponse = await FetchProjectRenderJsonAsync(location, accountId, projectId, accessToken, sendCompletionEmail);
+                return ParseProjectRenderJson(jsonResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error while rendering project.");
+                throw;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing error.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while rendering project.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたパラメータを基にURLを構築し、APIにリクエストを送信し、JSONレスポンスを取得する非同期メソッド
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">アカウントID (GUID)</param>
+        /// <param name="projectId">プロジェクトID</param>
+        /// <param name="accessToken">オプションのアクセストークン (Bearer トークンとして利用可能)</param>
+        /// <param name="sendCompletionEmail">レンダリング完了時にメール通知を送信するかのフラグ</param>
+        /// <returns>APIから取得したJSONレスポンス</returns>
+        private async Task<string> FetchProjectRenderJsonAsync(string location, string accountId, string projectId, string? accessToken, bool sendCompletionEmail)
+        {
+            var uriBuilder = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/render");
+
+            var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            query["sendCompletionEmail"] = sendCompletionEmail.ToString().ToLower();
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                query["accessToken"] = accessToken;
+            }
+            uriBuilder.Query = query.ToString();
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, uriBuilder.ToString());
+            request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを解析し、レンダリング結果のオブジェクトに変換するメソッド
+        /// </summary>
+        /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
+        /// <returns>パース済みのレンダリング結果オブジェクト</returns>
+        private ApiProjectRenderResponseModel ParseProjectRenderJson(string jsonResponse)
+        {
+            return JsonSerializer.Deserialize<ApiProjectRenderResponseModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                   ?? throw new JsonException("Failed to parse JSON response.");
         }
     }
 }
