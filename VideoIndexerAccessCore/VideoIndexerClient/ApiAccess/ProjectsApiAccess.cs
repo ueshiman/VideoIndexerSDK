@@ -683,5 +683,78 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
+
+        /// <summary>
+        /// 指定されたアカウントのプロジェクト一覧を取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン。</param>
+        /// <param name="accountId">アカウントのID（GUID形式）。</param>
+        /// <param name="createdAfter">指定された日付以降に作成されたプロジェクトをフィルタリング。</param>
+        /// <param name="createdBefore">指定された日付以前に作成されたプロジェクトをフィルタリング。</param>
+        /// <param name="pageSize">取得するページサイズ。</param>
+        /// <param name="skip">スキップするレコード数。</param>
+        /// <param name="accessToken">認証用のアクセストークン。</param>
+        /// <returns>プロジェクト情報を含むApiProjectSearchResultModel。</returns>
+        public async Task<ApiProjectSearchResultModel> GetProjectsAsync(string location, string accountId, string? createdAfter = null, string? createdBefore = null, int? pageSize = null, int? skip = null, string? accessToken = null)
+        {
+            try
+            {
+                var jsonResponse = await FetchProjectsJsonAsync(location, accountId, createdAfter, createdBefore, pageSize, skip, accessToken);
+                return MapToApiProjectSearchResultModel(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching project list");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたアカウントのプロジェクト一覧をJSON形式で取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン。</param>
+        /// <param name="accountId">アカウントのID（GUID形式）。</param>
+        /// <param name="createdAfter">指定された日付以降に作成されたプロジェクトをフィルタリング。</param>
+        /// <param name="createdBefore">指定された日付以前に作成されたプロジェクトをフィルタリング。</param>
+        /// <param name="pageSize">取得するページサイズ。</param>
+        /// <param name="skip">スキップするレコード数。</param>
+        /// <param name="accessToken">認証用のアクセストークン。</param>
+        /// <returns>APIレスポンスのJSON文字列。</returns>
+        public async Task<string> FetchProjectsJsonAsync(string location, string accountId, string? createdAfter, string? createdBefore, int? pageSize, int? skip, string? accessToken)
+        {
+            try
+            {
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects";
+                var queryParams = new List<string>();
+
+                if (!string.IsNullOrEmpty(createdAfter)) queryParams.Add($"createdAfter={createdAfter}");
+                if (!string.IsNullOrEmpty(createdBefore)) queryParams.Add($"createdBefore={createdBefore}");
+                if (pageSize.HasValue) queryParams.Add($"pageSize={pageSize}");
+                if (skip.HasValue) queryParams.Add($"skip={skip}");
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+                if (queryParams.Count > 0) url += "?" + string.Join("&", queryParams);
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error while fetching project list");
+                throw;
+            }
+        }
+        /// <summary>
+        /// JSONレスポンスを `ApiProjectSearchResultModel` に変換する。
+        /// </summary>
+        /// <param name="jsonResponse">APIから取得したJSONレスポンス。</param>
+        /// <returns>マッピングされた `ApiProjectSearchResultModel` オブジェクト。</returns>
+        public ApiProjectSearchResultModel MapToApiProjectSearchResultModel(string jsonResponse)
+        {
+            return JsonSerializer.Deserialize<ApiProjectSearchResultModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }) ?? new ApiProjectSearchResultModel();
+        }
     }
 }
