@@ -466,7 +466,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="projectId">取得するプロジェクトの一意の識別子。</param>
         /// <param name="widgetType">(オプション) 取得するウィジェットの種類（People, Sentiments, Keywords, Search）。</param>
         /// <param name="accessToken">(オプション) APIアクセス用のトークン。</param>
-        /// <returns>インサイトウィジェットのURLを表す文字列。</returns>
+        /// <returns>
+        /// インサイトウィジェットのURLを表す文字列。
+        /// response.Headers.Locationか、response.Contentか不明、要精査 todo
+        /// </returns>
         public async Task<string> GetProjectInsightsWidgetAsync(string location, string accountId, string projectId, string? widgetType = null, string? accessToken = null)
         {
             try
@@ -490,11 +493,193 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _logger.LogInformation("response.Content : {result}", result);
                 var headersLocation = response.Headers.Location?.ToString();
                 _logger.LogInformation("response.Headers.Location : {headersLocation}", headersLocation);
-                return location ?? throw new Exception("No redirect URL found");
+                return headersLocation ?? throw new Exception("No redirect URL found");
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "HTTP request error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのプレイヤーウィジェットのURLを取得する。
+        /// </summary>
+        /// <param name="location">APIのリクエストを送るAzureリージョン。</param>
+        /// <param name="accountId">プロジェクトが属するアカウントのGUID。</param>
+        /// <param name="projectId">取得するプロジェクトの一意の識別子。</param>
+        /// <param name="accessToken">(オプション) APIアクセス用のトークン。</param>
+        /// <returns>
+        /// プレイヤーウィジェットのURLを表す文字列。
+        /// response.Headers.Locationか、response.Contentか不明、要精査 todo
+        /// </returns>
+        public async Task<string> GetProjectPlayerWidgetAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/PlayerWidget";
+                var queryParams = new List<string>();
+
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("response.Content : {result}", result);
+                var headersLocation = response.Headers.Location?.ToString();
+                _logger.LogInformation("response.Headers.Location : {headersLocation}", headersLocation);
+                return headersLocation ?? throw new Exception("No redirect URL found");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのレンダー操作のステータスを取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">対象のアカウントID (GUID)</param>
+        /// <param name="projectId">対象のプロジェクトID</param>
+        /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+        /// <returns>レンダー操作の状態を含むモデル</returns>
+        public async Task<ApiProjectRenderOperationModel> GetProjectRenderOperationAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await FetchProjectRenderOperationJsonAsync(location, accountId, projectId, accessToken);
+                return ParseProjectRenderOperationJson(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching project render operation");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのレンダー操作のJSONデータを取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">対象のアカウントID (GUID)</param>
+        /// <param name="projectId">対象のプロジェクトID</param>
+        /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+        /// <returns>APIから取得したJSON文字列 (レンダー操作のステータスを含む)</returns>
+        /// <exception cref="HttpRequestException">HTTPリクエストエラーが発生した場合</exception>
+        public async Task<string> FetchProjectRenderOperationJsonAsync(string location, string accountId, string projectId, string? accessToken)
+        {
+            try
+            {
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/renderoperation";
+                var queryParams = new List<string>();
+
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                response.EnsureSuccessStatusCode(); response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// JSONデータを ApiProjectRenderOperationModel にパースする。
+        /// </summary>
+        /// <param name="json">JSON 文字列</param>
+        /// <returns>パースされた ApiProjectRenderOperationModel オブジェクト</returns>
+        public ApiProjectRenderOperationModel ParseProjectRenderOperationJson(string json)
+        {
+            return JsonSerializer.Deserialize<ApiProjectRenderOperationModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                   ?? throw new JsonException("Failed to parse JSON");
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのサムネイルのURLを取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">対象のアカウントID (GUID)</param>
+        /// <param name="projectId">対象のプロジェクトID</param>
+        /// <param name="thumbnailId">取得するサムネイルのID (GUID)</param>
+        /// <param name="format">オプション: サムネイルのフォーマット (Jpeg / Base64)</param>
+        /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+        /// <returns>サムネイルのURL</returns>
+        public async Task<string> GetProjectThumbnailUrlAsync(string location, string accountId, string projectId, string thumbnailId, string? format = null, string? accessToken = null)
+        {
+            try
+            {
+                return await FetchProjectThumbnailUrlAsync(location, accountId, projectId, thumbnailId, format, accessToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching project thumbnail URL");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのサムネイルのURLを取得する。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">対象のアカウントID (GUID)</param>
+        /// <param name="projectId">対象のプロジェクトID</param>
+        /// <param name="thumbnailId">取得するサムネイルのID (GUID)</param>
+        /// <param name="format">オプション: サムネイルのフォーマット (Jpeg / Base64)</param>
+        /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+        /// <returns>サムネイルのURLを表す文字列</returns>
+        /// <exception cref="HttpRequestException">HTTPリクエストエラーが発生した場合</exception>
+        public async Task<string> FetchProjectThumbnailUrlAsync(string location, string accountId, string projectId, string thumbnailId, string? format, string? accessToken)
+        {
+            try
+            {
+                // APIエンドポイントのURLを構築
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/Thumbnails/{thumbnailId}";
+                var queryParams = new List<string>();
+
+                // サムネイルのフォーマットが指定されている場合は、クエリパラメータに追加
+                if (!string.IsNullOrEmpty(format)) queryParams.Add($"format={format}");
+
+                // アクセストークンが指定されている場合は、クエリパラメータに追加
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                // クエリパラメータをURLに追加
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                // APIへHTTP GETリクエストを送信
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null."); 
+                response.EnsureSuccessStatusCode(); // HTTPレスポンスの成功ステータスを確認
+                return await response.Content.ReadAsStringAsync(); // サムネイルのURLを取得
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error while fetching thumbnail URL");
                 throw;
             }
         }
