@@ -811,6 +811,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// プロジェクトのレンダリングを開始し、結果を取得する非同期メソッド
+        /// Render Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Render-Project
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">アカウントID (GUID)</param>
@@ -844,6 +846,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたパラメータを基にURLを構築し、APIにリクエストを送信し、JSONレスポンスを取得する非同期メソッド
+        /// Render Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Render-Project
         /// </summary>
         /// <param name="location">Azureのリージョン</param>
         /// <param name="accountId">アカウントID (GUID)</param>
@@ -877,6 +881,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSONレスポンスを解析し、レンダリング結果のオブジェクトに変換するメソッド
+        /// Render Project
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Render-Project
         /// </summary>
         /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
         /// <returns>パース済みのレンダリング結果オブジェクト</returns>
