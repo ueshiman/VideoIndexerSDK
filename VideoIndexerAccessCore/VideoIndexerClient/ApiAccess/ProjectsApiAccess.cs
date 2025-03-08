@@ -883,12 +883,103 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// JSONレスポンスを解析し、レンダリング結果のオブジェクトに変換するメソッド
         /// Render Project
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Render-Project
-        /// </summary>
+        /// </summar
         /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
         /// <returns>パース済みのレンダリング結果オブジェクト</returns>
         private ApiProjectRenderResponseModel ParseProjectRenderJson(string jsonResponse)
         {
             return JsonSerializer.Deserialize<ApiProjectRenderResponseModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                   ?? throw new JsonException("Failed to parse JSON response.");
+        }
+
+
+        // Search Projects
+
+        /// <summary>
+        /// 指定された検索条件でプロジェクトを検索する非同期メソッド
+        /// Search Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Projects
+        /// </summary>
+        /// <param name="location">Azureリージョン</param>
+        /// <param name="accountId">アカウントのGUID</param>
+        /// <param name="query">(オプション) フリーテキスト検索クエリ</param>
+        /// <param name="sourceLanguage">(オプション) ソース言語</param>
+        /// <param name="pageSize">(オプション) 取得するプロジェクトの最大件数</param>
+        /// <param name="skip">(オプション) スキップするプロジェクトの件数 (ページネーション用)</param>
+        /// <param name="accessToken">(オプション) アクセストークン</param>
+        /// <returns>検索結果のレスポンスモデル</returns>
+        public async Task<ApiProjectSearchResultModel> SearchProjectsAsync(string location, string accountId, string? query = null, string? sourceLanguage = null, int? pageSize = null, int? skip = null, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await FetchProjectSearchJsonAsync(location, accountId, query, sourceLanguage, pageSize, skip, accessToken);
+                return ParseApiProjectSearchResultModelJson(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while searching projects.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定された検索条件でプロジェクトを検索する非同期メソッド
+        /// Search Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Projects
+        /// </summary>
+        /// <param name="location">Azureリージョン</param>
+        /// <param name="accountId">アカウントのGUID</param>
+        /// <param name="query">(オプション) フリーテキスト検索クエリ</param>
+        /// <param name="sourceLanguage">(オプション) ソース言語</param>
+        /// <param name="pageSize">(オプション) 取得するプロジェクトの最大件数</param>
+        /// <param name="skip">(オプション) スキップするプロジェクトの件数 (ページネーション用)</param>
+        /// <param name="accessToken">(オプション) アクセストークン</param>
+        /// <returns>検索結果のレスポンスモデル</returns>
+        public async Task<string> FetchProjectSearchJsonAsync(string location, string accountId, string? query, string? sourceLanguage, int? pageSize, int? skip, string? accessToken)
+        {
+            var uriBuilder = new UriBuilder(string.Format(_apiResourceConfigurations.ApiEndpoint, location, accountId));
+            var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            if (!string.IsNullOrEmpty(query)) queryParams["query"] = query;
+            if (!string.IsNullOrEmpty(sourceLanguage)) queryParams["sourceLanguage"] = sourceLanguage;
+            if (pageSize.HasValue) queryParams["pageSize"] = pageSize.Value.ToString();
+            if (skip.HasValue) queryParams["skip"] = skip.Value.ToString();
+            if (!string.IsNullOrEmpty(accessToken)) queryParams["accessToken"] = accessToken;
+            uriBuilder.Query = queryParams.ToString();
+
+            return await SendApiRequestAsync(HttpMethod.Get, uriBuilder.ToString());
+        }
+
+        /// <summary>
+        /// APIリクエストを送信し、JSONレスポンスを取得する共通メソッド
+        /// Search Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Projects
+        /// </summary>
+        /// <param name="method">HTTPメソッド (GET, POSTなど)</param>
+        /// <param name="url">リクエストを送信するURL</param>
+        /// <returns>APIからのJSONレスポンス</returns>
+        public async Task<string> SendApiRequestAsync(HttpMethod method, string url)
+        {
+            using var request = new HttpRequestMessage(method, url);
+            request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを指定した型にパースするメソッド
+        /// Search Projects
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Projects
+        /// </summary>
+        /// <typeparam name="T">パースするオブジェクトの型</typeparam>
+        /// <param name="jsonResponse">APIからのJSONレスポンス</param>
+        /// <returns>パースされたオブジェクト</returns>
+        public ApiProjectSearchResultModel ParseApiProjectSearchResultModelJson(string jsonResponse)
+        {
+            return JsonSerializer.Deserialize<ApiProjectSearchResultModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new JsonException("Failed to parse JSON response.");
         }
     }
