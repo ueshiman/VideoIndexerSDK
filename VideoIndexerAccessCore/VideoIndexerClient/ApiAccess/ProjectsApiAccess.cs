@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
@@ -980,6 +981,83 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         public ApiProjectSearchResultModel ParseApiProjectSearchResultModelJson(string jsonResponse)
         {
             return JsonSerializer.Deserialize<ApiProjectSearchResultModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                   ?? throw new JsonException("Failed to parse JSON response.");
+        }
+
+        // Update Project
+
+        /// <summary>
+        /// 指定されたプロジェクトの情報を更新する非同期メソッド。
+        /// </summary>
+        /// <param name="location">Azureリージョン</param>
+        /// <param name="accountId">アカウントのGUID</param>
+        /// <param name="projectId">更新するプロジェクトのID</param>
+        /// <param name="updateRequest">更新するプロジェクトのデータ (名前とビデオ範囲)</param>
+        /// <param name="accessToken">(オプション) アクセストークン</param>
+        /// <returns>更新されたプロジェクトのレスポンスモデル</returns>
+        public async Task<ApiProjectUpdateResponseModel> UpdateProjectAsync(string location, string accountId, string projectId, ApiProjectUpdateRequestModel updateRequest, string? accessToken = null)
+        {
+            try
+            {
+                string jsonResponse = await FetchProjectUpdateJsonAsync(location, accountId, projectId, updateRequest, accessToken);
+                return ParseProjectUpdateResponseJson(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while updating project.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトの更新リクエストをAPIに送信し、レスポンスを取得する。
+        /// </summary>
+        /// <param name="location">Azureリージョンの識別子</param>
+        /// <param name="accountId">更新対象のアカウントID</param>
+        /// <param name="projectId">更新するプロジェクトのID</param>
+        /// <param name="updateRequest">プロジェクトの更新内容</param>
+        /// <param name="accessToken">(オプション) アクセストークン</param>
+        /// <returns>APIのJSONレスポンス</returns>        
+        private async Task<string> FetchProjectUpdateJsonAsync(string location, string accountId, string projectId, ApiProjectUpdateRequestModel updateRequest, string? accessToken)
+        {
+            var uriBuilder = new UriBuilder(string.Format(_apiResourceConfigurations.ApiEndpoint, location, accountId, projectId));
+            var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            if (!string.IsNullOrEmpty(accessToken)) queryParams["accessToken"] = accessToken;
+            uriBuilder.Query = queryParams.ToString();
+
+            var jsonContent = JsonSerializer.Serialize(updateRequest);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            return await SendApiRequestAsync(HttpMethod.Put, uriBuilder.ToString(), content);
+        }
+
+        /// <summary>
+        /// APIリクエストを送信し、JSONレスポンスを取得する共通メソッド。
+        /// </summary>
+        /// <param name="method">HTTPメソッド (GET, POST, PUT など)</param>
+        /// <param name="url">APIのリクエストURL</param>
+        /// <param name="content">(オプション) HTTPリクエストのボディコンテンツ</param>
+        /// <returns>APIからのJSONレスポンス</returns>
+        private async Task<string> SendApiRequestAsync(HttpMethod method, string url, HttpContent? content = null)
+        {
+            using var request = new HttpRequestMessage(method, url) { Content = content };
+            request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSONレスポンスを指定した型にパースするメソッド。
+        /// </summary>
+        /// <param name="jsonResponse">APIからのJSONレスポンス</param>
+        /// <returns>パースされたオブジェクト</returns>
+        private ApiProjectUpdateResponseModel ParseProjectUpdateResponseJson(string jsonResponse)
+        {
+            return JsonSerializer.Deserialize<ApiProjectUpdateResponseModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new JsonException("Failed to parse JSON response.");
         }
     }
