@@ -5,7 +5,7 @@
     /// </summary>
     public class ApiPromptCreateResponseModel
     {
-        public string? ErrorType { get; set; }
-        public string? Message { get; set; }
+        public string? errorType { get; set; }
+        public string? message { get; set; }
     }
 }

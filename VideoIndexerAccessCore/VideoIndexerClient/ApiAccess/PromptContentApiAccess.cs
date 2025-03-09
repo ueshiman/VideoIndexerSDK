@@ -37,7 +37,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="promptStyle">プロンプトのスタイル（オプション）</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>API から取得した JSON 文字列</returns>
-        private async Task<string> FetchPromptContentJsonAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null)
+        public async Task<string> FetchPromptContentJsonAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
                 var response = await httpClient.SendAsync(request);
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
@@ -73,7 +73,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiPromptCreateResponseModel オブジェクト、エラー時は null</returns>
-        private ApiPromptCreateResponseModel? ParsePromptContentJson(string json)
+        public ApiPromptCreateResponseModel? ParsePromptContentJson(string json)
         {
             try
             {
@@ -101,10 +101,79 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             var json = await FetchPromptContentJsonAsync(location, accountId, videoId, modelName, promptStyle, accessToken);
             return ParsePromptContentJson(json);
         }
+
+
+        // Get Prompt Content
+
+        /// <summary>
+        /// API からプロンプトコンテンツの JSON データを取得します。
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoId">ビデオ ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>API から取得した JSON 文字列</returns>
+        public async Task<string> FetchPromptContentJsonAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            try
+            {
+                var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/PromptContent";
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    requestUrl += $"?accessToken={accessToken}";
+                }
+
+                var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError($"API request failed: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// JSON をパースして ApiPromptContentContractModel オブジェクトに変換します。
+        /// </summary>
+        /// <param name="json">API から取得した JSON 文字列</param>
+        /// <returns>パースした ApiPromptContentContractModel オブジェクト、エラー時は null</returns>
+        public ApiPromptContentContractModel? ParseGetPromptContentJson(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiPromptContentContractModel>(json);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError($"JSON parsing error: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// API を呼び出してプロンプトコンテンツのデータを取得します。
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoId">ビデオ ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>プロンプトコンテンツのデータ、エラー時は null</returns>
+        public async Task<ApiPromptContentContractModel?> GetPromptContentAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            var json = await FetchPromptContentJsonAsync(location, accountId, videoId, accessToken);
+            return ParseGetPromptContentJson(json);
+        }
     }
-
-    // Get Prompt Content
-
-
 }
 
