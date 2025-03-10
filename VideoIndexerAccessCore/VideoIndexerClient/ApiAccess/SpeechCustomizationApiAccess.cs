@@ -27,6 +27,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API からスピーチデータセット作成の JSON データを取得します。
+        /// Create Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Speech-Dataset
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -71,6 +73,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 取得した JSON をパースして ApiSpeechDatasetResponseModel オブジェクトに変換します。
+        /// Create Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Speech-Dataset
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiSpeechDatasetResponseModel オブジェクト、エラー時は null</returns>
@@ -89,6 +93,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API を呼び出してスピーチデータセットを作成します。
+        /// Create Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Speech-Dataset
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
