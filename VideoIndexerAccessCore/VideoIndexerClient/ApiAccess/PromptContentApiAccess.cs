@@ -14,11 +14,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
     public class PromptContentApiAccess
     {
-        private readonly ILogger<ProjectsApiAccess> _logger;
+        private readonly ILogger<PromptContentApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
-        public PromptContentApiAccess(ILogger<ProjectsApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        public PromptContentApiAccess(ILogger<PromptContentApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
         {
             _logger = logger;
             _durableHttpClient = durableHttpClient;
