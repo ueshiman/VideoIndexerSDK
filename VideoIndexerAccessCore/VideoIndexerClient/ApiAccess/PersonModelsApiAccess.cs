@@ -689,7 +689,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     url += "?" + queryParams.ToString();
                 }
 
-                _logger.LogInformation("Fetching custom faces sprite from API: {logUrl}", logUrl);
+                _logger.LogInformation("Fetching custom ApiFaces sprite from API: {logUrl}", logUrl);
                 string jsonResponse = await FetchApiResponseAsync(url);
                 return ParseSpriteResponse(jsonResponse);
             }

@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
@@ -16,11 +12,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         private readonly ILogger<RedactionApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
-    
-    /// <summary>
-    /// API から JSON データを取得します。
-    /// </summary>
-    private async Task<string> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, RedactVideoRequest request, string? accessToken = null)
+
+        /// <summary>
+        /// API からビデオ編集 (Redact) の JSON データを取得します。
+        /// Redact Video
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Redact-Video
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoId">ビデオ ID</param>
+        /// <param name="request">ビデオの編集リクエストオブジェクト</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>API から取得した JSON 文字列</returns>
+        private async Task<string> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -46,7 +50,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var response = await httpClient.SendAsync(httpRequest);
                 response.EnsureSuccessStatusCode();
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+                if (response is null) throw new HttpRequestException("The response was null.");
+                response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
@@ -57,8 +62,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// JSON をパースして ApiRedactVideoResponseModel オブジェクトに変換します。
+        /// 取得した JSON をパースして ApiRedactVideoResponseModel オブジェクトに変換します。
+        /// Redact Video
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Redact-Video
         /// </summary>
+        /// <param name="json">API から取得した JSON 文字列</param>
+        /// <returns>パースした ApiRedactVideoResponseModel オブジェクト、エラー時は null</returns>
         private ApiRedactVideoResponseModel? ParseRedactVideoJson(string json)
         {
             try
@@ -74,35 +83,19 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API を呼び出してビデオの編集 (Redact) を開始します。
+        /// Redact Video
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Redact-Video
         /// </summary>
-        public async Task<ApiRedactVideoResponseModel?> RedactVideoAsync(string location, string accountId, string videoId, RedactVideoRequest request, string? accessToken = null)
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="videoId">ビデオ ID</param>
+        /// <param name="request">ビデオの編集リクエストオブジェクト</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>編集リクエストのステータス、エラー時は null</returns>
+        public async Task<ApiRedactVideoResponseModel?> RedactVideoAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
         {
             var json = await FetchRedactVideoJsonAsync(location, accountId, videoId, request, accessToken);
             return ParseRedactVideoJson(json);
         }
     }
-
-public class RedactVideoRequest
-{
-    public FaceRedaction faces { get; set; } = new FaceRedaction();
-}
-
-public class FaceRedaction
-{
-    public string blurringKind { get; set; } = "HighBlur";
-    public FaceFilter filter { get; set; } = new FaceFilter();
-}
-
-public class FaceFilter
-{
-    public List<int> ids { get; set; } = new List<int>();
-    public string scope { get; set; } = "Exclude";
-}
-
-public class ApiRedactVideoResponseModel
-{
-    public string? errorType { get; set; }
-    public string? message { get; set; }
-}
-
 }
