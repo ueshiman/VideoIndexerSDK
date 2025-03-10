@@ -12,7 +12,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class PromptContentApiAccess
+    public class PromptContentApiAccess : IPromptContentApiAccess
     {
         private readonly ILogger<PromptContentApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;

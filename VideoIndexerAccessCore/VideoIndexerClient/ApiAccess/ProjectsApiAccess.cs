@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -8,7 +7,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class ProjectsApiAccess
+    public class ProjectsApiAccess : IProjectsApiAccess
     {
         private readonly ILogger<ProjectsApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -856,7 +855,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accessToken">オプションのアクセストークン (Bearer トークンとして利用可能)</param>
         /// <param name="sendCompletionEmail">レンダリング完了時にメール通知を送信するかのフラグ</param>
         /// <returns>APIから取得したJSONレスポンス</returns>
-        private async Task<string> FetchProjectRenderJsonAsync(string location, string accountId, string projectId, string? accessToken, bool sendCompletionEmail)
+        public async Task<string> FetchProjectRenderJsonAsync(string location, string accountId, string projectId, string? accessToken, bool sendCompletionEmail)
         {
             var uriBuilder = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/render");
 
@@ -887,7 +886,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summar
         /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
         /// <returns>パース済みのレンダリング結果オブジェクト</returns>
-        private ApiProjectRenderResponseModel ParseProjectRenderJson(string jsonResponse)
+        public ApiProjectRenderResponseModel ParseProjectRenderJson(string jsonResponse)
         {
             return JsonSerializer.Deserialize<ApiProjectRenderResponseModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new JsonException("Failed to parse JSON response.");
@@ -1018,7 +1017,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="updateRequest">プロジェクトの更新内容</param>
         /// <param name="accessToken">(オプション) アクセストークン</param>
         /// <returns>APIのJSONレスポンス</returns>        
-        private async Task<string> FetchProjectUpdateJsonAsync(string location, string accountId, string projectId, ApiProjectUpdateRequestModel updateRequest, string? accessToken)
+        public async Task<string> FetchProjectUpdateJsonAsync(string location, string accountId, string projectId, ApiProjectUpdateRequestModel updateRequest, string? accessToken)
         {
             var uriBuilder = new UriBuilder(string.Format(_apiResourceConfigurations.ApiEndpoint, location, accountId, projectId));
             var queryParams = System.Web.HttpUtility.ParseQueryString(string.Empty);
@@ -1038,7 +1037,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="url">APIのリクエストURL</param>
         /// <param name="content">(オプション) HTTPリクエストのボディコンテンツ</param>
         /// <returns>APIからのJSONレスポンス</returns>
-        private async Task<string> SendApiRequestAsync(HttpMethod method, string url, HttpContent? content = null)
+        public async Task<string> SendApiRequestAsync(HttpMethod method, string url, HttpContent? content = null)
         {
             using var request = new HttpRequestMessage(method, url) { Content = content };
             request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
@@ -1055,7 +1054,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIからのJSONレスポンス</param>
         /// <returns>パースされたオブジェクト</returns>
-        private ApiProjectUpdateResponseModel ParseProjectUpdateResponseJson(string jsonResponse)
+        public ApiProjectUpdateResponseModel ParseProjectUpdateResponseJson(string jsonResponse)
         {
             return JsonSerializer.Deserialize<ApiProjectUpdateResponseModel>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new JsonException("Failed to parse JSON response.");

@@ -7,7 +7,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class PersonModelsApiAccess
+    public class PersonModelsApiAccess : IPersonModelsApiAccess
     {
         private readonly ILogger<PersonModelsApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -884,7 +884,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="url">APIのURL</param>
         /// <returns>APIのJSONレスポンス</returns>
-        private async Task<string> FetchApiPersonsResponseAsync(string url)
+        public async Task<string> FetchApiPersonsResponseAsync(string url)
         {
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             using var response = await httpClient.GetAsync(url);
@@ -902,7 +902,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIのJSONレスポンス</param>
         /// <returns>人物情報のリスト</returns>
-        private List<ApiPersonModel> ParsePersonsResponse(string jsonResponse)
+        public List<ApiPersonModel> ParsePersonsResponse(string jsonResponse)
         {
             if (string.IsNullOrEmpty(jsonResponse))
             {
@@ -963,7 +963,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="personIdentificationThreshold">人物識別閾値 (0.0 - 1.0) (オプション)</param>
         /// <param name="accessToken">APIのアクセストークン</param>
         /// <returns>APIのJSONレスポンス</returns>
-        private async Task<string> FetchApiPatchResponseAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
+        public async Task<string> FetchApiPatchResponseAsync(string location, string accountId, string personModelId, string? newName = null, double? personIdentificationThreshold = null, string? accessToken = null)
         {
             string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}";
             var logUrl = url;
@@ -1002,7 +1002,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIのJSONレスポンス</param>
         /// <returns>更新された人物モデル情報</returns>
-        private ApiCustomPersonModel? ParsePatchPersonModelResponse(string jsonResponse)
+        public ApiCustomPersonModel? ParsePatchPersonModelResponse(string jsonResponse)
         {
             if (string.IsNullOrEmpty(jsonResponse))
             {
@@ -1053,7 +1053,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// Video Indexer API に PUT リクエストを送信し、JSON レスポンスを取得します。
         /// </summary>
         /// <returns>JSON レスポンスを文字列として返します。</returns>
-        private async Task<string> SendPutRequestAsync(string location, string accountId, string personModelId, string personId, string? name, string? description, string? accessToken)
+        public async Task<string> SendPutRequestAsync(string location, string accountId, string personModelId, string personId, string? name, string? description, string? accessToken)
         {
             string url = $"{_apiResourceConfigurations}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}";
             var queryParams = new List<string>();
@@ -1077,7 +1077,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">パースする JSON 文字列。</param>
         /// <returns>パースに成功した場合は ApiPersonModel オブジェクト、それ以外は null を返します。</returns>
-        private ApiPersonModel? ParsePersonJson(string json)
+        public ApiPersonModel? ParsePersonJson(string json)
         {
             try
             {
@@ -1126,7 +1126,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// Video Indexer API に PUT リクエストを送信し、JSON レスポンスを取得します。
         /// </summary>
         /// <returns>JSON レスポンスを文字列として返します。</returns>
-        private async Task<string> SendPutRequestForPersonModelAsync(string location, string accountId, string personModelId, string? name, string? accessToken)
+        public async Task<string> SendPutRequestForPersonModelAsync(string location, string accountId, string personModelId, string? name, string? accessToken)
         {
             string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}";
             var queryParams = new List<string>();
@@ -1149,7 +1149,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">パースする JSON 文字列。</param>
         /// <returns>パースに成功した場合は ApiPersonModel オブジェクト、それ以外は null を返します。</returns>
-        private ApiPersonModel? ParsePersonModelsJson(string json)
+        public ApiPersonModel? ParsePersonModelsJson(string json)
         {
             try
             {
