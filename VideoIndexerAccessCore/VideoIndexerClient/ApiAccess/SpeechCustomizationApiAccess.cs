@@ -33,7 +33,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="request">スピーチデータセットのリクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>API から取得した JSON 文字列</returns>
-        private async Task<string> FetchCreateSpeechDatasetJsonAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null)
+        public async Task<string> FetchCreateSpeechDatasetJsonAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiSpeechDatasetResponseModel オブジェクト、エラー時は null</returns>
-        private ApiSpeechDatasetResponseModel? ParseSpeechDatasetJson(string json)
+        public ApiSpeechDatasetResponseModel? ParseSpeechDatasetJson(string json)
         {
             try
             {
