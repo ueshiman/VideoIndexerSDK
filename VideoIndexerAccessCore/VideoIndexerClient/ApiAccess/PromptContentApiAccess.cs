@@ -26,9 +26,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         // Create Prompt Content
+        // 戻り値はboolかもしれない todo
 
         /// <summary>
         /// API からプロンプトコンテンツの JSON データを取得します。
+        /// Create Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Prompt-Content
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -60,6 +63,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
+                //return false; // todo
             }
             catch (HttpRequestException ex)
             {
@@ -70,6 +74,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 取得した JSON データをパースし、オブジェクトに変換します。
+        /// Create Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Prompt-Content
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiPromptCreateResponseModel オブジェクト、エラー時は null</returns>
@@ -88,6 +94,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API を呼び出してプロンプトコンテンツのデータを取得します。
+        /// Create Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Prompt-Content
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -107,6 +115,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API からプロンプトコンテンツの JSON データを取得します。
+        /// Get Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Prompt-Content
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -145,6 +155,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON をパースして ApiPromptContentContractModel オブジェクトに変換します。
+        /// Get Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Prompt-Content
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiPromptContentContractModel オブジェクト、エラー時は null</returns>
@@ -163,6 +175,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API を呼び出してプロンプトコンテンツのデータを取得します。
+        /// Get Prompt Content
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Prompt-Content
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
