@@ -50,6 +50,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IPersonModelsApiAccess, PersonModelsApiAccess>();
             services.TryAddTransient<IProjectsApiAccess, ProjectsApiAccess>();
             services.TryAddTransient<IPromptContentApiAccess, PromptContentApiAccess>();
+            services.TryAddTransient<IRedactionApiAccess, RedactionApiAccess>();
 
             return services;
         }
