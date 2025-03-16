@@ -111,47 +111,6 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Create Speech Model
 
-        ///// <summary>
-        ///// API からスピーチデータセット作成の JSON データを取得します。
-        ///// </summary>
-        ///// <param name="location">Azure のリージョン</param>
-        ///// <param name="accountId">アカウント ID</param>
-        ///// <param name="request">スピーチデータセットのリクエストオブジェクト</param>
-        ///// <param name="accessToken">アクセストークン（オプション）</param>
-        ///// <returns>API から取得した JSON 文字列</returns>
-        //private async Task<string> FetchCreateSpeechDatasetJsonAsync(string location, string accountId, SpeechDatasetRequest request, string? accessToken = null)
-        //{
-        //    try
-        //    {
-        //        var requestUrl = $"{ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/datasets";
-        //        if (!string.IsNullOrEmpty(accessToken))
-        //        {
-        //            requestUrl += $"?accessToken={accessToken}";
-        //        }
-
-        //        var jsonContent = JsonSerializer.Serialize(request);
-        //        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-        //        var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl)
-        //        {
-        //            Content = content
-        //        };
-        //        if (!string.IsNullOrEmpty(accessToken))
-        //        {
-        //            httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-        //        }
-
-        //        var response = await _httpClient.SendAsync(httpRequest);
-        //        response.EnsureSuccessStatusCode();
-        //        return await response.Content.ReadAsStringAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError($"Create speech dataset request failed: {ex.Message}");
-        //        throw;
-        //    }
-        //}
-
         /// <summary>
         /// API からスピーチモデル作成の JSON データを取得します。
         /// Create Speech Model
