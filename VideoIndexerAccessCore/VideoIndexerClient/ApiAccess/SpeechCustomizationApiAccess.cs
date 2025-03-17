@@ -79,7 +79,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiSpeechDatasetResponseModel オブジェクト、エラー時は null</returns>
-        public ApiSpeechDatasetResponseModel? ParseSpeechDatasetJson(string json)
+        public ApiSpeechDatasetResponseModel? ParseSpeechDatasetResponseJson(string json)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         public async Task<ApiSpeechDatasetResponseModel?> CreateSpeechDatasetAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null)
         {
             var json = await FetchCreateSpeechDatasetJsonAsync(location, accountId, request, accessToken);
-            return ParseSpeechDatasetJson(json);
+            return ParseSpeechDatasetResponseJson(json);
         }
 
 
@@ -121,7 +121,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="request">スピーチモデルのリクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>API から取得した JSON 文字列</returns>
-        private async Task<string> FetchCreateSpeechModelJsonAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null)
+        public async Task<string> FetchCreateSpeechModelJsonAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -181,7 +181,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiSpeechModelResponseModel オブジェクト、エラー時は null</returns>
-        private ApiSpeechModelResponseModel? ParseSpeechModelJson(string json)
+        public ApiSpeechModelResponseModel? ParseSpeechModelJson(string json)
         {
             try
             {
@@ -192,6 +192,181 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _logger.LogError($"JSON parsing error: {ex.Message}");
                 return null;
             }
+        }
+
+        // Delete Speech Dataset
+
+        /// <summary>
+        /// API からスピーチデータセット削除リクエストを送信します。
+        /// Delete Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Speech-Dataset
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="datasetId">削除するデータセットの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>削除成功時は true、失敗時は false</returns>
+        public async Task<bool> DeleteSpeechDatasetAsync(string location, string accountId, string datasetId, string? accessToken = null)
+        {
+            try
+            {
+                var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/datasets/{datasetId}";
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    requestUrl += $"?accessToken={accessToken}";
+                }
+
+                var httpRequest = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(httpRequest);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError($"Failed to delete speech dataset: {response.StatusCode}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Delete speech dataset request failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Delete Speech Model
+
+        /// <summary>
+        /// API からスピーチモデル削除リクエストを送信します。
+        /// Delete Speech Model
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Speech-Model
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="modelId">削除するスピーチモデルの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>削除成功時は true、失敗時は false</returns>
+        public async Task<bool> DeleteSpeechModelAsync(string location, string accountId, string modelId, string? accessToken = null)
+        {
+            try
+            {
+                var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/models/{modelId}";
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    requestUrl += $"?accessToken={accessToken}";
+                }
+
+                var httpRequest = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                }
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(httpRequest);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError($"Failed to delete speech model: {response.StatusCode}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Delete speech model request failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Get Speech Dataset
+
+        /// <summary>
+        /// API からスピーチデータセットを取得します。
+        /// Get Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="datasetId">取得するデータセットの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>スピーチデータセット情報を含む ApiSpeechDatasetModel オブジェクト</returns>
+        public async Task<ApiSpeechDatasetModel?> GetSpeechDatasetAsync(string location, string accountId, string datasetId, string? accessToken = null)
+        {
+            try
+            {
+                var responseContent = await FetchSpeechDatasetJsonAsync(location, accountId, datasetId, accessToken);
+                return responseContent != null ? ParseSpeechDatasetJson(responseContent) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get speech dataset request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// API から JSON を取得するメソッド。
+        /// Get Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="datasetId">取得するデータセットの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>JSON 形式のレスポンスを文字列として返す。取得できなかった場合は null。</returns>
+        public async Task<string?> FetchSpeechDatasetJsonAsync(string location, string accountId, string datasetId, string? accessToken)
+        {
+            var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/datasets/{datasetId}";
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                requestUrl += $"?accessToken={accessToken}";
+            }
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(httpRequest);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                _logger.LogError($"Failed to get speech dataset: {response.StatusCode}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// JSON を SpeechDataset オブジェクトにパースするメソッド。
+        /// Get Speech Dataset
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset
+        /// </summary>
+        /// <param name="jsonContent">JSON 形式のレスポンス</param>
+        /// <returns>パースした SpeechDataset オブジェクト。パースに失敗した場合は null。</returns>
+        public ApiSpeechDatasetModel? ParseSpeechDatasetJson(string jsonContent)
+        {
+            return JsonSerializer.Deserialize<ApiSpeechDatasetModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
     }
 }
