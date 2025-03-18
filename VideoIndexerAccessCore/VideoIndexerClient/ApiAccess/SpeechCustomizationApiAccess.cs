@@ -471,6 +471,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API からスピーチデータセット一覧を取得します。
+        /// Get Speech Datasets
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Datasets
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -493,6 +495,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API から JSON を取得するメソッド。
+        /// Get Speech Datasets
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Datasets
         /// </summary>
         /// <param name="location">Azure のリージョン</param>
         /// <param name="accountId">アカウント ID</param>
@@ -541,7 +545,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// JSON を List<ApiSpeechDatasetModel> にパースするメソッド。
+        /// JSON を List＜ApiSpeechDatasetModel＞? にパースするメソッド。
+        /// Get Speech Datasets
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Datasets
         /// </summary>
         /// <param name="jsonContent">JSON 形式のレスポンス</param>
         /// <returns>パースしたスピーチデータセットのリスト。パースに失敗した場合は null。</returns>
