@@ -304,7 +304,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="datasetId">取得するデータセットの ID</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>スピーチデータセット情報を含む ApiSpeechDatasetModel オブジェクト</returns>
-        public async Task<ApiSpeechDatasetModel?> GetSpeechDatasetAsync(string location, string accountId, string datasetId, string? accessToken = null)
+        public async Task<ApiModel.ApiSpeechDatasetModel?> GetSpeechDatasetAsync(string location, string accountId, string datasetId, string? accessToken = null)
         {
             try
             {
@@ -358,15 +358,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// JSON を SpeechDataset オブジェクトにパースするメソッド。
+        /// JSON を ApiSpeechDatasetModel オブジェクトにパースするメソッド。
         /// Get Speech Dataset
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset
         /// </summary>
         /// <param name="jsonContent">JSON 形式のレスポンス</param>
-        /// <returns>パースした SpeechDataset オブジェクト。パースに失敗した場合は null。</returns>
-        public ApiSpeechDatasetModel? ParseSpeechDatasetJson(string jsonContent)
+        /// <returns>パースした ApiSpeechDatasetModel オブジェクト。パースに失敗した場合は null。</returns>
+        public ApiModel.ApiSpeechDatasetModel? ParseSpeechDatasetJson(string jsonContent)
         {
-            return JsonSerializer.Deserialize<ApiSpeechDatasetModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<ApiModel.ApiSpeechDatasetModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         // Get Speech Dataset Files
@@ -466,5 +466,97 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        // Get Speech Datasets
+
+        /// <summary>
+        /// API からスピーチデータセット一覧を取得します。
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="locale">取得するデータセットのロケール（省略可、null の場合はすべて取得）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>スピーチデータセットのリスト。取得できなかった場合は null。</returns>
+        public async Task<List<ApiSpeechDatasetModel>?> GetSpeechDatasetsAsync(string location, string accountId, string? locale = null, string? accessToken = null)
+        {
+            try
+            {
+                var responseContent = await FetchSpeechDatasetsJsonAsync(location, accountId, locale, accessToken);
+                return responseContent != null ? ParseSpeechDatasetsJson(responseContent) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get speech datasets request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// API から JSON を取得するメソッド。
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="locale">取得するデータセットのロケール（省略可）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>JSON 形式のレスポンスを文字列として返す。取得できなかった場合は null。</returns>
+        private async Task<string?> FetchSpeechDatasetsJsonAsync(string location, string accountId, string? locale, string? accessToken)
+        {
+            var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/datasets";
+            var queryParams = new List<string>();
+
+            if (!string.IsNullOrEmpty(locale))
+            {
+                queryParams.Add($"locale={locale}");
+            }
+
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                queryParams.Add($"accessToken={accessToken}");
+            }
+
+            if (queryParams.Count > 0)
+            {
+                requestUrl += "?" + string.Join("&", queryParams);
+            }
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(httpRequest);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                _logger.LogError($"Failed to get speech datasets: {response.StatusCode}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// JSON を List<ApiSpeechDatasetModel> にパースするメソッド。
+        /// </summary>
+        /// <param name="jsonContent">JSON 形式のレスポンス</param>
+        /// <returns>パースしたスピーチデータセットのリスト。パースに失敗した場合は null。</returns>
+        private List<ApiSpeechDatasetModel>? ParseSpeechDatasetsJson(string jsonContent)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<List<ApiSpeechDatasetModel>>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError($"Failed to parse speech datasets JSON: {ex.Message}");
+                return null;
+            }
+        }
+
     }
 }

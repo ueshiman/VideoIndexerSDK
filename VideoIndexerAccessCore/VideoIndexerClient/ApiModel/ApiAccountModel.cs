@@ -4,7 +4,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
 public class ApiAccountModel
 {
-    [JsonPropertyName("properties")]
+    [JsonPropertyName("PropertiesModel")]
     public ApiAccountProperties? properties { get; set; }
 
     [JsonPropertyName("location")]
