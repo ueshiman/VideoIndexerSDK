@@ -368,5 +368,103 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             return JsonSerializer.Deserialize<ApiSpeechDatasetModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
+
+        // Get Speech Dataset Files
+
+        /// <summary>
+        /// API からスピーチデータセットのファイル一覧を取得します。
+        /// Get Speech Dataset Files
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset-Files
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="datasetId">取得するデータセットの ID</param>
+        /// <param name="sasValidityInSeconds">SAS URL の有効時間（秒）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>スピーチデータセットのファイルリストを含むリスト。取得できなかった場合は null。</returns>
+        public async Task<List<ApiSpeechDatasetFileModel>?> GetSpeechDatasetFilesAsync(string location, string accountId, string datasetId, int? sasValidityInSeconds = null, string? accessToken = null)
+        {
+            try
+            {
+                var responseContent = await FetchSpeechDatasetFilesJsonAsync(location, accountId, datasetId, sasValidityInSeconds, accessToken);
+                return responseContent != null ? ParseSpeechDatasetFilesJson(responseContent) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get speech dataset files request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// API から JSON を取得するメソッド。
+        /// Get Speech Dataset Files
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset-Files
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="datasetId">取得するデータセットの ID</param>
+        /// <param name="sasValidityInSeconds">SAS URL の有効時間（秒）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>JSON 形式のレスポンスを文字列として返す。取得できなかった場合は null。</returns>
+        public async Task<string?> FetchSpeechDatasetFilesJsonAsync(string location, string accountId, string datasetId, int? sasValidityInSeconds, string? accessToken)
+        {
+            var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/datasets/{datasetId}/files";
+            var queryParams = new List<string>();
+
+            if (sasValidityInSeconds.HasValue)
+            {
+                queryParams.Add($"sasValidityInSeconds={sasValidityInSeconds.Value}");
+            }
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                queryParams.Add($"accessToken={accessToken}");
+            }
+
+            if (queryParams.Count > 0)
+            {
+                requestUrl += "?" + string.Join("&", queryParams);
+            }
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(httpRequest);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                _logger.LogError($"Failed to get speech dataset files: {response.StatusCode}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// JSON を ApiSpeechDatasetFileModel のリストにパースするメソッド。
+        /// Get Speech Dataset Files
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Dataset-Files
+        /// </summary>
+        /// <param name="jsonContent">JSON 形式のレスポンス</param>
+        /// <returns>パースした ApiSpeechDatasetFileModel のリスト。パースに失敗した場合は null。</returns>
+        public List<ApiSpeechDatasetFileModel>? ParseSpeechDatasetFilesJson(string jsonContent)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<List<ApiSpeechDatasetFileModel>>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError($"Failed to parse speech dataset files JSON: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
