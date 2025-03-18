@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
@@ -564,5 +565,89 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Get Speech Model
+
+        /// <summary>
+        /// API からスピーチモデルを取得します。
+        /// Get Speech Model
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="modelId">取得するスピーチモデルの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>スピーチモデル情報。取得できなかった場合は null。</returns>
+        public async Task<ApiCustomSpeechModel?> GetSpeechModelAsync(string location, string accountId, string modelId, string? accessToken = null)
+        {
+            try
+            {
+                var responseContent = await FetchSpeechModelJsonAsync(location, accountId, modelId, accessToken);
+                return responseContent != null ? ParseCustomSpeechModelJson(responseContent) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Get speech model request failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// API から JSON を取得するメソッド。
+        /// Get Speech Model
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">アカウント ID</param>
+        /// <param name="modelId">取得するスピーチモデルの ID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>JSON 形式のレスポンスを文字列として返す。取得できなかった場合は null。</returns>
+        private async Task<string?> FetchSpeechModelJsonAsync(string location, string accountId, string modelId, string? accessToken)
+        {
+            var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/Speech/models/{modelId}";
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                requestUrl += $"?accessToken={accessToken}";
+            }
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(httpRequest);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                _logger.LogError($"Failed to get speech model: {response.StatusCode}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// JSON を ApiCustomSpeechModel にパースするメソッド。
+        /// Get Speech Model
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
+        /// </summary>
+        /// <param name="jsonContent">JSON 形式のレスポンス</param>
+        /// <returns>パースしたスピーチモデル情報。パースに失敗した場合は null。</returns>
+        private ApiCustomSpeechModel? ParseCustomSpeechModelJson(string jsonContent)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiCustomSpeechModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError($"Failed to parse speech model JSON: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
