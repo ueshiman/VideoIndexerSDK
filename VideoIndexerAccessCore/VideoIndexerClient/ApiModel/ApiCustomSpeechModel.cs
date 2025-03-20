@@ -1,7 +1,8 @@
-﻿using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
-
-namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+﻿namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
+    /// <summary>
+    /// APIから取得したカスタムスピーチモデルを表します。
+    /// </summary>
     public class ApiCustomSpeechModel
     {
         /// <summary>

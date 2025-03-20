@@ -1,8 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
-
-namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+﻿namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
+    /// <summary>
+    /// カスタムスピーチモデルに関連するプロパティを含みます。
+    /// </summary>
     public class ApiCustomSpeechModelPropertiesModel
     {
         /// <summary>

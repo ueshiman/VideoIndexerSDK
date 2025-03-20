@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+﻿namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
+    /// <summary>
+    /// カスタムスピーチモデルの非推奨日付を含みます。
+    /// </summary>
     public class ApiCustomSpeechModelDeprecationDatesModel
     {
         /// <summary>
