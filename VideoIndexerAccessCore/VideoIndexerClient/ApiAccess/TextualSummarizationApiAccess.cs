@@ -40,8 +40,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                string url = BuildApiUrl(location, accountId, videoId, accessToken, length, style, includedFrames);
-                string jsonResponse = await FetchApiResponseAsync(url);
+                string url = BuildApiUrl(out string maskedUrl, location, accountId, videoId, accessToken, length, style, includedFrames);
+                string jsonResponse = await FetchApiResponseAsync(url, maskedUrl);
                 return ParseVideoSummaryJson(jsonResponse);
             }
             catch (HttpRequestException ex)
@@ -67,19 +67,25 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Video-Summary
         /// </summary>
         /// <returns>構築された API URL (クエリパラメータ含む)</returns>
-        private string BuildApiUrl(string location, string accountId, string videoId, string? accessToken, string? length, string? style, string? includedFrames)
+        private string BuildApiUrl(out string maskedUrl, string location, string accountId, string videoId, string? accessToken, string? length, string? style, string? includedFrames)
         {
             string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual";
+            maskedUrl = url;
+
             var queryParams = new List<string>();
             if (!string.IsNullOrEmpty(length)) queryParams.Add($"length={length}");
             if (!string.IsNullOrEmpty(style)) queryParams.Add($"style={style}");
             if (!string.IsNullOrEmpty(includedFrames)) queryParams.Add($"includedFrames={includedFrames}");
-            if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
 
-            if (queryParams.Count > 0)
+            if (queryParams.Count > 0) maskedUrl += "?" + string.Join("&", queryParams);
+
+            if (!string.IsNullOrEmpty(accessToken))
             {
-                url += "?" + string.Join("&", queryParams);
+                queryParams.Add($"accessToken={accessToken}");
+                maskedUrl += $"{(queryParams.Count > 0 ? "&" : "?")}accessToken=***";
             }
+
+            if (queryParams.Count > 0) url += "?" + string.Join("&", queryParams);
             return url;
         }
 
@@ -89,10 +95,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Video-Summary
         /// </summary>
         /// <param name="url">リクエストを送信する API の URL</param>
+        /// <param name="maskedUrl"></param>
         /// <returns>API から取得した JSON レスポンス文字列</returns>
-        private async Task<string> FetchApiResponseAsync(string url)
+        private async Task<string> FetchApiResponseAsync(string url, string maskedUrl)
         {
-            _logger.LogInformation("Sending request to Video Indexer API: {Url}", url);
+            _logger.LogInformation("Sending request to Video Indexer API: {maskedUrl}", maskedUrl);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             HttpResponseMessage response = await httpClient.GetAsync(url);
             // responseがnullなら例外を
