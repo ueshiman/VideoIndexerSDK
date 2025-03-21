@@ -131,5 +131,55 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        // Delete Video Summary
+
+        /// <summary>
+        /// ビデオのテキスト要約を削除する非同期メソッド。
+        /// </summary>
+        /// <param name="location">API のリージョン名 (例: "trial")</param>
+        /// <param name="accountId">Azure Video Indexer のアカウント ID</param>
+        /// <param name="videoId">対象ビデオの ID</param>
+        /// <param name="summaryId">削除する要約の ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>成功した場合 true、失敗した場合 false</returns>
+        public async Task<bool> DeleteVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
+        {
+            try
+            {
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual/{summaryId}";
+                string maskedUrl = url;
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    url += $"?accessToken={accessToken}";
+                    maskedUrl += $"?accessToken=***";
+                }
+
+                _logger.LogInformation("Sending DELETE request to: {maskedUrl}", maskedUrl);
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.DeleteAsync(url);
+
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Successfully deleted video summary: {SummaryId}", summaryId);
+                    return true;
+                }
+
+                _logger.LogWarning("Failed to delete video summary. Status code: {StatusCode}", response.StatusCode);
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error while deleting video summary.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while deleting video summary.");
+                return false;
+            }
+        }
     }
 }
