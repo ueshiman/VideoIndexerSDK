@@ -67,7 +67,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Video-Summary
         /// </summary>
         /// <returns>構築された API URL (クエリパラメータ含む)</returns>
-        private string BuildApiUrl(out string maskedUrl, string location, string accountId, string videoId, string? accessToken, string? length, string? style, string? includedFrames)
+        public string BuildApiUrl(out string maskedUrl, string location, string accountId, string videoId, string? accessToken, string? length, string? style, string? includedFrames)
         {
             string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual";
             maskedUrl = url;
@@ -97,7 +97,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="url">リクエストを送信する API の URL</param>
         /// <param name="maskedUrl"></param>
         /// <returns>API から取得した JSON レスポンス文字列</returns>
-        private async Task<string> FetchApiResponseAsync(string url, string maskedUrl)
+        public async Task<string> FetchApiResponseAsync(string url, string maskedUrl)
         {
             _logger.LogInformation("Sending request to Video Indexer API: {maskedUrl}", maskedUrl);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
@@ -115,7 +115,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースされた `ApiVideoSummaryModel` オブジェクト。失敗時は null。</returns>
-        private ApiVideoSummaryModel? ParseVideoSummaryJson(string json)
+        public ApiVideoSummaryModel? ParseVideoSummaryJson(string json)
         {
             try
             {
