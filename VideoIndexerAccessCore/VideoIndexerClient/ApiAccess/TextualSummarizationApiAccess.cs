@@ -12,7 +12,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class TextualSummarizationApiAccess
+    public class TextualSummarizationApiAccess : ITextualSummarizationApiAccess
     {
 
         private readonly ILogger<TextualSummarizationApiAccess> _logger;
@@ -229,7 +229,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="summaryId">サマリー ID</param>
         /// <param name="accessToken">アクセストークン（省略可）</param>
         /// <returns>取得した JSON 文字列</returns>
-        private async Task<string> FetchVideoSummaryJsonAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
+        public async Task<string> FetchVideoSummaryJsonAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
         {
             var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual/{summaryId}";
             var maskedUrl = baseUrl;
@@ -256,7 +256,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">動画要約の JSON データ</param>
         /// <returns>ApiVideoSummaryModel オブジェクト</returns>
-        private ApiVideoSummaryResponseModel? ParseVideoSummaryResponseJson(string json)
+        public ApiVideoSummaryResponseModel? ParseVideoSummaryResponseJson(string json)
         {
             return JsonSerializer.Deserialize<ApiVideoSummaryResponseModel>(json, new JsonSerializerOptions
             {
@@ -268,9 +268,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 動画に紐づくすべてのテキスト要約メタ情報をリスト形式で取得します。
-        /// </summary>
-        /// <summary>
-        /// 動画に紐づくすべてのテキスト要約メタ情報をリスト形式で取得します。
+        /// List Video Summaries
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Video-Summaries
         /// </summary>
         /// <param name="location">Azure のリージョン名（例: "trial"、"japaneast"）</param>
         /// <param name="accountId">Video Indexer アカウントの GUID</param>
@@ -303,40 +302,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             return null;
         }
 
-        ///// <summary>
-        ///// 動画のテキスト要約（summaryId 指定）の JSON を API から取得します。
-        ///// </summary>
-        ///// <param name="location">Azure のリージョン名</param>
-        ///// <param name="accountId">アカウント GUID</param>
-        ///// <param name="videoId">動画 ID</param>
-        ///// <param name="summaryId">取得するサマリー ID</param>
-        ///// <param name="accessToken">アクセストークン（省略可能）</param>
-        ///// <returns>取得した JSON 文字列</returns>
-        //private async Task<string> FetchVideoSummaryJsonAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
-        //{
-        //    var baseUrl = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual/{summaryId}";
-        //    if (!string.IsNullOrEmpty(accessToken))
-        //    {
-        //        baseUrl += $"?accessToken={Uri.EscapeDataString(accessToken)}";
-        //    }
-
-        //    var response = await _httpClient.GetAsync(baseUrl);
-        //    response.EnsureSuccessStatusCode();
-        //    return await response.Content.ReadAsStringAsync();
-        //}
-
-        ///// <summary>
-        ///// JSON 文字列を ApiVideoSummaryModel にパースします。
-        ///// </summary>
-        ///// <param name="json">API から取得した JSON 文字列</param>
-        ///// <returns>ApiVideoSummaryModel オブジェクト。失敗時は null。</returns>
-        //private ApiVideoSummaryModel? ParseVideoSummaryJson(string json)
-        //{
-        //    return JsonSerializer.Deserialize<ApiVideoSummaryModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        //}
 
         /// <summary>
         /// テキスト要約の一覧 JSON を取得するために Video Indexer API を呼び出します。
+        /// List Video Summaries
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Video-Summaries
         /// </summary>
         /// <param name="location">Azure リージョン</param>
         /// <param name="accountId">アカウント GUID</param>
@@ -346,7 +316,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="state">状態フィルター</param>
         /// <param name="accessToken">アクセストークン</param>
         /// <returns>API から返される JSON 文字列</returns>
-        private async Task<string> FetchVideoSummariesJsonAsync(string location, string accountId, string videoId, int? pageNumber, int? pageSize, string[]? state, string? accessToken)
+        public async Task<string> FetchVideoSummariesJsonAsync(string location, string accountId, string videoId, int? pageNumber, int? pageSize, string[]? state, string? accessToken)
         {
             var query = new List<string>();
             if (pageNumber.HasValue) query.Add($"pageNumber={pageNumber.Value}");
@@ -376,10 +346,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// テキスト要約一覧の JSON を ApiTextualSummarizationContractPageModel にパースします。
+        /// List Video Summaries
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=List-Video-Summaries
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>ApiTextualSummarizationContractPageModel オブジェクト</returns>
-        private ApiTextualSummarizationContractPageModel? ParseVideoSummariesJson(string json)
+        public ApiTextualSummarizationContractPageModel? ParseVideoSummariesJson(string json)
         {
             return JsonSerializer.Deserialize<ApiTextualSummarizationContractPageModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
