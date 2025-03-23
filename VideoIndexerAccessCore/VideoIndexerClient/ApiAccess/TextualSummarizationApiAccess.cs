@@ -181,5 +181,86 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return false;
             }
         }
+
+        // Get Video Summary
+
+        /// <summary>
+        /// Video Indexer API を使用して動画の要約情報を取得します。
+        /// Get Video Summary
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Summary
+        /// </summary>
+        /// <param name="location">API リージョン（例: "trial" や "japaneast"）</param>
+        /// <param name="accountId">Video Indexer アカウントの GUID</param>
+        /// <param name="videoId">対象の動画 ID</param>
+        /// <param name="summaryId">取得するサマリー ID（GUID）</param>
+        /// <param name="accessToken">（オプション）アクセストークン。URL クエリに付加されます</param>
+        /// <returns>動画要約情報を格納した ApiVideoSummaryResponseModel オブジェクト。失敗時は null。</returns>
+        public async Task<ApiVideoSummaryResponseModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
+        {
+            try
+            {
+                var json = await FetchVideoSummaryJsonAsync(location, accountId, videoId, summaryId, accessToken);
+                return ParseVideoSummaryResponseJson(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while fetching video summary.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse JSON from video summary.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving video summary.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// API にアクセスして JSON 文字列を取得します。
+        /// Get Video Summary
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Summary
+        /// </summary>
+        /// <param name="location">Azure リージョン</param>
+        /// <param name="accountId">アカウント GUID</param>
+        /// <param name="videoId">動画 ID</param>
+        /// <param name="summaryId">サマリー ID</param>
+        /// <param name="accessToken">アクセストークン（省略可）</param>
+        /// <returns>取得した JSON 文字列</returns>
+        private async Task<string> FetchVideoSummaryJsonAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
+        {
+            var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual/{summaryId}";
+            var maskedUrl = baseUrl;
+
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                baseUrl += $"?accessToken={Uri.EscapeDataString(accessToken)}";
+                maskedUrl += $"?accessToken=***";
+            }
+            _logger.LogInformation("Sending Get Video Summary request to: {maskedUrl}", maskedUrl);
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.GetAsync(baseUrl);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSON 文字列をパースして ApiVideoSummaryModel オブジェクトに変換します。
+        /// Get Video Summary
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Summary
+        /// </summary>
+        /// <param name="json">動画要約の JSON データ</param>
+        /// <returns>ApiVideoSummaryModel オブジェクト</returns>
+        private ApiVideoSummaryResponseModel? ParseVideoSummaryResponseJson(string json)
+        {
+            return JsonSerializer.Deserialize<ApiVideoSummaryResponseModel>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
     }
 }
