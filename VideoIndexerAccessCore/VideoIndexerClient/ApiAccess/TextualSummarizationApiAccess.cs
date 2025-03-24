@@ -17,7 +17,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたビデオのテキスト要約を取得する非同期メソッド。
-        /// Create Video Summary
+        /// Create Video Summary1
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Video-Summary
         /// </summary>
         /// <param name="location">API のリージョン名 (例: "trial")</param>

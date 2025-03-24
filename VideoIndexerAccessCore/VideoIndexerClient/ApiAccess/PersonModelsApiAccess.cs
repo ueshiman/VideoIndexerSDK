@@ -1252,5 +1252,79 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             return JsonSerializer.Deserialize<string>(json) ?? throw new JsonException("Expected a JSON string value but got null or invalid.");
         }
+
+        // Get Video Access Token
+
+        /// <summary>
+        /// ビデオに対するアクセストークンを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="location">Azure リージョン（例: "japaneast"）。</param>
+        /// <param name="accountId">対象のアカウント ID（GUID形式）。</param>
+        /// <param name="videoId">対象のビデオ ID。</param>
+        /// <param name="allowEdit">アクセストークンに編集権限を含めるか（true: 編集可、false: 読み取り専用）。省略可。</param>
+        /// <param name="clientRequestId">リクエストを識別するための GUID（省略可）。</param>
+        /// <returns>アクセストークンの文字列。失敗時は null。</returns>
+        public async Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            try
+            {
+                var json = await FetchVideoAccessTokenJsonAsync(location, accountId, videoId, allowEdit, clientRequestId);
+                return ParseVideoAccessTokenJson(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error while getting video access token.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing error while reading video access token.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while getting video access token.");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Video Indexer API からビデオアクセストークンの JSON データを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="location">API 呼び出し対象の Azure リージョン。</param>
+        /// <param name="accountId">アカウント ID（GUID形式）。</param>
+        /// <param name="videoId">ビデオ ID。</param>
+        /// <param name="allowEdit">編集権限を付与するか（true または false）。省略可。</param>
+        /// <param name="clientRequestId">リクエストトラッキング用の GUID（任意）。</param>
+        /// <returns>API 応答の JSON 文字列。</returns>
+        private async Task<string> FetchVideoAccessTokenJsonAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            var uri = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/Auth/{location}/Accounts/{accountId}/Videos/{videoId}/AccessToken");
+            if (allowEdit.HasValue)
+            {
+                uri.Query = $"allowEdit={allowEdit.Value.ToString().ToLower()}";
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri.Uri);
+            if (!string.IsNullOrEmpty(clientRequestId))
+            {
+                request.Headers.Add("x-ms-client-request-id", clientRequestId);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// ビデオアクセストークンの JSON を解析してトークン文字列を抽出する。
+        /// </summary>
+        /// <param name="json">JSON 文字列。</param>
+        /// <returns>アクセストークンの文字列。</returns>
+        private string ParseVideoAccessTokenJson(string json)
+        {
+            return ParseStringJson(json);
+        }
     }
 }
