@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -1160,6 +1162,95 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _logger.LogError(ex, "Failed to parse Person Model JSON.");
                 return null;
             }
+        }
+
+        // Get User Access Token
+
+        /// <summary>
+        /// ユーザーに対するアクセストークンを取得する非同期メソッド。
+        /// Get User Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-User-Access-Token
+        /// </summary>
+        /// <param name="location">API 呼び出し対象の Azure リージョン（例: "japaneast"）。</param>
+        /// <param name="allowEdit">アクセストークンに編集権限を付与するか（true: 編集可, false: 読み取り専用）。省略可。</param>
+        /// <param name="clientRequestId">リクエストを識別する GUID（省略可）。</param>
+        /// <returns>アクセストークンの文字列。エラー時は null を返す。</returns>
+        public async Task<string?> GetUserAccessTokenAsync(string location, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            try
+            {
+                var json = await FetchUserAccessTokenJsonAsync(location, allowEdit, clientRequestId);
+                return ParseUserAccessTokenJson(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error while getting user access token.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing error while reading user access token.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while getting user access token.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// ユーザーアクセストークンを取得する API を呼び出して JSON 文字列を取得する。
+        /// Get User Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-User-Access-Token
+        /// </summary>
+        /// <param name="location">Azure リージョン。</param>
+        /// <param name="allowEdit">編集を許可するか（true または false）。省略可。</param>
+        /// <param name="clientRequestId">任意のリクエスト ID。</param>
+        /// <returns>API 応答の JSON 文字列。</returns>
+        private async Task<string> FetchUserAccessTokenJsonAsync(string location, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            var uri = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/Auth/{location}/Users/me/AccessToken");
+            if (allowEdit.HasValue)
+            {
+                uri.Query = $"allowEdit={allowEdit.Value.ToString().ToLower()}";
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri.Uri);
+            if (!string.IsNullOrEmpty(clientRequestId))
+            {
+                request.Headers.Add("x-ms-client-request-id", clientRequestId);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// ユーザーアクセストークンの JSON を解析してトークン文字列を抽出する。
+        /// Get User Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-User-Access-Token
+        /// </summary>
+        /// <param name="json">JSON 文字列。</param>
+        /// <returns>アクセストークンの文字列。</returns>
+        private string ParseUserAccessTokenJson(string json)
+        {
+            return ParseStringJson(json);
+        }
+
+
+        /// <summary>
+        /// JSON 文字列から単一の文字列値をデシリアライズする汎用メソッド。
+        /// Get User Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-User-Access-Token
+        /// </summary>
+        /// <param name="json">文字列を含む JSON データ。</param>
+        /// <returns>デシリアライズされた文字列。null や不正な形式の場合は例外をスロー。</returns>
+        private string ParseStringJson(string json)
+        {
+            return JsonSerializer.Deserialize<string>(json) ?? throw new JsonException("Expected a JSON string value but got null or invalid.");
         }
     }
 }
