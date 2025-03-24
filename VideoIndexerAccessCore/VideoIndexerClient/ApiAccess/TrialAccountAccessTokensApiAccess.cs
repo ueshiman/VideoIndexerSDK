@@ -257,6 +257,76 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Get Project Access Token
 
+        /// <summary>
+        /// プロジェクトに対するアクセストークンを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="location">Azure リージョン（例: "japaneast"）。</param>
+        /// <param name="accountId">アカウント ID（GUID形式）。</param>
+        /// <param name="projectId">プロジェクト ID。</param>
+        /// <param name="allowEdit">編集を許可するかどうか（true で書き込み可）。省略可。</param>
+        /// <param name="clientRequestId">リクエストトラッキング用の GUID（省略可）。</param>
+        /// <returns>アクセストークンの文字列。失敗時は null。</returns>
+        public async Task<string?> GetProjectAccessTokenAsync(string location, string accountId, string projectId, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            try
+            {
+                var json = await FetchProjectAccessTokenJsonAsync(location, accountId, projectId, allowEdit, clientRequestId);
+                return ParseProjectAccessTokenJson(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error while getting project access token.");
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing error while reading project access token.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while getting project access token.");
+            }
+            return null;
+        }
 
+        /// <summary>
+        /// プロジェクトアクセストークン取得用の JSON を Video Indexer API から取得する非同期メソッド。
+        /// </summary>
+        /// <param name="location">API 呼び出し対象の Azure リージョン（例: "japaneast"）。</param>
+        /// <param name="accountId">対象のアカウント ID（GUID形式）。</param>
+        /// <param name="projectId">対象のプロジェクト ID。</param>
+        /// <param name="allowEdit">アクセストークンに編集権限を含めるか（true: 編集可、false: 読み取り専用）。省略可。</param>
+        /// <param name="clientRequestId">リクエストの識別に使用される GUID（任意）。</param>
+        /// <returns>API 応答の JSON 文字列。</returns>
+        public async Task<string> FetchProjectAccessTokenJsonAsync(string location, string accountId, string projectId, bool? allowEdit, string? clientRequestId)
+        {
+            var uri = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/Auth/{location}/Accounts/{accountId}/Projects/{projectId}/AccessToken");
+            if (allowEdit.HasValue)
+            {
+                uri.Query = $"allowEdit={allowEdit.Value.ToString().ToLower()}";
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri.Uri);
+            if (!string.IsNullOrEmpty(clientRequestId))
+            {
+                request.Headers.Add("x-ms-client-request-id", clientRequestId);
+            }
+
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// JSON 文字列から単一の文字列値をデシリアライズする汎用メソッド。
+        /// </summary>
+        /// <param name="json">文字列を含む JSON データ。</param>
+        /// <returns>デシリアライズされた文字列。null や不正な形式の場合は例外をスロー。</returns>
+        public string ParseProjectAccessTokenJson(string json)
+        {
+            return JsonSerializer.Deserialize<string>(json) ?? throw new JsonException("Expected a JSON string value but got null or invalid.");
+        }
     }
 }
