@@ -53,6 +53,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<IRedactionApiAccess, RedactionApiAccess>();
             services.TryAddTransient<ISpeechCustomizationApiAccess, SpeechCustomizationApiAccess>();
             services.TryAddTransient<ITextualSummarizationApiAccess, TextualSummarizationApiAccess>();
+            services.TryAddTransient<ITrialAccountAccessTokensApiAccess, TrialAccountAccessTokensApiAccess>();
 
             return services;
         }

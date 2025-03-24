@@ -6,14 +6,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using VideoIndexerAccess.Repositories.VideoItemRepository;
 using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccess.Repositories.VideoItemRepository;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
-using VideoIndexerAccessCore.VideoIndexerClient.Authorization;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.Parser;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
