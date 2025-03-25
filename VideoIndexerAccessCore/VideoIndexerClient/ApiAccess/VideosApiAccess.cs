@@ -380,6 +380,69 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Get Video Id By External Id
+
+        /// <summary>
+        /// 外部 ID を使って、対応する Video ID を取得します。
+        /// Get Video Id By External Id
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Id-By-External-Id
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer のアカウント ID（GUID）</param>
+        /// <param name="externalId">検索対象の外部 ID（ExternalId）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>対応する Video ID（string）を返します。見つからない場合やエラー時は null。</returns>
+        public async Task<string?> GetVideoIdByExternalIdAsync(
+            string location,
+            string accountId,
+            string externalId,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/GetIdByExternalId";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(externalId))
+                    query["externalId"] = externalId;
+
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                    query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve videoId by externalId: {Error}", error);
+                    return null;
+                }
+
+                var videoId = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Video ID retrieved successfully by externalId.");
+                return videoId.Trim('"'); // 念のため JSON の "文字列" を外す
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving video ID by externalId.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving video ID by externalId.");
+                return null;
+            }
+        }
+
     }
 }
 
