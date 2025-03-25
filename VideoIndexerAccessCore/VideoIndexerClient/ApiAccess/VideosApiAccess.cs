@@ -233,6 +233,81 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        // Get Video Captions
+
+        /// <summary>
+        /// 指定された動画に対して字幕（キャプション）を取得します。
+        /// Get Video Captions
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Captions
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象となるビデオ ID</param>
+        /// <param name="indexId">インデックス ID（オプション）</param>
+        /// <param name="format">字幕フォーマット（例: Vtt, Srt, Txt, Csv など）</param>
+        /// <param name="language">字幕の言語（例: ja-JP, en-US など）</param>
+        /// <param name="includeAudioEffects">音声効果を含めるか（true/false）</param>
+        /// <param name="includeSpeakers">話者情報を含めるか（true/false）</param>
+        /// <param name="accessToken">アクセストークン（省略可能だが、必要な場合あり）</param>
+        /// <returns>取得された字幕データ（文字列）を返します。失敗時は null。</returns>
+        public async Task<string?> GetVideoCaptionsAsync(
+            string location,
+            string accountId,
+            string videoId,
+            string? indexId = null,
+            string? format = null,
+            string? language = null,
+            bool? includeAudioEffects = null,
+            bool? includeSpeakers = null,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Captions";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(indexId)) query["indexId"] = indexId;
+                if (!string.IsNullOrWhiteSpace(format)) query["format"] = format;
+                if (!string.IsNullOrWhiteSpace(language)) query["language"] = language;
+                if (includeAudioEffects.HasValue) query["includeAudioEffects"] = includeAudioEffects.Value.ToString().ToLower();
+                if (includeSpeakers.HasValue) query["includeSpeakers"] = includeSpeakers.Value.ToString().ToLower();
+                if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve captions: {Error}", error);
+                    return null;
+                }
+
+                var captions = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Captions retrieved successfully.");
+                return captions;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving captions.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving captions.");
+                return null;
+            }
+        }
+
     }
 }
 
