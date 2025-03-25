@@ -299,14 +299,17 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "API communication error occurred while retrieving captions.");
-                return null;
+                throw;
+                //return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred while retrieving captions.");
-                return null;
+                throw;
+                //return null;
             }
         }
+
 
     }
 }
