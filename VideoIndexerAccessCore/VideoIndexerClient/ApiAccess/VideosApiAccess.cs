@@ -120,7 +120,119 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Delete Video Source File
 
+        /// <summary>
+        /// 指定された動画のソースファイルとストリーミングアセットを削除します（インサイトは保持）。
+        /// Delete Video Source File
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Video-Source-File
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast"、"westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウントの一意な GUID 文字列</param>
+        /// <param name="videoId">ソースファイルを削除するビデオの ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>
+        /// 削除に成功した場合は true を返し、失敗や例外発生時には false を返します。
+        /// </returns>
+        public async Task<bool> DeleteVideoSourceFileAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/SourceFile";
 
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                    url += $"?accessToken={Uri.EscapeDataString(accessToken)}";
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    _logger.LogInformation("Video source file deleted successfully.");
+                    return true;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Video source file deletion response: {Json}", json);
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while deleting source file.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while deleting source file.");
+                return false;
+            }
+        }
+
+        // Get Video Artifact Download Url
+
+        /// <summary>
+        /// 指定された動画の指定された種類のアーティファクトのダウンロード URL を取得します。
+        /// Get Video Artifact Download Url
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Artifact-Download-Url
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast"、"westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウントの GUID</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="artifactType">アーティファクトの種類（例: Transcript, Faces, Labels など）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>ダウンロード可能な一時的な URL（文字列）</returns>
+        public async Task<string?> GetArtifactDownloadUrlAsync(string location, string accountId, string videoId, string? artifactType = null, string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/ArtifactUrl";
+
+                var hasQuery = false;
+                if (!string.IsNullOrWhiteSpace(artifactType))
+                {
+                    url += $"?type={Uri.EscapeDataString(artifactType)}";
+                    hasQuery = true;
+                }
+
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                {
+                    url += hasQuery ? "&" : "?";
+                    url += $"accessToken={Uri.EscapeDataString(accessToken)}";
+                }
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorJson = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve artifact URL: {Error}", errorJson);
+                    return null;
+                }
+
+                var result = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Artifact URL retrieved: {Url}", result);
+                return result.Trim('"');
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving artifact URL.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving artifact URL.");
+                return null;
+            }
+        }
     }
 }
 
