@@ -6,8 +6,8 @@ public interface ITrialAccountAccessTokensApiAccess
 {
     /// <summary>
     /// アカウントアクセストークンを取得する非同期メソッド。
-    /// Get Account Access Token
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+    /// Get ApiTrialAccountModel Access Token
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
     /// </summary>
     /// <param name="location">Azureリージョンを示す文字列（例: "japaneast"）。</param>
     /// <param name="accountId">アカウントID（GUID形式）。</param>
@@ -18,8 +18,8 @@ public interface ITrialAccountAccessTokensApiAccess
 
     /// <summary>
     /// 指定されたパラメータに基づいて Video Indexer API からアクセストークンを取得する非同期メソッド。
-    /// Get Account Access Token
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+    /// Get ApiTrialAccountModel Access Token
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
     /// </summary>
     /// <param name="location">Azure リージョン。</param>
     /// <param name="accountId">アカウント ID。</param>
@@ -30,8 +30,8 @@ public interface ITrialAccountAccessTokensApiAccess
 
     /// <summary>
     /// アクセストークンの JSON 文字列をパースしてトークン文字列を返す。
-    /// Get Account Access Token
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+    /// Get ApiTrialAccountModel Access Token
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
     /// </summary>
     /// <param name="json">APIから取得した JSON 文字列。</param>
     /// <returns>アクセストークンの文字列。null または不正な形式の場合は例外をスロー。</returns>
@@ -39,8 +39,8 @@ public interface ITrialAccountAccessTokensApiAccess
 
     /// <summary>
     /// アカウントアクセストークン（パーミッション指定付き）を取得する非同期メソッド。
-    /// Get Account Access Token With Permission (PREVIEW)
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token-With-Permission
+    /// Get ApiTrialAccountModel Access Token With Permission (PREVIEW)
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token-With-Permission
     /// </summary>
     /// <param name="location">Azureリージョン。</param>
     /// <param name="accountId">アカウントID（GUID形式）。</param>
@@ -51,8 +51,8 @@ public interface ITrialAccountAccessTokensApiAccess
 
     /// <summary>
     /// 指定されたパーミッションに基づいて Video Indexer API からアクセストークンを取得する非同期メソッド。
-    /// Get Account Access Token With Permission (PREVIEW)
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token-With-Permission
+    /// Get ApiTrialAccountModel Access Token With Permission (PREVIEW)
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token-With-Permission
     /// </summary>
     /// <param name="location">Azure リージョン。</param>
     /// <param name="accountId">アカウント ID。</param>

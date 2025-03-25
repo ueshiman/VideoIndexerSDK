@@ -13,7 +13,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
     /// </summary>
     public class AccountApiAccess : IAccounApitAccess
     {
-        private const string ParamName = "JsonSerializer.Deserialize<Account>(jsonResponseBody)";
+        private const string ParamName = "JsonSerializer.Deserialize<ApiTrialAccountModel>(jsonResponseBody)";
         private ApiAccountModel? _account;
         private readonly ILogger<AccountApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -74,7 +74,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 ApiAccountModel? account = JsonSerializer.Deserialize<ApiAccountModel>(jsonResponseBody) ?? throw new ArgumentNullException(ParamName);
                 //if (account == null) throw new ArgumentNullException(nameof(account));
                 VerifyValidAccount(account, accountName);
-                _logger.LogInformation($"[Account Details] Id:{account!.properties!.id}, location: {account.location}");
+                _logger.LogInformation($"[ApiTrialAccountModel Details] Id:{account!.properties!.id}, location: {account.location}");
                 _account = account;
                 return account;
             }
@@ -114,7 +114,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var jsonResponseBody = await result.Content.ReadAsStringAsync();
                 ApiAccountModel? account = JsonSerializer.Deserialize<ApiAccountModel>(jsonResponseBody) ?? throw new ArgumentNullException(paramName: ParamName);
                 VerifyValidAccount(account, accountName);
-                _logger.LogInformation($"[Account Details] Id:{account!.properties!.id}, Location: {account.location}");
+                _logger.LogInformation($"[ApiTrialAccountModel Details] Id:{account!.properties!.id}, Location: {account.location}");
                 _account = account;
                 return account;
             }
@@ -135,7 +135,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             if (string.IsNullOrWhiteSpace(account?.location) || account.properties == null || string.IsNullOrWhiteSpace(account.properties.id))
             {
                 _logger.LogError($"{nameof(accountName)} {accountName} not found. Check {nameof(_apiResourceConfigurations.SubscriptionId)}, {nameof(_apiResourceConfigurations.ResourceGroup)}, {nameof(accountName)} are valid.");
-                throw new Exception($"Account {accountName} not found.");
+                throw new Exception($"ApiTrialAccountModel {accountName} not found.");
             }
         }
     }

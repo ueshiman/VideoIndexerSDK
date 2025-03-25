@@ -14,7 +14,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
     /// <summary>
     /// アカウント移行ステータスを取得するためのクラス
-    /// Get Account Migration Status
+    /// Get ApiTrialAccountModel Migration Status
     /// Try it Gets the account asset’s migration status.
     /// </summary>
     public class AccountMigrationStatusApiAccess : IAccountMigrationStatusApiAccess
@@ -25,7 +25,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// AccountMigrationStatusApiAccess クラスの新しいインスタンスを初期化します。
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Migration-Status
         /// </summary>
         /// <param name="logger">ロガーインスタンス</param>
         /// <param name="durableHttpClient">HTTP クライアント</param>

@@ -12,12 +12,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
-        // Get Account Access Token
+        // Get ApiTrialAccountModel Access Token
 
         /// <summary>
         /// アカウントアクセストークンを取得する非同期メソッド。
-        /// Get Account Access Token
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+        /// Get ApiTrialAccountModel Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
         /// </summary>
         /// <param name="location">Azureリージョンを示す文字列（例: "japaneast"）。</param>
         /// <param name="accountId">アカウントID（GUID形式）。</param>
@@ -49,8 +49,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたパラメータに基づいて Video Indexer API からアクセストークンを取得する非同期メソッド。
-        /// Get Account Access Token
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+        /// Get ApiTrialAccountModel Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
         /// </summary>
         /// <param name="location">Azure リージョン。</param>
         /// <param name="accountId">アカウント ID。</param>
@@ -84,8 +84,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// アクセストークンの JSON 文字列をパースしてトークン文字列を返す。
-        /// Get Account Access Token
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token
+        /// Get ApiTrialAccountModel Access Token
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token
         /// </summary>
         /// <param name="json">APIから取得した JSON 文字列。</param>
         /// <returns>アクセストークンの文字列。null または不正な形式の場合は例外をスロー。</returns>
@@ -96,12 +96,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                    ?? throw new JsonException("Access token is null or invalid.");
         }
 
-        // Get Account Access Token With Permission (PREVIEW)
+        // Get ApiTrialAccountModel Access Token With Permission (PREVIEW)
 
         /// <summary>
         /// アカウントアクセストークン（パーミッション指定付き）を取得する非同期メソッド。
-        /// Get Account Access Token With Permission (PREVIEW)
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token-With-Permission
+        /// Get ApiTrialAccountModel Access Token With Permission (PREVIEW)
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token-With-Permission
         /// </summary>
         /// <param name="location">Azureリージョン。</param>
         /// <param name="accountId">アカウントID（GUID形式）。</param>
@@ -133,8 +133,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたパーミッションに基づいて Video Indexer API からアクセストークンを取得する非同期メソッド。
-        /// Get Account Access Token With Permission (PREVIEW)
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Access-Token-With-Permission
+        /// Get ApiTrialAccountModel Access Token With Permission (PREVIEW)
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-ApiTrialAccountModel-Access-Token-With-Permission
         /// </summary>
         /// <param name="location">Azure リージョン。</param>
         /// <param name="accountId">アカウント ID。</param>
