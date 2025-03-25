@@ -310,6 +310,75 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Get Video Frames File Paths
+
+        /// <summary>
+        /// 指定された動画から抽出されたフレーム画像の SAS URL 一覧を取得します。
+        /// Get Video Frames File Paths
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Frames-File-Paths
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="urlsLifetimeSeconds">URL の有効期限（秒単位）</param>
+        /// <param name="pageSize">1ページあたりの取得件数（省略可能）</param>
+        /// <param name="skip">スキップするフレーム数（省略可能）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>JSON 文字列として返される SAS URL 一覧（または null）</returns>
+        public async Task<string?> GetVideoFramesFilePathsAsync(
+            string location,
+            string accountId,
+            string videoId,
+            int? urlsLifetimeSeconds = null,
+            int? pageSize = null,
+            int? skip = null,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/FramesFilePaths";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (urlsLifetimeSeconds.HasValue) query["urlsLifetimeSeconds"] = urlsLifetimeSeconds.Value.ToString();
+                if (pageSize.HasValue) query["pageSize"] = pageSize.Value.ToString();
+                if (skip.HasValue) query["skip"] = skip.Value.ToString();
+                if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve frame file paths: {Error}", error);
+                    return null;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Frame file paths retrieved successfully.");
+                return json;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving frame file paths.");
+                throw;
+                //return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving frame file paths.");
+                throw;
+                //return null;
+            }
+        }
 
     }
 }
