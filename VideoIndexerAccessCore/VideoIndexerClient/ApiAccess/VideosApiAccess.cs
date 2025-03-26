@@ -507,7 +507,119 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Get Video Streaming URL
 
+        /// <summary>
+        /// 指定された動画のストリーミング再生用 URL を取得します。
+        /// Get Video Streaming URL
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Streaming-URL
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="useProxy">Safari 対応などのためにプロキシを使用するかどうか（省略可能）</param>
+        /// <param name="urlFormat">ストリーミングフォーマット（例: HLS_V4, HLS_V6, MPEG_DASH など）</param>
+        /// <param name="tokenLifetimeInMinutes">トークンの有効期限（分）※省略時は既定値（60分）</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
+        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(
+            string location,
+            string accountId,
+            string videoId,
+            bool? useProxy = null,
+            string? urlFormat = null,
+            int? tokenLifetimeInMinutes = null,
+            string? accessToken = null)
+        {
+            try
+            {
+                var json = await FetchStreamingUrlJsonAsync(location, accountId, videoId, useProxy, urlFormat, tokenLifetimeInMinutes, accessToken);
+                return ParseStreamingUrlJson(json);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving streaming URL.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving streaming URL.");
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// ストリーミング URL を取得するための API から JSON を取得します。
+        /// Get Video Streaming URL
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Streaming-URL
+        /// </summary>
+        /// <param name="location">Azure リージョン名</param>
+        /// <param name="accountId">Video Indexer アカウント ID</param>
+        /// <param name="videoId">対象ビデオ ID</param>
+        /// <param name="useProxy">プロキシ使用の有無（Safari対応）</param>
+        /// <param name="urlFormat">ストリーミング URL フォーマット</param>
+        /// <param name="tokenLifetimeInMinutes">トークン有効期限（分）</param>
+        /// <param name="accessToken">アクセストークン（任意）</param>
+        /// <returns>ストリーミング URL 情報の JSON テキスト。失敗時は null。</returns>
+        private async Task<string?> FetchStreamingUrlJsonAsync(
+            string location,
+            string accountId,
+            string videoId,
+            bool? useProxy,
+            string? urlFormat,
+            int? tokenLifetimeInMinutes,
+            string? accessToken)
+        {
+            var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/streaming-url";
+            var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+            if (useProxy.HasValue) query["useProxy"] = useProxy.Value.ToString().ToLower();
+            if (!string.IsNullOrWhiteSpace(urlFormat)) query["urlFormat"] = urlFormat;
+            if (tokenLifetimeInMinutes.HasValue) query["tokenLifetimeInMinutes"] = tokenLifetimeInMinutes.ToString();
+            if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+            if (query.Count > 0)
+                url += "?" + query.ToString();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+            //var response = await _httpClient.SendAsync(request);
+            HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+            var response = await httpClient.SendAsync(request);
+            // responseがnullなら例外を
+            if (response is null) throw new HttpRequestException("The response was null.");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Failed to retrieve video streaming URL: {Error}", error);
+                return null;
+            }
+
+            _logger.LogInformation("Video streaming URL JSON retrieved successfully.");
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// ストリーミング URL 情報の JSON テキストを ApiStreamingUrlModel オブジェクトに変換します。
+        /// Get Video Streaming URL
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Streaming-URL
+        /// </summary>
+        /// <param name="json">JSON テキスト</param>
+        /// <returns>ApiStreamingUrlModel オブジェクト。失敗時は null。</returns>
+        private ApiStreamingUrlModel? ParseStreamingUrlJson(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<ApiStreamingUrlModel>(json);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON parsing error occurred while parsing streaming URL.");
+                return null;
+            }
+        }
     }
 }
 
