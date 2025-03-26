@@ -443,6 +443,71 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Get Video Source File Download Url
+
+        /// <summary>
+        /// 指定された動画のソースファイル（元動画）のダウンロード用一時 URL を取得します。
+        /// Get Video Source File Download Url
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Source-File-Download-Url
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>ソースファイルのダウンロード URL（SAS 付きの一時 URL）。取得できなければ null。</returns>
+        public async Task<string?> GetVideoSourceFileDownloadUrlAsync(
+            string location,
+            string accountId,
+            string videoId,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/SourceFile/DownloadUrl";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                    query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve video source file URL: {Error}", error);
+                    return null;
+                }
+
+                var downloadUrl = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Video source file download URL retrieved successfully.");
+                return downloadUrl.Trim('"');
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving source file URL.");
+                throw;
+                //return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving source file URL.");
+                throw;
+                //return null;
+            }
+        }
+
+        // Get Video Streaming URL
+
+
     }
 }
 
