@@ -2,7 +2,7 @@
 {
     public class ApiStreamingUrlModel
     {
-        public string? Url { get; set; }
-        public string? Jwt { get; set; }
+        public string? url { get; set; }
+        public string? jwt { get; set; }
     }
 }

@@ -689,6 +689,36 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         // List Videos
 
         /// <summary>
+        /// 指定された Video Indexer アカウント内の動画一覧を取得します。
+        /// </summary>
+        /// <param name="location">Azureリージョン。例: "japaneast"</param>
+        /// <param name="accountId">Video IndexerアカウントのGUID</param>
+        /// <param name="createdAfter">指定日以降に作成された動画にフィルタリング（RFC3339形式）</param>
+        /// <param name="createdBefore">指定日以前に作成された動画にフィルタリング（RFC3339形式）</param>
+        /// <param name="pageSize">1ページあたりの取得件数</param>
+        /// <param name="skip">先頭からスキップする動画数</param>
+        /// <param name="partitions">パーティションに基づいて動画をフィルタ</param>
+        /// <param name="accessToken">APIアクセス用のアクセストークン</param>
+        /// <returns>
+        /// <see cref="VideoSearchResult"/> オブジェクト。成功時は動画の一覧情報を含みます。失敗時は null を返します。
+        /// </returns>
+        public async Task<ApiVideoSearchResultModel?> ListVideosAsync(
+            string location,
+            string accountId,
+            string? createdAfter = null,
+            string? createdBefore = null,
+            int? pageSize = null,
+            int? skip = null,
+            string[]? partitions = null,
+            string? accessToken = null)
+        {
+            var url = BuildListVideosUrl(location, accountId, createdAfter, createdBefore, pageSize, skip, partitions, accessToken);
+            var json = await FetchVideoListJsonAsync(url);
+            return ParseVideoListJson(json);
+        }
+
+
+        /// <summary>
         /// ListVideos API用のURLを生成します。
         /// </summary>
         /// <param name="location">APIのルーティング対象となるAzureリージョン（例: "japaneast"）</param>
@@ -734,7 +764,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
                 var response = await httpClient.SendAsync(request);
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null."); if (!response.IsSuccessStatusCode)
+                if (response is null) throw new HttpRequestException("The response was null.");
+                if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
                     _logger.LogWarning("Failed to list videos: {Error}", error);
@@ -758,71 +789,28 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
-        /// 動画一覧の結果を表すレスポンスモデル
+        /// JSON文字列を ApiVideoSearchResultModel モデルにパースします。
         /// </summary>
-        public class VideoSearchResult
+        /// <param name="json">ListVideos APIから返されたJSON文字列</param>
+        /// <returns>ApiVideoSearchResultModel モデル、または失敗時は null</returns>
+        private ApiVideoSearchResultModel? ParseVideoListJson(string? json)
         {
-            public List<VideoSearchResultItem>? Results { get; set; }
-            public PagingInfo? NextPage { get; set; }
-        }
+            if (string.IsNullOrWhiteSpace(json)) return null;
 
-        /// <summary>
-        /// 各動画の情報を表します
-        /// </summary>
-        public class VideoSearchResultItem
-        {
-            public string? AccountId { get; set; }
-            public string? Id { get; set; }
-            public string? Name { get; set; }
-            public string? Description { get; set; }
-            public string? Created { get; set; }
-            public string? LastModified { get; set; }
-            public string? LastIndexed { get; set; }
-            public string? PrivacyMode { get; set; }
-            public string? UserName { get; set; }
-            public bool IsOwned { get; set; }
-            public bool IsBase { get; set; }
-            public int DurationInSeconds { get; set; }
-            public string? State { get; set; }
-            public string? ThumbnailVideoId { get; set; }
-            public string? ThumbnailId { get; set; }
-            public string? IndexingPreset { get; set; }
-            public string? StreamingPreset { get; set; }
-            public string? SourceLanguage { get; set; }
+            try
+            {
+                return JsonSerializer.Deserialize<ApiVideoSearchResultModel>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse video list JSON.");
+                return null;
+            }
         }
-
-        /// <summary>
-        /// ページング情報を表します
-        /// </summary>
-        public class PagingInfo
-        {
-            public int PageSize { get; set; }
-            public int Skip { get; set; }
-            public bool Done { get; set; }
-            public int? TotalCount { get; set; }
-        }
-
     }
 }
 
