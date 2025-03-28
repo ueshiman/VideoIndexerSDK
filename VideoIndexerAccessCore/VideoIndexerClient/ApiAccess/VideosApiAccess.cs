@@ -620,6 +620,74 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        // Get Video Thumbnail
+
+        /// <summary>
+        /// 指定された動画のサムネイル画像を取得します。
+        /// Get Video Thumbnail
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Thumbnail
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="thumbnailId">取得したいサムネイルの ID（GUID）</param>
+        /// <param name="format">返却されるサムネイルの形式（"Jpeg" または "Base64"）※省略時はデフォルト形式</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>サムネイル画像のバイナリ配列（JPEG）または Base64 文字列。取得に失敗した場合は null。</returns>
+        public async Task<byte[]?> GetVideoThumbnailAsync(
+            string location,
+            string accountId,
+            string videoId,
+            string thumbnailId,
+            string? format = null,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(format)) query["format"] = format;
+                if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                //var response = await _httpClient.SendAsync(request);
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to retrieve video thumbnail: {Error}", error);
+                    return null;
+                }
+
+                _logger.LogInformation("Video thumbnail retrieved successfully.");
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while retrieving video thumbnail.");
+                throw;
+                //return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving video thumbnail.");
+                throw;
+                //return null;
+            }
+        }
+
+
+
     }
 }
 
