@@ -645,7 +645,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                var url = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}";
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Thumbnails/{thumbnailId}";
                 var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
 
                 if (!string.IsNullOrWhiteSpace(format)) query["format"] = format;
