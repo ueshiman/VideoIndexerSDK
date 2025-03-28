@@ -52,7 +52,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// API のレスポンス本文（JSON文字列）。
         /// 削除に成功し NoContent の場合は null を返します。
         /// </returns>
-        private async Task<string?> FetchDeleteVideoJsonAsync(string location, string accountId, string videoId, string? accessToken)
+        public async Task<string?> FetchDeleteVideoJsonAsync(string location, string accountId, string videoId, string? accessToken)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// JSON をデシリアライズした <see cref="ApiDeleteVideoResultModel"/> オブジェクト。
         /// JSON が null またはパースできない場合は null を返します。
         /// </returns>
-        private ApiDeleteVideoResultModel? ParseDeleteVideoJson(string? json)
+        public ApiDeleteVideoResultModel? ParseDeleteVideoJson(string? json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;
 
@@ -559,7 +559,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="tokenLifetimeInMinutes">トークン有効期限（分）</param>
         /// <param name="accessToken">アクセストークン（任意）</param>
         /// <returns>ストリーミング URL 情報の JSON テキスト。失敗時は null。</returns>
-        private async Task<string?> FetchStreamingUrlJsonAsync(
+        public async Task<string?> FetchStreamingUrlJsonAsync(
             string location,
             string accountId,
             string videoId,
@@ -606,7 +606,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">JSON テキスト</param>
         /// <returns>ApiStreamingUrlModel オブジェクト。失敗時は null。</returns>
-        private ApiStreamingUrlModel? ParseStreamingUrlJson(string? json)
+        public ApiStreamingUrlModel? ParseStreamingUrlJson(string? json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;
 
@@ -734,7 +734,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="partitions">対象動画のパーティションフィルタ（省略可）</param>
         /// <param name="accessToken">Video Indexer APIのアクセストークン（有効期間は1時間）</param>
         /// <returns>生成されたAPIの完全なリクエストURL</returns>
-        private string BuildListVideosUrl(string location, string accountId, string? createdAfter, string? createdBefore, int? pageSize, int? skip, string[]? partitions, string? accessToken)
+        public string BuildListVideosUrl(string location, string accountId, string? createdAfter, string? createdBefore, int? pageSize, int? skip, string[]? partitions, string? accessToken)
         {
             var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos";
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
@@ -759,7 +759,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="url">取得対象のAPIエンドポイント</param>
         /// <returns>取得成功時はJSON文字列、失敗時はnull</returns>
-        private async Task<string?> FetchVideoListJsonAsync(string url)
+        public async Task<string?> FetchVideoListJsonAsync(string url)
         {
             try
             {
@@ -802,7 +802,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">ListVideos APIから返されたJSON文字列</param>
         /// <returns>ApiVideoSearchResultModel モデル、または失敗時は null</returns>
-        private ApiVideoSearchResultModel? ParseVideoListJson(string? json)
+        public ApiVideoSearchResultModel? ParseVideoListJson(string? json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;
 
@@ -820,7 +820,71 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Update Video Transcript
 
+        /// <summary>
+        /// 指定された動画に新しいトランスクリプト（VTT形式）をアップロードし、再インデックスを実行します。
+        /// </summary>
+        /// <param name="location">APIの地域（例: "japaneast"）</param>
+        /// <param name="accountId">Video IndexerアカウントのGUID</param>
+        /// <param name="videoId">対象の動画ID</param>
+        /// <param name="vttContent">VTT形式のトランスクリプトテキスト</param>
+        /// <param name="language">言語コード（例: "ja-JP"）</param>
+        /// <param name="setAsSourceLanguage">指定言語をソース言語として設定するか</param>
+        /// <param name="callbackUrl">処理完了時に呼び出されるURL（省略可）</param>
+        /// <param name="sendSuccessEmail">成功通知メールを送信するか</param>
+        /// <param name="accessToken">アクセストークン（Contributor 権限）</param>
+        /// <returns>成功時は true、失敗時は false を返します。</returns>
+        public async Task<bool> UpdateVideoTranscriptAsync(string location, string accountId, string videoId, string vttContent, string? language = null, bool? setAsSourceLanguage = null, string? callbackUrl = null, bool? sendSuccessEmail = null, string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Index/Transcript";
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(language)) query["language"] = language;
+                if (setAsSourceLanguage.HasValue) query["setAsSourceLanguage"] = setAsSourceLanguage.Value.ToString().ToLower();
+                if (!string.IsNullOrWhiteSpace(callbackUrl)) query["callbackUrl"] = callbackUrl;
+                if (sendSuccessEmail.HasValue) query["sendSuccessEmail"] = sendSuccessEmail.Value.ToString().ToLower();
+                if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+                if (query.Count > 0)
+                    url += "?" + query.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = new StringContent(vttContent, Encoding.UTF8, "text/vtt")
+                };
+
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                //var response = await _httpClient.SendAsync(request);
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Transcript updated successfully.");
+                    return true;
+                }
+
+                var error = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Failed to update transcript: {Error}", error);
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while updating transcript.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while updating transcript.");
+                return false;
+            }
+        }
 
     }
 }
