@@ -686,7 +686,142 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // List Videos
 
+        /// <summary>
+        /// ListVideos API用のURLを生成します。
+        /// </summary>
+        /// <param name="location">APIのルーティング対象となるAzureリージョン（例: "japaneast"）</param>
+        /// <param name="accountId">Video IndexerアカウントのGUID</param>
+        /// <param name="createdAfter">この日時以降に作成された動画のみを取得（RFC3339形式）</param>
+        /// <param name="createdBefore">この日時以前に作成された動画のみを取得（RFC3339形式）</param>
+        /// <param name="pageSize">取得する動画件数（最大件数）</param>
+        /// <param name="skip">スキップする動画件数（ページネーション用）</param>
+        /// <param name="partitions">対象動画のパーティションフィルタ（省略可）</param>
+        /// <param name="accessToken">Video Indexer APIのアクセストークン（有効期間は1時間）</param>
+        /// <returns>生成されたAPIの完全なリクエストURL</returns>
+        private string BuildListVideosUrl(string location, string accountId, string? createdAfter, string? createdBefore, int? pageSize, int? skip, string[]? partitions, string? accessToken)
+        {
+            var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos";
+            var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(createdAfter)) query["createdAfter"] = createdAfter;
+            if (!string.IsNullOrWhiteSpace(createdBefore)) query["createdBefore"] = createdBefore;
+            if (pageSize.HasValue) query["pageSize"] = pageSize.ToString();
+            if (skip.HasValue) query["skip"] = skip.ToString();
+            if (partitions != null && partitions.Length > 0) query["partitions"] = string.Join(",", partitions);
+            if (!string.IsNullOrWhiteSpace(accessToken)) query["accessToken"] = accessToken;
+
+            if (query.Count > 0)
+                url += "?" + query.ToString();
+
+            return url;
+        }
+
+        /// <summary>
+        /// 指定した URL に対して GET リクエストを送信し、JSON 結果を文字列として返却します。
+        /// </summary>
+        /// <param name="url">取得対象のAPIエンドポイント</param>
+        /// <returns>取得成功時はJSON文字列、失敗時はnull</returns>
+        private async Task<string?> FetchVideoListJsonAsync(string url)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
+
+                //var response = await _httpClient.SendAsync(request);
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.SendAsync(request);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null."); if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to list videos: {Error}", error);
+                    return null;
+                }
+
+                _logger.LogInformation("Video list retrieved successfully.");
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API communication error occurred while listing videos.");
+                throw;
+                //return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while listing videos.");
+                throw;
+                //return null;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 動画一覧の結果を表すレスポンスモデル
+        /// </summary>
+        public class VideoSearchResult
+        {
+            public List<VideoSearchResultItem>? Results { get; set; }
+            public PagingInfo? NextPage { get; set; }
+        }
+
+        /// <summary>
+        /// 各動画の情報を表します
+        /// </summary>
+        public class VideoSearchResultItem
+        {
+            public string? AccountId { get; set; }
+            public string? Id { get; set; }
+            public string? Name { get; set; }
+            public string? Description { get; set; }
+            public string? Created { get; set; }
+            public string? LastModified { get; set; }
+            public string? LastIndexed { get; set; }
+            public string? PrivacyMode { get; set; }
+            public string? UserName { get; set; }
+            public bool IsOwned { get; set; }
+            public bool IsBase { get; set; }
+            public int DurationInSeconds { get; set; }
+            public string? State { get; set; }
+            public string? ThumbnailVideoId { get; set; }
+            public string? ThumbnailId { get; set; }
+            public string? IndexingPreset { get; set; }
+            public string? StreamingPreset { get; set; }
+            public string? SourceLanguage { get; set; }
+        }
+
+        /// <summary>
+        /// ページング情報を表します
+        /// </summary>
+        public class PagingInfo
+        {
+            public int PageSize { get; set; }
+            public int Skip { get; set; }
+            public bool Done { get; set; }
+            public int? TotalCount { get; set; }
+        }
 
     }
 }
