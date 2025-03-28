@@ -690,6 +690,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定された Video Indexer アカウント内の動画一覧を取得します。
+        /// List Videos
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Videos
         /// </summary>
         /// <param name="location">Azureリージョン。例: "japaneast"</param>
         /// <param name="accountId">Video IndexerアカウントのGUID</param>
@@ -720,6 +722,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// ListVideos API用のURLを生成します。
+        /// List Videos
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Videos
         /// </summary>
         /// <param name="location">APIのルーティング対象となるAzureリージョン（例: "japaneast"）</param>
         /// <param name="accountId">Video IndexerアカウントのGUID</param>
@@ -750,6 +754,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定した URL に対して GET リクエストを送信し、JSON 結果を文字列として返却します。
+        /// List Videos
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Videos
         /// </summary>
         /// <param name="url">取得対象のAPIエンドポイント</param>
         /// <returns>取得成功時はJSON文字列、失敗時はnull</returns>
@@ -791,6 +797,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSON文字列を ApiVideoSearchResultModel モデルにパースします。
+        /// List Videos
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Search-Videos
         /// </summary>
         /// <param name="json">ListVideos APIから返されたJSON文字列</param>
         /// <returns>ApiVideoSearchResultModel モデル、または失敗時は null</returns>
@@ -811,6 +819,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+
+
     }
 }
 
