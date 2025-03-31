@@ -1,6 +1,4 @@
-﻿using Azure;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
+﻿using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
 using System.Text.Json;

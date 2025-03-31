@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Polly;
@@ -54,6 +49,9 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<ISpeechCustomizationApiAccess, SpeechCustomizationApiAccess>();
             services.TryAddTransient<ITextualSummarizationApiAccess, TextualSummarizationApiAccess>();
             services.TryAddTransient<ITrialAccountAccessTokensApiAccess, TrialAccountAccessTokensApiAccess>();
+            services.TryAddTransient<ITrialAccountsApiAccess, TrialAccountsApiAccess>();
+            services.TryAddTransient<IVideosApiAccess, VideosApiAccess>();
+            services.TryAddTransient<IWidgetsApiAccess, WidgetsApiAccess>();
 
             return services;
         }

@@ -1,18 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class TrialAccountsApiAccess
+    public class TrialAccountsApiAccess : ITrialAccountsApiAccess
     {
         private readonly ILogger<TrialAccountsApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -55,7 +49,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="includeStatistics">統計情報の有無</param>
         /// <param name="accessToken">アクセストークン（省略可）</param>
         /// <returns>レスポンスJSON文字列</returns>
-        private async Task<string> FetchAccountJsonAsync(string location, string accountId, bool? includeUsage, bool? includeStatistics, string accessToken)
+        public async Task<string> FetchAccountJsonAsync(string location, string accountId, bool? includeUsage, bool? includeStatistics, string accessToken)
         {
             try
             {
@@ -97,7 +91,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">JSON文字列</param>
         /// <returns>Account配列</returns>
-        private ApiTrialAccountModel[] ParseAccountJson(string json)
+        public ApiTrialAccountModel[] ParseAccountJson(string json)
         {
             try
             {
@@ -138,7 +132,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="allowEdit">編集許可付きトークンを生成するかどうか。</param>
         /// <param name="accessToken">（任意）アクセストークン。</param>
         /// <returns>レスポンスとして返却された JSON 文字列。</returns>
-        private async Task<string> FetchAccountsJsonAsync(string location, bool? generateAccessTokens, bool? allowEdit, string accessToken)
+        public async Task<string> FetchAccountsJsonAsync(string location, bool? generateAccessTokens, bool? allowEdit, string accessToken)
         {
             try
             {
