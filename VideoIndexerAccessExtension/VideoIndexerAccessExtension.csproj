@@ -25,11 +25,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
-    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VideoIndexerAccessCore\VideoIndexerAccessCore.csproj" />
+    <ProjectReference Include="..\VideoIndexerAccess\VideoIndexerAccess.csproj" />
   </ItemGroup>
 
 

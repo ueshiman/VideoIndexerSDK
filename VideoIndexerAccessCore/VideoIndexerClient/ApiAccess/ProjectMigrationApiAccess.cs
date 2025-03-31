@@ -29,8 +29,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             _apiResourceConfigurations = apiResourceConfigurations;
         }
 
+        // ProjectAMSAssetMigrations
+
         /// <summary>
         /// プロジェクトのマイグレーション情報を取得します。
+        /// ProjectAMSAssetMigrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migration
         /// Get Project Migration
         /// Try it Get project migration
         /// </summary>
@@ -63,6 +67,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API からプロジェクトのマイグレーションデータを JSON 文字列として取得します。
+        /// ProjectAMSAssetMigrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migration
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -118,6 +124,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 取得した JSON 文字列を ProjectMigrationResponse オブジェクトに変換します。
+        /// ProjectAMSAssetMigrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migration
         /// </summary>
         /// <param name="json">JSON 文字列</param>
         /// <returns>プロジェクトのマイグレーション情報</returns>
@@ -142,8 +150,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        // Get Project Migrations
+
         /// <summary>
         /// プロジェクトのマイグレーション情報を取得します。
+        /// Get Project Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migrations
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -176,6 +188,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API からプロジェクトのマイグレーションデータを JSON 文字列として取得します。
+        /// Get Project Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migrations
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -230,6 +244,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 取得した JSON 文字列を ApiProjectsMigrations オブジェクトに変換します。
+        /// Get Project Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Migrations
         /// </summary>
         /// <param name="jsonResponse">JSON 文字列</param>
         /// <returns>プロジェクトのマイグレーション情報のリスト</returns>

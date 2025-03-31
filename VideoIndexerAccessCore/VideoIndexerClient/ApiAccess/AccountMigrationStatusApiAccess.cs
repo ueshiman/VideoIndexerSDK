@@ -33,6 +33,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// アカウント移行ステータスを非同期で取得するメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -59,6 +61,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSONレスポンスをデシリアライズするメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="jsonString">JSON文字列</param>
         /// <returns>アカウント移行ステータスモデル</returns>
@@ -69,6 +73,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// アカウント移行ステータスのJSONを非同期で取得するメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>

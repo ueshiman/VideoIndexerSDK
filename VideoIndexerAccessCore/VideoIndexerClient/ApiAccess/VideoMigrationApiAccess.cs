@@ -29,8 +29,12 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
             _apiResourceConfigurations = apiResourceConfigurations;
         }
 
+        // Get Video Migration
+
         /// <summary>
         /// Web API にリクエストを送信し、レスポンスを文字列で取得する。
+        /// Get Video Migration
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migration
         /// </summary>
         public async Task<string> FetchJsonResponseAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
@@ -72,6 +76,8 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
 
         /// <summary>
         /// ビデオの移行情報を取得する。
+        /// Get Video Migration
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migration
         /// </summary>
         /// <param name="location">APIのリージョン</param>
         /// <param name="accountId">アカウントID</param>
@@ -86,8 +92,12 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
             return ParseJsonResponse(responseBody);
         }
 
+        // Get Video Migrations
+
         /// <summary>
         /// ビデオ移行の一覧を取得する。
+        /// Get Video Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migrations
         /// </summary>
         public async Task<ApiVideoMigrationsListModel?> GetVideoMigrationsAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
@@ -97,6 +107,8 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
 
         /// <summary>
         /// WebAPIからビデオ移行データを取得する。
+        /// Get Video Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migrations
         /// </summary>
         public async Task<string> FetchVideoMigrationsJsonAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
@@ -143,6 +155,8 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
 
         /// <summary>
         /// JSON文字列をApiVideoMigrationsListModelオブジェクトに変換する。
+        /// Get Video Migrations
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migrations
         /// </summary>
         public static ApiVideoMigrationsListModel? ParseJson(string json)
         {
@@ -151,6 +165,8 @@ public class VideoMigrationApiAccess : IVideoMigrationApiAccess
 
         /// <summary>
         /// JSONレスポンスを解析する。
+        /// Get Video Migration
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Migration
         /// </summary>
         public ApiVideoMigrationModel? ParseJsonResponse(string json)
         {
