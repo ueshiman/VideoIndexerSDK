@@ -106,6 +106,75 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return null;
             }
         }
+
+        // Get Video Player Widget
+
+        /// <summary>
+        /// 外部公開用メソッド。Video Player Widget の情報を取得します。
+        /// </summary>
+        /// <param name="location">API呼び出し先のリージョン（例：trial）</param>
+        /// <param name="accountId">Video Indexer アカウントの GUID</param>
+        /// <param name="videoId">対象のビデオID</param>
+        /// <param name="accessToken">（任意）アクセストークン。プライベートビデオなどに必要</param>
+        /// <returns>Player Widget URLを格納した <see cref="ApiVideoPlayerWidgetResponseModel"/>。失敗時は null</returns>
+        public async Task<ApiVideoPlayerWidgetResponseModel?> GetVideoPlayerWidgetAsync(
+            string location,
+            string accountId,
+            string videoId,
+            string? accessToken = null)
+        {
+            try
+            {
+                var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/PlayerWidget";
+
+                var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                if (!string.IsNullOrEmpty(accessToken))
+                    query["accessToken"] = accessToken;
+
+                var finalUrl = $"{url}?{query}";
+
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(finalUrl);
+                // responseがnullなら例外を
+                if (response is null) throw new HttpRequestException("The response was null.");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.MovedPermanently)
+                {
+                    var redirectUrl = response.Headers.Location?.ToString();
+                    return new ApiVideoPlayerWidgetResponseModel
+                    {
+                        playerWidgetUrl = redirectUrl
+                    };
+                }
+
+                response.EnsureSuccessStatusCode();
+
+                // 成功だがリダイレクトじゃない（ありえる？）
+                return new ApiVideoPlayerWidgetResponseModel
+                {
+                    playerWidgetUrl = finalUrl
+                };
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error while calling Video Player Widget API.");
+                return new ApiVideoPlayerWidgetResponseModel
+                {
+                    errorType = "HTTP_REQUEST_ERROR",
+                    message = ex.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while retrieving video player widget.");
+                return new ApiVideoPlayerWidgetResponseModel
+                {
+                    errorType = "UNEXPECTED_ERROR",
+                    message = ex.Message
+                };
+            }
+        }
+
     }
 }
 
