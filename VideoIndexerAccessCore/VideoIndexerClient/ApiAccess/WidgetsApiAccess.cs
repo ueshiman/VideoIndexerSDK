@@ -128,8 +128,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/PlayerWidget";
 
                 var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
-                if (!string.IsNullOrEmpty(accessToken))
-                    query["accessToken"] = accessToken;
+                if (!string.IsNullOrEmpty(accessToken)) query["accessToken"] = accessToken;
 
                 var finalUrl = $"{url}?{query}";
 
