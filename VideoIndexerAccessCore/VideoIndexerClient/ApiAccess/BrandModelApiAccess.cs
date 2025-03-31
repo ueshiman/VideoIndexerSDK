@@ -68,12 +68,8 @@ public class BrandModelApiAccess : IBrandModelApiAccess
             throw;
         }
 
-        // responseがnullなら例外を発生
-        if (response == null)
-        {
-            _logger.LogError("Response is null");
-            throw new HttpRequestException("Response is null");
-        }
+        // responseがnullなら例外を
+        if (response is null) throw new HttpRequestException("The response was null.");
 
         // ステータスコードをチェック、成功ならレスポンスを返す
         if (response.IsSuccessStatusCode) return response;
@@ -164,16 +160,19 @@ public class BrandModelApiAccess : IBrandModelApiAccess
             _logger.LogError("Exception occurred: {Message}", ex.Message);
             throw;
         }
-        if (!response.IsSuccessStatusCode)
+
+        if (response is null) throw new HttpRequestException("The response was null.");
+
+        if (response.IsSuccessStatusCode)
         {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            _logger.LogError("Failed to get brand: {StatusCode} - {ErrorContent}", response.StatusCode, errorContent);
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorContent}");
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"Successfully listed videos: {jsonResponse}");
+            return jsonResponse;
         }
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        _logger.LogInformation($"Successfully listed videos: {jsonResponse}");
-        return jsonResponse;
+        var errorContent = await response.Content.ReadAsStringAsync();
+        _logger.LogError("Failed to get brand: {StatusCode} - {ErrorContent}", response.StatusCode, errorContent);
+        throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorContent}");
     }
 
     /// <summary>

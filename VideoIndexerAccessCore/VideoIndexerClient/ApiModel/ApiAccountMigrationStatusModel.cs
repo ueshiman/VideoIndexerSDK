@@ -10,39 +10,39 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     public class ApiAccountMigrationStatusModel
     {
         // 移行ステータス
-        public int Status { get; set; }
+        public int status { get; set; }
 
         // 移行進捗（パーセンテージ）
-        public int Progress { get; set; }
+        public int progress { get; set; }
 
         // 移行が残っているビデオの数
-        public int VideosLeftToMigrate { get; set; }
+        public int videosLeftToMigrate { get; set; }
 
         // 移行が完了したビデオの数
-        public int VideosMigrated { get; set; }
+        public int videosMigrated { get; set; }
 
         // 移行に失敗したビデオの数
-        public int VideosFailedToMigrate { get; set; }
+        public int videosFailedToMigrate { get; set; }
 
         // 移行対象のビデオの総数
-        public int TotalVideosToMigrate { get; set; }
+        public int totalVideosToMigrate { get; set; }
 
         // 移行が残っているプロジェクトの数
-        public int ProjectsLeftToMigrate { get; set; }
+        public int projectsLeftToMigrate { get; set; }
 
         // 移行が完了したプロジェクトの数
-        public int ProjectsMigrated { get; set; }
+        public int projectsMigrated { get; set; }
 
         // 移行に失敗したプロジェクトの数
-        public int ProjectsFailedToMigrate { get; set; }
+        public int projectsFailedToMigrate { get; set; }
 
         // 移行対象のプロジェクトの総数
-        public int TotalProjectsToMigrate { get; set; }
+        public int totalProjectsToMigrate { get; set; }
 
         // 詳細情報
-        public string? Details { get; set; }
+        public string? details { get; set; }
 
         // 移行完了日
-        public DateTime? MigrationCompletedDate { get; set; }
+        public DateTime? migrationCompletedDate { get; set; }
     }
 }

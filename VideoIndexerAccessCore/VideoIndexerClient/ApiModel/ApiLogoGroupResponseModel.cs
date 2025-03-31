@@ -14,22 +14,22 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
         /// <summary>
         /// グループID
         /// </summary>
-        public string Id { get; set; } = "";
+        public string id { get; set; } = "";
 
         /// <summary>
         /// グループ名
         /// </summary>
-        public string Name { get; set; } = "";
+        public string name { get; set; } = "";
 
         /// <summary>
         /// グループの説明
         /// </summary>
-        public string Description { get; set; } = "";
+        public string description { get; set; } = "";
 
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy { get; set; } = "";
+        public string createdBy { get; set; } = "";
     }
 
 }

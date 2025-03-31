@@ -14,16 +14,16 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
         /// <summary>
         /// ロゴのリスト
         /// </summary>
-        public ApiLogoGroupLinkModel[] Logos { get; set; } = Array.Empty<ApiLogoGroupLinkModel>();
+        public ApiLogoGroupLinkModel[] logos { get; set; } = Array.Empty<ApiLogoGroupLinkModel>();
 
         /// <summary>
         /// ロゴグループの名前
         /// </summary>
-        public string Name { get; set; } = "";
+        public string name { get; set; } = "";
 
         /// <summary>
         /// ロゴグループの説明
         /// </summary>
-        public string Description { get; set; } = "";
+        public string description { get; set; } = "";
     }
 }
