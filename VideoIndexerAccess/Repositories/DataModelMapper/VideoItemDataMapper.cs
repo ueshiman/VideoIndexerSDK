@@ -817,7 +817,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 Tags = model.tags?.Where(tag=>tag is not null).Select(tag => tag).ToArray(),
                 Confidence = model.confidence,
                 IsCustom = model.isCustom,
-                Instances = model.instances is null || model.instances.Length == 0 ? [] : model.instances.Select(_instanceMapper.MapFrom).ToArray(),
+                Instances = model.instances is null || model.instances.Length == 0 ? [] : [.. model.instances.Select(_instanceMapper.MapFrom)],
                 Appearances = model.appearances?.Where(appearance => appearance is not null).Select(_appearanceMapper.MapFrom).ToArray(),
                 SeenDuration = model.seenDuration,
             };
