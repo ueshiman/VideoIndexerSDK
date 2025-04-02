@@ -90,7 +90,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     url += "?accessToken=" + Uri.EscapeDataString(accessToken);
                 }
 
-                using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+                using HttpRequestMessage request = new(HttpMethod.Get, url);
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     request.Headers.Add("Authorization", $"Bearer {accessToken}");

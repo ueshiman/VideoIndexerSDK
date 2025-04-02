@@ -206,7 +206,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 url += "&pageSize=" + pageSize.Value;
             if (skip.HasValue)
                 url += "&skip=" + skip.Value;
-            if (states != null && states.Any())
+            if (states is { Length: > 0 })
                 url += "&states=" + string.Join(",", states);
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);

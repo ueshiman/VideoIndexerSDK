@@ -84,6 +84,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
         services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
         services.TryAddTransient<IClassicLanguageCustomizationApiAccess, ClassicLanguageCustomizationApiAccess>();
+        services.TryAddTransient<IAccountMigrationStatusMapper, AccountMigrationStatusMapper>();
 
         return services;
     }

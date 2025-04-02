@@ -14,14 +14,14 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 /// </summary>
 public class ClassicLanguageCustomizationApiAccess : IClassicLanguageCustomizationApiAccess
 {
-    private readonly ILogger<BrandModelApiAccess> _logger;
+    private readonly ILogger<BrandsApiAccess> _logger;
     private readonly IDurableHttpClient? _durableHttpClient;
     private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
     /// <summary>
     /// ClassicLanguageCustomizationApiAccess のインスタンスを作成
     /// </summary>
-    public ClassicLanguageCustomizationApiAccess(ILogger<BrandModelApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+    public ClassicLanguageCustomizationApiAccess(ILogger<BrandsApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
     {
         _logger = logger;
         _durableHttpClient = durableHttpClient;

@@ -25,18 +25,18 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw new ApplicationException("Account is not found.");
             }
 
-            string? location = account.Location;
+            string? location = account.location;
             if (string.IsNullOrEmpty(location))
             {
-                _logger?.LogError("Account.Location is not found.");
-                throw new ApplicationException("Account.Location is not found.");
+                _logger?.LogError("Account.location is not found.");
+                throw new ApplicationException("Account.location is not found.");
             }
 
-            string? accountId = account.Properties?.Id;
+            string? accountId = account.properties?.id;
             if (string.IsNullOrEmpty(accountId))
             {
-                _logger?.LogError("Account.Properties.Id is not found.");
-                throw new ApplicationException("Account.Properties.Id is not found.");
+                _logger?.LogError("Account.properties.id is not found.");
+                throw new ApplicationException("Account.properties.id is not found.");
             }
         }
     }

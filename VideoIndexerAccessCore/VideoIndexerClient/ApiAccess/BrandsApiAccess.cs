@@ -11,19 +11,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 /// <summary>
 /// ブランドモデルを作成するAPIを呼び出すクラス
 /// </summary>
-public class BrandModelApiAccess : IBrandModelApiAccess
+public class BrandsApiAccess : IBrandslApiAccess
 {
-    // HTTPリクエストを送信するためのクライアント
-    //private readonly HttpClient _httpClient;
     // ログを記録するためのロガー
-    private readonly ILogger<BrandModelApiAccess> _logger;
+    private readonly ILogger<BrandsApiAccess> _logger;
     private readonly IDurableHttpClient? _durableHttpClient;
     private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
-
-
     // 指定された情報を基に新しいブランドモデルを作成する非同期メソッド
-    public BrandModelApiAccess(ILogger<BrandModelApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+    public BrandsApiAccess(ILogger<BrandsApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
     {
         _logger = logger;
         _durableHttpClient = durableHttpClient;
@@ -166,7 +162,7 @@ public class BrandModelApiAccess : IBrandModelApiAccess
         if (response.IsSuccessStatusCode)
         {
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"Successfully listed videos: {jsonResponse}");
+            _logger.LogInformation("Successfully listed videos: {jsonResponse}", jsonResponse);
             return jsonResponse;
         }
 

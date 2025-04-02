@@ -37,11 +37,11 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 DurationInSeconds = dataModel.durationInSeconds,
                 ThumbnailVideoId = dataModel.thumbnailVideoId,
                 ThumbnailId = dataModel.thumbnailId,
-                SearchMatches = dataModel?.searchMatches?.ToArray() ?? Array.Empty<object>(),
+                SearchMatches = dataModel?.searchMatches?.ToArray() ?? [],
                 IndexingPreset = dataModel?.indexingPreset,
                 StreamingPreset = dataModel?.streamingPreset,
                 SourceLanguage = dataModel?.sourceLanguage,
-                SourceLanguages = dataModel?.sourceLanguages?.ToArray() ?? Array.Empty<string>(),
+                SourceLanguages = dataModel?.sourceLanguages?.ToArray() ?? [],
                 PersonModelId = dataModel?.personModelId,
                 ThumbnailUrl = dataModel?.thumbnailUrl,
             };

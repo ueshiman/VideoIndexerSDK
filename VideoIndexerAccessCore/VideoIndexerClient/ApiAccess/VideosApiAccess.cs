@@ -15,6 +15,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Delete Video
 
+        public VideosApiAccess(ILogger<VideosApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        {
+            _logger = logger;
+            _durableHttpClient = durableHttpClient;
+            _apiResourceConfigurations = apiResourceConfigurations;
+        }
+
         /// <summary>
         /// 指定された動画を Video Indexer から削除します。
         /// Delete Video
@@ -62,9 +69,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 {
@@ -140,9 +146,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 {
@@ -202,9 +207,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -276,9 +280,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -346,9 +349,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -411,9 +413,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -471,9 +472,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -579,9 +579,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             //var response = await _httpClient.SendAsync(request);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -654,9 +653,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
                 //var response = await _httpClient.SendAsync(request);
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
@@ -763,9 +761,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
                 //var response = await _httpClient.SendAsync(request);
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
@@ -855,9 +852,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
                 //var response = await _httpClient.SendAsync(request);
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (response.IsSuccessStatusCode)
                 {

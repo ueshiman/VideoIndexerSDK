@@ -68,9 +68,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var finalUrl = $"{url}?{query}";
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.GetAsync(finalUrl);
+                var response = await httpClient.GetAsync(finalUrl) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadAsStringAsync();
@@ -126,9 +125,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var finalUrl = $"{url}?{query}";
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.GetAsync(finalUrl);
+                var response = await httpClient.GetAsync(finalUrl) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.MovedPermanently)
                 {

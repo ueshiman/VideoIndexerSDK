@@ -52,16 +52,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
                 //return false; // todo
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"API request failed: {ex.Message}");
+                _logger.LogError("API request failed: {ex.Message}", ex.Message);
                 throw;
             }
         }
@@ -81,7 +80,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON parsing error: {ex.Message}");
+                _logger.LogError("JSON parsing error: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -134,15 +133,14 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"API request failed: {ex.Message}");
+                _logger.LogError("API request failed: {ex.Message}", ex.Message);
                 throw;
             }
         }
@@ -162,7 +160,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON parsing error: {ex.Message}");
+                _logger.LogError("JSON parsing error: {ex.Message}", ex.Message);
                 return null;
             }
         }

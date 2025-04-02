@@ -31,10 +31,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             try
             {
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.GetAsync(apiBaseUrl);
-
+                var response = await httpClient.GetAsync(apiBaseUrl) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null."); 
 
                 response.EnsureSuccessStatusCode(); // HTTP エラー時に例外を発生
 
@@ -59,7 +57,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 return JsonSerializer.Deserialize<List<ApiSupportedLanguageModel>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                }) ?? new List<ApiSupportedLanguageModel>();
+                }) ?? [];
             }
             catch (JsonException ex)
             {

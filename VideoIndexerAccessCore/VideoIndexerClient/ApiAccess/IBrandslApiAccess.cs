@@ -2,7 +2,7 @@
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 
-public interface IBrandModelApiAccess
+public interface IBrandslApiAccess
 {
     /// <summary>
     /// 指定された情報を基に新しいブランドモデルを作成する非同期メソッド

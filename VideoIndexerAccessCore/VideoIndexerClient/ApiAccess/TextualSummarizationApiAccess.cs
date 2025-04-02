@@ -15,6 +15,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         // Create Video Summary
 
+        public TextualSummarizationApiAccess(ILogger<TextualSummarizationApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        {
+            _logger = logger;
+            _durableHttpClient = durableHttpClient;
+            _apiResourceConfigurations = apiResourceConfigurations;
+        }
+
         /// <summary>
         /// 指定されたビデオのテキスト要約を取得する非同期メソッド。
         /// Create Video Summary1
@@ -95,9 +102,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             _logger.LogInformation("Sending request to Video Indexer API: {maskedUrl}", maskedUrl);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            HttpResponseMessage response = await httpClient.GetAsync(url);
+            HttpResponseMessage response = await httpClient.GetAsync(url) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
@@ -151,10 +157,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
                 _logger.LogInformation("Sending DELETE request to: {maskedUrl}", maskedUrl);
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.DeleteAsync(url);
-
+                var response = await httpClient.DeleteAsync(url) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Successfully deleted video summary: {SummaryId}", summaryId);
@@ -236,9 +240,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             _logger.LogInformation("Sending Get Video Summary request to: {maskedUrl}", maskedUrl);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.GetAsync(baseUrl);
+            var response = await httpClient.GetAsync(baseUrl) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
@@ -331,9 +334,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             var queryString = query.Count > 0 ? "?" + string.Join("&", query) : string.Empty;
             var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/Summaries/Textual{queryString}";
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.GetAsync(url);
+            var response = await httpClient.GetAsync(url) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }

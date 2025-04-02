@@ -13,6 +13,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
+        public RedactionApiAccess(ILogger<RedactionApiAccess> logger, IDurableHttpClient? durableHttpClient, IApiResourceConfigurations apiResourceConfigurations)
+        {
+            _logger = logger;
+            _durableHttpClient = durableHttpClient;
+            _apiResourceConfigurations = apiResourceConfigurations;
+        }
+
         /// <summary>
         /// API からビデオ編集 (Redact) の JSON データを取得します。
         /// Redact Video
@@ -56,7 +63,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Redact video request failed: {ex.Message}");
+                _logger.LogError("Redact video request failed: {ex.Message}", ex.Message);
                 throw;
             }
         }
@@ -76,7 +83,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON parsing error: {ex.Message}");
+                _logger.LogError("JSON parsing error: {ex.Message}", ex.Message);
                 return null;
             }
         }
