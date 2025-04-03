@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
@@ -18,7 +19,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly ILogger<Accounts> _logger;
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
         private readonly IAccounApitAccess _accountAccess;
+
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
+
         //private readonly IVideoDownloadApiAccess _videoDownload;
         private readonly IAccountRepository _accountRepository;
         private readonly IAccountMigrationStatusApiAccess _accountMigrationStatusApiAccess;
@@ -26,10 +29,13 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IVideoMigrationApiAccess _videoMigrationApiAccess;
         private readonly IAccountMigrationStatusMapper _accountMigrationStatusMapper;
         private readonly IProjectMigrationMapper _projectMigrationMapper;
+        private readonly IProjectsMigrationsMapper _projectsMigrationsMapper;
+        private readonly IVideoMigrationMapper _videoMigrationMapper;
+        private readonly IVideoMigrationsListMapper _videoMigrationsListMapper;
 
         private const string ParamName = "account";
 
-        public Accounts(ILogger<Accounts> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IApiResourceConfigurations apiResourceConfigurations, IAccountRepository accountRepository, IAccountMigrationStatusApiAccess accountMigrationStatusApiAccess, IProjectMigrationApiAccess projectMigrationApiAccess, IVideoMigrationApiAccess videoMigrationApiAccess, IAccountMigrationStatusMapper accountMigrationStatusMapper, IProjectMigrationMapper projectMigrationMapper)
+        public Accounts(ILogger<Accounts> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IApiResourceConfigurations apiResourceConfigurations, IAccountRepository accountRepository, IAccountMigrationStatusApiAccess accountMigrationStatusApiAccess, IProjectMigrationApiAccess projectMigrationApiAccess, IVideoMigrationApiAccess videoMigrationApiAccess, IAccountMigrationStatusMapper accountMigrationStatusMapper, IProjectMigrationMapper projectMigrationMapper, IProjectsMigrationsMapper projectsMigrationsMapper, IVideoMigrationMapper videoMigrationMapper, IVideoMigrationsListMapper videoMigrationsListMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -42,6 +48,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
             _accountMigrationStatusMapper = accountMigrationStatusMapper;
             _projectMigrationMapper = projectMigrationMapper;
+            _projectsMigrationsMapper = projectsMigrationsMapper;
+            _videoMigrationMapper = videoMigrationMapper;
+            _videoMigrationsListMapper = videoMigrationsListMapper;
         }
 
         /// <summary>
@@ -112,5 +121,77 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             return _projectMigrationMapper.MapFrom(await _projectMigrationApiAccess.GetProjectMigrationAsync(location, accountId, projectId, accessToken));
         }
+
+        // Get Project Migrations
+
+        public async Task<ProjectsMigrationsModel?> GetProjectMigrationsAsync(string location, string accountId, string accessToken, int? pageSize = null, int? skip = null, string[]? states = null)
+        {
+            return _projectsMigrationsMapper.MapFrom(await _projectMigrationApiAccess.GetProjectMigrationsAsync(location, accountId, accessToken, pageSize, skip, states));
+        }
+
+        /// <summary>
+        /// プロジェクトの移行ステータスのリストを取得する
+        /// Get Project Migrations
+        /// </summary>
+        /// <returns>プロジェクトの移行ステータスモデルのリスト</returns>
+        /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
+        public async Task<ProjectsMigrationsModel?> GetProjectMigrationsAsync(int? pageSize = null, int? skip = null, string[]? states = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            var accessToken = await _authenticationTokenizer.GetAccessToken();
+            return await GetProjectMigrationsAsync(location!, accountId!, accessToken, pageSize, skip, states);
+        }
+
+        // Get Video Migration
+
+        /// <summary>
+        /// 指定されたビデオIDでビデオの移行ステータスを取得する
+        /// </summary>
+        /// <param name="location">アカウントのロケーション</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="videoId">ビデオID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>ビデオの移行ステータスモデル</returns>
+        /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
+        public async Task<VideoMigrationModel?> GetVideoMigrationAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            return _videoMigrationMapper.MapFrom(await _videoMigrationApiAccess.GetVideoMigrationAsync(location, accountId, videoId, accessToken));
+        }
+
+
+        /// <summary>
+        /// 指定されたビデオIDでビデオの移行ステータスを取得する
+        /// </summary>
+        /// <param name="videoId">ビデオID</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>ビデオの移行ステータスモデル</returns>
+        /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
+        public async Task<VideoMigrationModel?> GetVideoMigrationAsync(string videoId, string? accessToken = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            accessToken ??= await _authenticationTokenizer.GetAccessToken();
+            // ビデオの移行ステータスを取得して返す
+            return await GetVideoMigrationAsync(location!, accountId!, videoId, accessToken);
+        }
+
+        public async Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
+        {
+            return _videoMigrationsListMapper.MapFrom(await _videoMigrationApiAccess.GetVideoMigrationsAsync(location, accountId, pageSize, skip, states, accessToken));
+        }
+
     }
 }

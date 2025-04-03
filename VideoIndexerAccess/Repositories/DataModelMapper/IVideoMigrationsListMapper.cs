@@ -3,7 +3,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
 namespace VideoIndexerAccess.Repositories.DataModelMapper;
 
-public interface IAccountMigrationStatusMapper
+public interface IVideoMigrationsListMapper
 {
-    AccountMigrationStatusModel? MapFrom(ApiAccountMigrationStatusModel? model);
+    VideoMigrationsListModel? MapFrom(ApiVideoMigrationsListModel? dataModel);
 }

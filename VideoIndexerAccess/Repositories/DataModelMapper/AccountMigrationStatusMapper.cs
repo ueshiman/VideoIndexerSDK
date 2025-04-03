@@ -10,9 +10,9 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class AccountMigrationStatusMapper : IAccountMigrationStatusMapper
     {
-        public AccountMigrationStatusModel MapFrom(ApiAccountMigrationStatusModel model)
+        public AccountMigrationStatusModel? MapFrom(ApiAccountMigrationStatusModel? model)
         {
-            return new AccountMigrationStatusModel()
+            return model is null ? null : new AccountMigrationStatusModel()
             {
                 Status = model.status,
                 Progress = model.progress,
