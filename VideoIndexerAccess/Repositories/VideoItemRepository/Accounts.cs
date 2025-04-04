@@ -1,20 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
-using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class Accounts
+    public class Accounts : IAccounts
     {
         private readonly ILogger<Accounts> _logger;
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
@@ -153,6 +146,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         /// <summary>
         /// 指定されたビデオIDでビデオの移行ステータスを取得する
+        /// Get Video Migration
         /// </summary>
         /// <param name="location">アカウントのロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -168,6 +162,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         /// <summary>
         /// 指定されたビデオIDでビデオの移行ステータスを取得する
+        /// Get Video Migration
         /// </summary>
         /// <param name="videoId">ビデオID</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
@@ -188,9 +183,46 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await GetVideoMigrationAsync(location!, accountId!, videoId, accessToken);
         }
 
+        // Get Video Migrations
+
+        /// <summary>
+        /// ビデオの移行ステータスのリストを取得する
+        /// Get Video Migrations
+        /// </summary>
+        /// <param name="location">アカウントのロケーション</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="pageSize">ページサイズ（オプション）</param>
+        /// <param name="skip">スキップする項目数（オプション）</param>
+        /// <param name="states">状態フィルター（オプション）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>ビデオの移行ステータスモデルのリスト</returns>
         public async Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(string location, string accountId, int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
         {
             return _videoMigrationsListMapper.MapFrom(await _videoMigrationApiAccess.GetVideoMigrationsAsync(location, accountId, pageSize, skip, states, accessToken));
+        }
+
+        /// <summary>
+        /// ビデオの移行ステータスのリストを取得する
+        /// Get Video Migrations
+        /// </summary>
+        /// <param name="pageSize">ページサイズ（オプション）</param>
+        /// <param name="skip">スキップする項目数（オプション）</param>
+        /// <param name="states">状態フィルター（オプション）</param>
+        /// <param name="accessToken">アクセストークン（オプション）</param>
+        /// <returns>ビデオの移行ステータスモデルのリスト</returns>
+        public async Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            accessToken ??= await _authenticationTokenizer.GetAccessToken();
+            // ビデオの移行ステータスのリストを取得して返す
+            return await GetVideoMigrationsAsync(location!, accountId!, pageSize, skip, states, accessToken);
         }
 
     }
