@@ -95,6 +95,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IVideoIndexRepository, VideoIndexRepository>();
         services.TryAddTransient<IVideoListRepository, VideoListRepository>();
         services.TryAddTransient<IAccountRepository, AccountRepository>();
+        services.TryAddTransient<IAccountsRepository, AccountsRepository>();
 
         return services;
     }

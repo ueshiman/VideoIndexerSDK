@@ -14,7 +14,9 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-await host.RunAsync();
+// App クラスを解決して RunAsync を呼び出す
+var app = host.Services.GetRequiredService<IVideoService>();
+app.ProcessVideos();
 
 public interface IVideoService
 {

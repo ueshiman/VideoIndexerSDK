@@ -7,9 +7,9 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class Accounts : IAccounts
+    public class AccountsRepository : IAccountsRepository
     {
-        private readonly ILogger<Accounts> _logger;
+        private readonly ILogger<AccountsRepository> _logger;
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
         private readonly IAccounApitAccess _accountAccess;
 
@@ -28,7 +28,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         private const string ParamName = "account";
 
-        public Accounts(ILogger<Accounts> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IApiResourceConfigurations apiResourceConfigurations, IAccountRepository accountRepository, IAccountMigrationStatusApiAccess accountMigrationStatusApiAccess, IProjectMigrationApiAccess projectMigrationApiAccess, IVideoMigrationApiAccess videoMigrationApiAccess, IAccountMigrationStatusMapper accountMigrationStatusMapper, IProjectMigrationMapper projectMigrationMapper, IProjectsMigrationsMapper projectsMigrationsMapper, IVideoMigrationMapper videoMigrationMapper, IVideoMigrationsListMapper videoMigrationsListMapper)
+        public AccountsRepository(ILogger<AccountsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IApiResourceConfigurations apiResourceConfigurations, IAccountRepository accountRepository, IAccountMigrationStatusApiAccess accountMigrationStatusApiAccess, IProjectMigrationApiAccess projectMigrationApiAccess, IVideoMigrationApiAccess videoMigrationApiAccess, IAccountMigrationStatusMapper accountMigrationStatusMapper, IProjectMigrationMapper projectMigrationMapper, IProjectsMigrationsMapper projectsMigrationsMapper, IVideoMigrationMapper videoMigrationMapper, IVideoMigrationsListMapper videoMigrationsListMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;

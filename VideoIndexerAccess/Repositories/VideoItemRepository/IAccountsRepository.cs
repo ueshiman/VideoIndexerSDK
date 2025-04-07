@@ -2,7 +2,7 @@
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository;
 
-public interface IAccounts
+public interface IAccountsRepository
 {
     /// <summary>
     /// アカウントの移行ステータスを取得する
