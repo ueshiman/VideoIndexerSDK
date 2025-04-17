@@ -165,10 +165,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// Get Video Migration
         /// </summary>
         /// <param name="videoId">ビデオID</param>
-        /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>ビデオの移行ステータスモデル</returns>
         /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
-        public async Task<VideoMigrationModel?> GetVideoMigrationAsync(string videoId, string? accessToken = null)
+        public async Task<VideoMigrationModel?> GetVideoMigrationAsync(string videoId)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -178,7 +177,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string? location = account.location;
             string? accountId = account.properties?.id;
             // アクセストークンを取得
-            accessToken ??= await _authenticationTokenizer.GetAccessToken();
+            var accessToken = await _authenticationTokenizer.GetAccessToken();
             // ビデオの移行ステータスを取得して返す
             return await GetVideoMigrationAsync(location!, accountId!, videoId, accessToken);
         }
@@ -208,9 +207,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="pageSize">ページサイズ（オプション）</param>
         /// <param name="skip">スキップする項目数（オプション）</param>
         /// <param name="states">状態フィルター（オプション）</param>
-        /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>ビデオの移行ステータスモデルのリスト</returns>
-        public async Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null)
+        public async Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(int? pageSize = null, int? skip = null, List<string>? states = null)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -220,7 +218,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string? location = account.location;
             string? accountId = account.properties?.id;
             // アクセストークンを取得
-            accessToken ??= await _authenticationTokenizer.GetAccessToken();
+            var accessToken = await _authenticationTokenizer.GetAccessToken();
             // ビデオの移行ステータスのリストを取得して返す
             return await GetVideoMigrationsAsync(location!, accountId!, pageSize, skip, states, accessToken);
         }

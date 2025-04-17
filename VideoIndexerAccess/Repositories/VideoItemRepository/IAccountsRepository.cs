@@ -61,7 +61,7 @@ public interface IAccountsRepository
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>ビデオの移行ステータスモデル</returns>
     /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
-    Task<VideoMigrationModel?> GetVideoMigrationAsync(string location, string accountId, string videoId, string? accessToken = null);
+    Task<VideoMigrationModel?> GetVideoMigrationAsync(string location, string accountId, string videoId, string? accessToken = null);   
 
     /// <summary>
     /// 指定されたビデオIDでビデオの移行ステータスを取得する
@@ -71,7 +71,7 @@ public interface IAccountsRepository
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>ビデオの移行ステータスモデル</returns>
     /// <exception cref="ArgumentNullException">アカウントが見つからない場合にスローされる例外</exception>
-    Task<VideoMigrationModel?> GetVideoMigrationAsync(string videoId, string? accessToken = null);
+    Task<VideoMigrationModel?> GetVideoMigrationAsync(string videoId);  
 
     /// <summary>
     /// ビデオの移行ステータスのリストを取得する
@@ -95,5 +95,5 @@ public interface IAccountsRepository
     /// <param name="states">状態フィルター（オプション）</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>ビデオの移行ステータスモデルのリスト</returns>
-    Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(int? pageSize = null, int? skip = null, List<string>? states = null, string? accessToken = null);
+    Task<VideoMigrationsListModel?> GetVideoMigrationsAsync(int? pageSize = null, int? skip = null, List<string>? states = null);
 }
