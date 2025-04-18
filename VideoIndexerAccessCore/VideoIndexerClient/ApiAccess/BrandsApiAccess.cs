@@ -11,7 +11,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 /// <summary>
 /// ブランドモデルを作成するAPIを呼び出すクラス
 /// </summary>
-public class BrandsApiAccess : IBrandslApiAccess
+public class BrandsApiAccess : IBrandsApiAccess
 {
     // ログを記録するためのロガー
     private readonly ILogger<BrandsApiAccess> _logger;
