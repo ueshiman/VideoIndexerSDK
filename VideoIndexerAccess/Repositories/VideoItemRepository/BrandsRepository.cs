@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -36,6 +31,13 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _accountRepository = accountRepository;
         }
 
+        /// <summary>
+        /// 指定されたロケーションとアカウントIDを使用して、新しいブランドモデルを作成します。
+        /// </summary>
+        /// <param name="location">APIのリージョンを指定します。</param>
+        /// <param name="accountId">アカウントIDを指定します。</param>
+        /// <param name="accessToken">アクセストークン（省略可能）。指定しない場合はデフォルトのトークンが使用されます。</param>
+        /// <returns>ブランドモデルの作成に成功した場合はtrue、失敗した場合はfalseを返します。</returns>
         public async Task<bool> CreateApiBrandModelAsync(string location, string accountId, string? accessToken = null)
         {
             try
@@ -45,7 +47,16 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var brandModel = _brandslApiAccess.ParseApiBrandModel(jsonResponse);
-                    return true;
+
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.Created:
+                            _logger.LogDebug("Brand created successfully: {BrandModel}", brandModel);
+                            return true;
+                        default:
+                            _logger.LogWarning("Brand created with status code: {StatusCode}", response.StatusCode);
+                            return true;
+                    }
                 }
                 else
                 {
@@ -61,6 +72,31 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
+        /// <summary>
+        /// アカウント情報を取得し、存在しない場合は例外をスローします。
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// BrandsRepository クラスは、Video Indexer API を使用してブランドモデルを管理するためのリポジトリです。
+        /// </summary>
+        /// <remarks>
+        /// 主な機能:
+        /// - ブランドモデルの作成
+        /// - アカウント情報の取得と検証
+        /// - APIとの通信を通じたブランドデータの操作
+        /// 
+        /// 使用する依存コンポーネント:
+        /// - ILogger<BrandsRepository>: ログ出力用
+        /// - IAuthenticationTokenizer: アクセストークンの取得
+        /// - IAccounApitAccess: アカウント情報の取得
+        /// - IAccountRepository: アカウント情報の検証
+        /// - IBrandsApiAccess: ブランドモデルに関するAPI操作
+        /// - IApiResourceConfigurations: APIリソース設定
+        /// 
+        /// .NET バージョン: .NET 8
+        /// C# バージョン: 12.0
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"></exception>
         public async Task<bool> CreateApiBrandModelAsync()
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
@@ -74,5 +110,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             var accessToken = await _authenticationTokenizer.GetAccessToken();
             return await CreateApiBrandModelAsync(location!, accountId!, accessToken);
         }
+
+
     }
 }
