@@ -3,9 +3,9 @@ using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
 namespace VideoIndexerAccess.Repositories.DataModelMapper;
 
-public interface IInstanceMapper
+public interface IBrandsMapper
 {
-    Instance MapFrom(InstanceApiModel model);
-    InstanceApiModel MapToInstanceApiModel(Instance model);
+    BrandModel MapFrom(ApiBrandModel model);
+    ApiBrandModel MapToApiBrandModel(BrandModel model);
 
 }

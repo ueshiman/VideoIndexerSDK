@@ -22,7 +22,7 @@ public interface IBrandsApiAccess
     /// <param name="id">削除するブランドのID</param>
     /// <param name="accessToken">認証トークン（オプション）</param>
     /// <returns>HTTPレスポンスメッセージ</returns>
-    Task<HttpResponseMessage> DeleteApiBrandModelJsonAsync(string location, string accountId, int id, string? accessToken);
+    Task<HttpResponseMessage> DeleteApiBrandModelAsync(string location, string accountId, int id, string? accessToken);
 
     /// <summary>
     /// 指定されたブランドを取得する非同期メソッド

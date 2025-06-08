@@ -84,7 +84,7 @@ public class BrandsApiAccess : IBrandsApiAccess
     /// <param name="id">削除するブランドのID</param>
     /// <param name="accessToken">認証トークン（オプション）</param>
     /// <returns>HTTPレスポンスメッセージ</returns>
-    public async Task<HttpResponseMessage> DeleteApiBrandModelJsonAsync(string location, string accountId, int id, string? accessToken)
+    public async Task<HttpResponseMessage> DeleteApiBrandModelAsync(string location, string accountId, int id, string? accessToken)
     {
         HttpResponseMessage? response;
         try

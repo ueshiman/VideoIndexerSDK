@@ -1023,6 +1023,22 @@ public class VideosRangeMapper : IVideosRangeMapper
             };
         }
 
+        public BrandApiModel MapToBrandApiModel(Brand model)
+        {
+            return new BrandApiModel
+            {
+                id = model.Id,
+                name = model.Name,
+                description = model.Description,
+                tags = model.Tags,
+                confidence = model.Confidence,
+                instances = model.Instances?.Select(_instanceMapper.MapToInstanceApiModel).ToArray(),
+                isCustom = model.IsCustom,
+                referenceId = model.ReferenceId,
+                referenceType = model.ReferenceType,
+                referenceUrl = model.ReferenceUrl,
+            };
+        }
     }
 
     public class InstanceMapper : IInstanceMapper
@@ -1041,7 +1057,24 @@ public class VideosRangeMapper : IVideosRangeMapper
                 ThumbnailId = model.thumbnailId,
             };
         }
+
+        public InstanceApiModel MapToInstanceApiModel(Instance model)
+        {
+            return new InstanceApiModel
+            {
+                confidence = model.Confidence,
+                start = model.Start,
+                end = model.End,
+                adjustedEnd = model.AdjustedEnd,
+                adjustedStart = model.AdjustedStart,
+                brandType = model.BrandType,
+                instanceSource = model.InstanceSource,
+                thumbnailId = model.ThumbnailId,
+            };
+        }
     }
+
+
 }
 
 

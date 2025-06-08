@@ -8,7 +8,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
 namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
-    public class BrandsMapper
+    public class BrandsMapper : IBrandsMapper
     {
         public BrandModel MapFrom(ApiBrandModel model)
         {
@@ -24,6 +24,23 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 Enabled = model.enabled,
                 Description = model.description,
                 Tags = model.tags,
+            };
+        }
+
+        public ApiBrandModel MapToApiBrandModel(BrandModel model)
+        {
+            return new ApiBrandModel
+            {
+                referenceUrl = model.ReferenceUrl,
+                id = model.Id,
+                name = model.Name,
+                accountId = model.AccountId,
+                lastModifierUserName = model.LastModifierUserName,
+                create = model.Create,
+                lastModified = model.LastModified,
+                enabled = model.Enabled,
+                description = model.Description,
+                tags = model.Tags,
             };
         }
     }
