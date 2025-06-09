@@ -48,6 +48,12 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _logoRequestMapper = logoRequestMapper;
         }
 
+        /// <summary>
+        /// カスタムロゴを作成する非同期メソッド。
+        /// アカウント情報を取得し、APIを呼び出してロゴを作成します。
+        /// </summary>
+        /// <param name="request">ロゴ作成リクエストモデル</param>
+        /// <returns>作成されたロゴのレスポンスモデル</returns>
         public async Task<LogoResponseModel> CreateCustomLogoAsync(LogoRequestModel request)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
@@ -66,6 +72,17 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await CreateCustomLogoAsync(location!, accountId!, request, accessToken);
         }
 
+        /// <summary>
+        /// 指定されたロケーション・アカウントID・リクエスト・アクセストークンでカスタムロゴを作成します。
+        /// </summary>
+        /// <param name="location">APIのリージョン</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="request">ロゴ作成リクエストモデル</param>
+        /// <param name="accessToken">アクセストークン（省略可）</param>
+        /// <returns>作成されたロゴのレスポンスモデル</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
         public async Task<LogoResponseModel> CreateCustomLogoAsync(string location, string accountId, LogoRequestModel request, string? accessToken = null)
         {
             try
