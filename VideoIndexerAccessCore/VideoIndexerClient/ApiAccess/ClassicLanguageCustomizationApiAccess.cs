@@ -76,6 +76,31 @@ public class ClassicLanguageCustomizationApiAccess : IClassicLanguageCustomizati
         throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {errorMessage}");
     }
 
+    /// <summary>
+    /// 新しいカスタム言語モデルを作成し、作成結果をパースして返す。
+    /// </summary>
+    /// <param name="location">Azure のリージョン</param>
+    /// <param name="accountId">Azure Video Indexer のアカウントID</param>
+    /// <param name="requestModel">作成するカスタム言語モデルのリクエスト情報</param>
+    /// <param name="accessToken">認証用のアクセストークン（オプション）</param>
+    /// <returns>作成されたカスタム言語モデルの情報</returns>
+    /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされる</exception>
+    public async Task<ApiCustomLanguageModel> CreateLanguageModelAsync(string location, string accountId, ApiCustomLanguageRequestModel requestModel, string? accessToken = null)
+    {
+        HttpResponseMessage message = await CreateLanguageModelAsync(location, accountId, requestModel.ModelName, requestModel.Language, accessToken);
+
+        if (message.IsSuccessStatusCode)
+        {
+            string jsonResponse = await message.Content.ReadAsStringAsync();
+            return ParseLanguageModelJson(jsonResponse);
+        }
+        else
+        {
+            string errorMessage = await message.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Failed to create language model: {errorMessage}");
+        }
+    }
+
 
     /// <summary>
     /// 新しい言語モデルを作成する

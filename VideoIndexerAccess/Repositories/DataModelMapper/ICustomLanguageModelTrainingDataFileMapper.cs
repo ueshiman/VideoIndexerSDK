@@ -1,0 +1,10 @@
+﻿using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+
+namespace VideoIndexerAccess.Repositories.DataModelMapper;
+
+public interface ICustomLanguageModelTrainingDataFileMapper
+{
+    ApiCustomLanguageModelTrainingDataFileModel MapToApiCustomLanguageModelTrainingDataFileModel(VideoIndexerAccess.Repositories.DataModel.CustomLanguageModelTrainingDataFileModel model);
+    CustomLanguageModelTrainingDataFileModel MapFrom(VideoIndexerAccessCore.VideoIndexerClient.ApiModel.ApiCustomLanguageModelTrainingDataFileModel apiModel);
+}
