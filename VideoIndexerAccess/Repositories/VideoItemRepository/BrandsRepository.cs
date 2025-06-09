@@ -43,7 +43,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IBrandModelSettingsMapper _brandModelSettingsMapper;
 
         // 例外スロー時のパラメータ名
-        private const string ParamName = "account";
+        private const string ParamName = "brands";
 
         /// <summary>
         /// コンストラクタ。依存性注入で各種サービスを受け取る

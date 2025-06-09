@@ -457,7 +457,6 @@ public class ClassicLanguageCustomizationApiAccess : IClassicLanguageCustomizati
     /// <summary>
     /// 言語モデルのファイルデータを取得する
     /// </summary>
-    [RequiresPreviewFeatures] // このAPIはプレビュー版
     public async Task<ApiLanguageModelFileDataModel?> GetLanguageModelFileDataAsync(string location, string accountId, string modelId, string fileId, string? accessToken = null)
     {
         try
