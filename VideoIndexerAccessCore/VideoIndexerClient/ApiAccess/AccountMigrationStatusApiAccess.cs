@@ -1,12 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
-using VideoIndexerAccessCore.VideoIndexerClient.Authorization;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
@@ -39,6 +33,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// アカウント移行ステータスを非同期で取得するメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -65,6 +61,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// JSONレスポンスをデシリアライズするメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="jsonString">JSON文字列</param>
         /// <returns>アカウント移行ステータスモデル</returns>
@@ -75,6 +73,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// アカウント移行ステータスのJSONを非同期で取得するメソッド
+        /// Get Account Migration Status
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Account-Migration-Status
         /// </summary>
         /// <param name="location">ロケーション</param>
         /// <param name="accountId">アカウントID</param>
@@ -90,7 +90,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                     url += "?accessToken=" + Uri.EscapeDataString(accessToken);
                 }
 
-                using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+                using HttpRequestMessage request = new(HttpMethod.Get, url);
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     request.Headers.Add("Authorization", $"Bearer {accessToken}");

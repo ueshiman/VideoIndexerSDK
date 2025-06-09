@@ -432,7 +432,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 
     public class Keyword1Mapper : IKeyword1Mapper
     {
-        private IInstanceMapper _instanceMapper;
+        private readonly IInstanceMapper _instanceMapper;
 
         public Keyword1Mapper(IInstanceMapper instanceMapper)
         {
@@ -455,7 +455,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 
     public class BlockMapper : IBlockMapper
     {
-        private IInstanceMapper _instanceMapper;
+        private readonly IInstanceMapper _instanceMapper;
 
         public BlockMapper(IInstanceMapper instanceMapper)
         {
@@ -724,8 +724,8 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
         {
             return new Face
             {
-                AppearanceCount = model.AppearanceCount,
-                Name = model.Name,
+                AppearanceCount = model.appearanceCount,
+                Name = model.name,
             };
         }
     }
@@ -817,7 +817,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 Tags = model.tags?.Where(tag=>tag is not null).Select(tag => tag).ToArray(),
                 Confidence = model.confidence,
                 IsCustom = model.isCustom,
-                Instances = model.instances is null || model.instances.Length == 0 ? Array.Empty<Instance>() : model.instances.Select(_instanceMapper.MapFrom).ToArray(),
+                Instances = model.instances is null || model.instances.Length == 0 ? [] : [.. model.instances.Select(_instanceMapper.MapFrom)],
                 Appearances = model.appearances?.Where(appearance => appearance is not null).Select(_appearanceMapper.MapFrom).ToArray(),
                 SeenDuration = model.seenDuration,
             };
@@ -884,7 +884,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
             {
                 Id = model.id,
                 Name = model.name ?? String.Empty,
-                Instances = model.instances?.Select(_instanceMapper.MapFrom).ToArray() ?? Array.Empty<Instance>(),
+                Instances = model.instances?.Select(_instanceMapper.MapFrom).ToArray() ?? [],
             };
         }
     }
@@ -1023,6 +1023,22 @@ public class VideosRangeMapper : IVideosRangeMapper
             };
         }
 
+        public BrandApiModel MapToBrandApiModel(Brand model)
+        {
+            return new BrandApiModel
+            {
+                id = model.Id,
+                name = model.Name,
+                description = model.Description,
+                tags = model.Tags,
+                confidence = model.Confidence,
+                instances = model.Instances?.Select(_instanceMapper.MapToInstanceApiModel).ToArray(),
+                isCustom = model.IsCustom,
+                referenceId = model.ReferenceId,
+                referenceType = model.ReferenceType,
+                referenceUrl = model.ReferenceUrl,
+            };
+        }
     }
 
     public class InstanceMapper : IInstanceMapper
@@ -1041,7 +1057,24 @@ public class VideosRangeMapper : IVideosRangeMapper
                 ThumbnailId = model.thumbnailId,
             };
         }
+
+        public InstanceApiModel MapToInstanceApiModel(Instance model)
+        {
+            return new InstanceApiModel
+            {
+                confidence = model.Confidence,
+                start = model.Start,
+                end = model.End,
+                adjustedEnd = model.AdjustedEnd,
+                adjustedStart = model.AdjustedStart,
+                brandType = model.BrandType,
+                instanceSource = model.InstanceSource,
+                thumbnailId = model.ThumbnailId,
+            };
+        }
     }
+
+
 }
 
 

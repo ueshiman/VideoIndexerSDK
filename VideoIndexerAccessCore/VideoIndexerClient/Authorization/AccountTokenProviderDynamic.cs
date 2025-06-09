@@ -42,7 +42,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
         public async Task<string> GetArmAccessTokenAsync(CancellationToken ct = default)
         {
             var credentials = GetTokenCredential();
-            var tokenRequestContext = new TokenRequestContext(new[] { $"{_apiResourceConfigurations.AzureResource}/.default" });
+            var tokenRequestContext = new TokenRequestContext([$"{_apiResourceConfigurations.AzureResource}/.default"]);
             var tokenRequestResult = await credentials.GetTokenAsync(tokenRequestContext, ct);
             return tokenRequestResult.Token;
         }
@@ -55,7 +55,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
         public string GetArmAccessToken(CancellationToken ct = default)
         {
             var credentials = GetTokenCredential();
-            var tokenRequestContext = new TokenRequestContext(new[] { $"{_apiResourceConfigurations.AzureResource}/.default" });
+            var tokenRequestContext = new TokenRequestContext([$"{_apiResourceConfigurations.AzureResource}/.default"]);
             var tokenRequestResult = credentials.GetToken(tokenRequestContext, ct);
             return tokenRequestResult.Token;
         }
@@ -79,7 +79,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
             try
             {
                 var jsonRequestBody = JsonSerializer.Serialize(accessTokenRequest);
-                _logger.LogInformation($"Getting ApiTrialAccountModel access token: {jsonRequestBody}");
+                _logger.LogInformation("Getting ApiTrialAccountModel access token: {jsonRequestBody}", jsonRequestBody);
                 var httpContent = new StringContent(jsonRequestBody, System.Text.Encoding.UTF8, "application/json");
 
                 var requestUri = $"{_apiResourceConfigurations.AzureResource}/subscriptions/{_apiResourceConfigurations.SubscriptionId}/resourcegroups/{_apiResourceConfigurations?.ResourceGroup}/providers/Microsoft.VideoIndexer/accounts/{_apiResourceConfigurations?.ViAccountName}/generateAccessToken?api-version={_apiResourceConfigurations?.ApiVersion}";
@@ -89,7 +89,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
                 var result = httpClient.PostAsync(requestUri, httpContent, ct).Result;
                 result.EnsureSuccessStatusCode();
                 var jsonResponseBody = result.Content.ReadAsStringAsync(ct).Result;
-                _logger.LogInformation($"Got ApiTrialAccountModel access token: {scope} , {permission}");
+                _logger.LogInformation("Got ApiTrialAccountModel access token: {scope} , {permission}", scope, permission);
                 return JsonSerializer.Deserialize<GenerateAccessTokenResponse>(jsonResponseBody)?.AccessToken!;
             }
             catch (Exception ex)
@@ -118,7 +118,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
             try
             {
                 var jsonRequestBody = JsonSerializer.Serialize(accessTokenRequest);
-                _logger.LogInformation($"Getting ApiTrialAccountModel access token: {jsonRequestBody}");
+                _logger.LogInformation("Getting ApiTrialAccountModel access token: {jsonRequestBody}", jsonRequestBody);
                 var httpContent = new StringContent(jsonRequestBody, System.Text.Encoding.UTF8, "application/json");
 
                 var requestUri = $"{_apiResourceConfigurations.AzureResource}/subscriptions/{_apiResourceConfigurations.SubscriptionId}/resourcegroups/{_apiResourceConfigurations?.ResourceGroup}/providers/Microsoft.VideoIndexer/accounts/{_apiResourceConfigurations?.ViAccountName}/generateAccessToken?api-version={_apiResourceConfigurations?.ApiVersion}";
@@ -128,7 +128,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
                 var result = await httpClient.PostAsync(requestUri, httpContent, ct);
                 result.EnsureSuccessStatusCode();
                 var jsonResponseBody = await result.Content.ReadAsStringAsync(ct);
-                _logger.LogInformation($"Got ApiTrialAccountModel access token: {scope} , {permission}");
+                _logger.LogInformation("Got ApiTrialAccountModel access token: {scope} , {permission}", scope, permission);
                 return JsonSerializer.Deserialize<GenerateAccessTokenResponse>(jsonResponseBody)?.AccessToken!;
             }
             catch (Exception ex)

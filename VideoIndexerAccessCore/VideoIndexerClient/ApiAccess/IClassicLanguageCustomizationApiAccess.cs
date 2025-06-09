@@ -17,6 +17,20 @@ public interface IClassicLanguageCustomizationApiAccess
     /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされる</exception>
     Task<HttpResponseMessage> CancelTrainingModelAsync(string location, string accountId, string accessToken, string modelId);
 
+
+    /// <summary>
+    /// 新しいカスタム言語モデルを作成する
+    /// </summary>
+    /// <param name="location">Azure のリージョン</param>
+    /// <param name="accountId">Azure Video Indexer のアカウントID</param>
+    /// <param name="requestModel">作成リクエストのモデル</param>
+    /// <param name="accessToken">認証用のアクセストークン（オプション）</param>
+    /// <returns>作成されたカスタム言語モデル</returns>
+    /// <exception cref="ArgumentException">location, accountId, または requestModel が null または空の場合にスローされる</exception>
+    /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされる</exception>
+    Task<ApiCustomLanguageModel> CreateLanguageModelAsync(string location, string accountId, ApiCustomLanguageRequestModel requestModel, string? accessToken = null);
+
+
     /// <summary>
     /// 新しい言語モデルを作成する
     /// </summary>

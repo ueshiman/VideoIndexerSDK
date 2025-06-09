@@ -15,7 +15,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly ILogger<VideoListRepository> _logger;
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
         private readonly IAccounApitAccess _accountAccess;
-        private readonly IVideoItemApiAccess _videoItemApiAccess;
+        private readonly IVideoIndexApiAccess _videoIndexApiAccess;
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
         private readonly IVideoItemDataMapper _videoItemDataMapper;
         private readonly IAccountRepository _accountRepository;
@@ -28,16 +28,16 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="logger">ロガー</param>
         /// <param name="authenticationTokenizer">認証トークンプロバイダー</param>
         /// <param name="accountAccess">アカウントアクセスプロバイダー</param>
-        /// <param name="videoItemApiAccess">ビデオアイテムAPIアクセスプロバイダー</param>
+        /// <param name="videoIndexApiAccess">ビデオアイテムAPIアクセスプロバイダー</param>
         /// <param name="apiResourceConfigurations">APIリソース設定</param>
         /// <param name="videoItemDataMapper">ビデオアイテムデータマッパー</param>
         /// <param name="accountRepository">アカウントリポジトリ</param>
-        public VideoIndexRepository(ILogger<VideoListRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IVideoItemApiAccess videoItemApiAccess, IApiResourceConfigurations apiResourceConfigurations, IVideoItemDataMapper videoItemDataMapper, IAccountRepository accountRepository)
+        public VideoIndexRepository(ILogger<VideoListRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IVideoIndexApiAccess videoIndexApiAccess, IApiResourceConfigurations apiResourceConfigurations, IVideoItemDataMapper videoItemDataMapper, IAccountRepository accountRepository)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
             _accountAccess = accountAccess;
-            _videoItemApiAccess = videoItemApiAccess;
+            _videoIndexApiAccess = videoIndexApiAccess;
             _apiResourceConfigurations = apiResourceConfigurations;
             _videoItemDataMapper = videoItemDataMapper;
             _accountRepository = accountRepository;
@@ -52,10 +52,10 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
             _accountRepository.CheckAccount(account);
-            string? location = account.Location;
-            string? accountId = account.Properties?.Id;
+            string? location = account.location;
+            string? accountId = account.properties?.id;
             var accessToken = await _authenticationTokenizer.GetAccessToken();
-            return await _videoItemApiAccess.GetVideoItemJsonAsync(location!, accountId!, videoId, accessToken);
+            return await _videoIndexApiAccess.GetVideoItemJsonAsync(location!, accountId!, videoId, accessToken);
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
             _accountRepository.CheckAccount(account);
-            string? location = account.Location;
-            string? accountId = account.Properties?.Id;
+            string? location = account.location;
+            string? accountId = account.properties?.id;
             var accessToken = await _authenticationTokenizer.GetAccessToken();
-            var dataModel = await _videoItemApiAccess.GetVideoItemAsync(location!, accountId!, videoId, accessToken);
+            var dataModel = await _videoIndexApiAccess.GetVideoItemAsync(location!, accountId!, videoId, accessToken);
             return _videoItemDataMapper.MapFrom(dataModel);
         }
     }

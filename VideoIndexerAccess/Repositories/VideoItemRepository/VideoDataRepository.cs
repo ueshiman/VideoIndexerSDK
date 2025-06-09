@@ -70,7 +70,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _logger.LogInformation("Account retrieved successfully for accountId: {AccountId}", accountId);
 
             // ビデオのダウンロードURLを取得
-            string downloadUrlResponse = await _videoDownload.GetVideoDownloadUrl(account!.Location!, account!.Properties!.Id!, videoId, accessToken);
+            string downloadUrlResponse = await _videoDownload.GetVideoDownloadUrl(account!.location!, account!.properties!.id!, videoId, accessToken);
             _logger.LogInformation("Download URL retrieved successfully for videoId: {VideoId}", videoId);
 
             return downloadUrlResponse;

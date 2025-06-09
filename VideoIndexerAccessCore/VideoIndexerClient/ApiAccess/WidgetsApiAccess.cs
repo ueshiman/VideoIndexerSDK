@@ -1,19 +1,12 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using System.Threading.Tasks;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 {
-    public class WidgetsApiAccess
+    public class WidgetsApiAccess : IWidgetsApiAccess
     {
         private readonly ILogger<WidgetsApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
@@ -62,7 +55,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="allowEdit">（任意）ウィジェットが編集可能かどうか</param>
         /// <param name="accessToken">（任意）アクセストークン。編集やプライベートビデオの場合に必要</param>
         /// <returns>APIから取得した生のJSONレスポンス文字列</returns>
-        private async Task<string> FetchVideoInsightsJsonAsync(string location, string accountId, string videoId, string? widgetType, bool? allowEdit, string? accessToken)
+        public async Task<string> FetchVideoInsightsJsonAsync(string location, string accountId, string videoId, string? widgetType, bool? allowEdit, string? accessToken)
         {
             try
             {
@@ -75,9 +68,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var finalUrl = $"{url}?{query}";
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.GetAsync(finalUrl);
+                var response = await httpClient.GetAsync(finalUrl) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadAsStringAsync();
@@ -94,7 +86,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">APIから取得したJSON文字列</param>
         /// <returns>デシリアライズされた <see cref="ApiVideoInsightsWidgetResponseModel"/> オブジェクト。失敗時は null</returns>
-        private ApiVideoInsightsWidgetResponseModel? ParseVideoInsightsJson(string json)
+        public ApiVideoInsightsWidgetResponseModel? ParseVideoInsightsJson(string json)
         {
             try
             {
@@ -133,9 +125,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 var finalUrl = $"{url}?{query}";
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.GetAsync(finalUrl);
+                var response = await httpClient.GetAsync(finalUrl) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.MovedPermanently)
                 {

@@ -66,12 +66,12 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 var account = await _accountAccess.GetAccountAsync(); // キャッシュしちゃダメ
                 _accountRepository.CheckAccount(account);
 
-                string? location = account?.Location;
+                string? location = account?.location;
 
-                string? accountId = account!.Properties!.Id;
+                string? accountId = account!.properties!.id;
 
                 var accessToken = await _authenticationTokenizer.GetAccessToken();
-                IEnumerable<ApiVideoListItemModel> apiVideoListItemModels =  await _videoListApiAccess.ListVideosAsync(location!, accountId!, accessToken: accessToken, createdAfter: createdAfter?.ToString("o"), createdBefore: createdBefore?.ToString("o"), pageSize: pageSize, skip: skip, partitions: partitions);
+                IEnumerable<ApiVideoListItemModel> apiVideoListItemModels = await _videoListApiAccess.ListVideosAsync(location!, accountId!, accessToken: accessToken, createdAfter: createdAfter?.ToString("o"), createdBefore: createdBefore?.ToString("o"), pageSize: pageSize, skip: skip, partitions: partitions);
                 return apiVideoListItemModels.Select(_videoListDataModelMapper.MapFrom);
             }
             catch (Exception ex)
@@ -110,8 +110,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 var account = await _accountAccess.GetAccountAsync(); // キャッシュしちゃダメ
                 _accountRepository.CheckAccount(account);
 
-                string? location = account?.Location;
-                string? accountId = account!.Properties?.Id;
+                string? location = account?.location;
+                string? accountId = account!.properties?.id;
 
                 var accessToken = await _authenticationTokenizer.GetAccessToken();
                 return await _videoListApiAccess.SearchVideosAsync(location!, accountId!, sourceLanguage, hasSourceVideoFile, sourceVideoId, state, privacy, id, partition, externalId, owner, face, animatedCharacter, query, textScope, language, createdAfter?.ToString("o"), createdBefore?.ToString("o"), pageSize, skip, accessToken);

@@ -54,8 +54,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(httpRequest);
-                if (response is null) throw new HttpRequestException("The response was null.");
+                var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 _logger.LogInformation("Successfully fetched create speech dataset JSON. Location: {Location}, AccountId: {AccountId}", location, accountId);
                 return await response.Content.ReadAsStringAsync();
@@ -92,7 +91,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON parsing error: {ex.Message}");
+                _logger.LogError("JSON parsing error: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -149,25 +148,24 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(httpRequest);
+                var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"HTTP request error: {ex.Message}");
+                _logger.LogError("HTTP request error: {ex.Message}", ex.Message);
                 throw;
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON serialization error: {ex.Message}");
+                _logger.LogError("JSON serialization error: {ex.Message}", ex.Message);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Unexpected error: {ex.Message}");
+                _logger.LogError("Unexpected error: {ex.Message}", ex.Message);
                 throw;
             }
         }
@@ -203,7 +201,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"JSON parsing error: {ex.Message}");
+                _logger.LogError("JSON parsing error: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -237,22 +235,21 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(httpRequest);
+                var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
                 }
                 else
                 {
-                    _logger.LogError($"Failed to delete speech dataset: {response.StatusCode}");
+                    _logger.LogError("Failed to delete speech dataset: {response.StatusCode}", response.StatusCode);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Delete speech dataset request failed: {ex.Message}");
+                _logger.LogError("Delete speech dataset request failed: {ex.Message}", ex.Message);
                 return false;
             }
         }
@@ -286,22 +283,21 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 }
 
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.SendAsync(httpRequest);
+                var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
                 }
                 else
                 {
-                    _logger.LogError($"Failed to delete speech model: {response.StatusCode}");
+                    _logger.LogError("Failed to delete speech model: {response.StatusCode}", response.StatusCode);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Delete speech model request failed: {ex.Message}");
+                _logger.LogError("Delete speech model request failed: {ex.Message}", ex.Message);
                 return false;
             }
         }
@@ -327,7 +323,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Get speech dataset request failed: {ex.Message}");
+                _logger.LogError("Get speech dataset request failed: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -357,16 +353,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.SendAsync(httpRequest);
+            var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
             else
             {
-                _logger.LogError($"Failed to get speech dataset: {response.StatusCode}");
+                _logger.LogError("Failed to get speech dataset: {response.StatusCode}", response.StatusCode);
                 return null;
             }
         }
@@ -405,7 +400,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Get speech dataset files request failed: {ex.Message}");
+                _logger.LogError("Get speech dataset files request failed: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -447,16 +442,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.SendAsync(httpRequest);
+            var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
             else
             {
-                _logger.LogError($"Failed to get speech dataset files: {response.StatusCode}");
+                _logger.LogError("Failed to get speech dataset files: {response.StatusCode}", response.StatusCode);
                 return null;
             }
         }
@@ -476,7 +470,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"Failed to parse speech dataset files JSON: {ex.Message}");
+                _logger.LogError("Failed to parse speech dataset files JSON: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -502,7 +496,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Get speech datasets request failed: {ex.Message}");
+                _logger.LogError("Get speech datasets request failed: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -544,16 +538,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.SendAsync(httpRequest);
+            var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
             else
             {
-                _logger.LogError($"Failed to get speech datasets: {response.StatusCode}");
+                _logger.LogError("Failed to get speech datasets: {response.StatusCode}", response.StatusCode);
                 return null;
             }
         }
@@ -573,7 +566,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"Failed to parse speech datasets JSON: {ex.Message}");
+                _logger.LogError("Failed to parse speech datasets JSON: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -599,7 +592,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Get speech model request failed: {ex.Message}");
+                _logger.LogError("Get speech model request failed: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -629,16 +622,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.SendAsync(httpRequest);
+            var response = await httpClient.SendAsync(httpRequest) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
             }
             else
             {
-                _logger.LogError($"Failed to get speech model: {response.StatusCode}");
+                _logger.LogError("Failed to get speech model: {response.StatusCode}", response.StatusCode);
                 return null;
             }
         }
@@ -658,7 +650,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
             catch (JsonException ex)
             {
-                _logger.LogError($"Failed to parse speech model JSON: {ex.Message}");
+                _logger.LogError("Failed to parse speech model JSON: {ex.Message}", ex.Message);
                 return null;
             }
         }
@@ -695,9 +687,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             var requestUri = BuildRequestUri(location, accountId, locale, accessToken);
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.GetAsync(requestUri);
+            var response = await httpClient.GetAsync(requestUri) ?? throw new HttpRequestException("The response was null.");
             // responseがnullなら例外を
-            if (response is null) throw new HttpRequestException("The response was null.");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
@@ -819,9 +810,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             try
             {
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.PutAsync(requestUri, content);
+                var response = await httpClient.PutAsync(requestUri, content) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 var responseBody = await response.Content.ReadAsStringAsync();
                 _logger.LogDebug("Speech dataset update response: {ResponseBody}", responseBody);
@@ -918,9 +908,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             try
             {
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-                var response = await httpClient.PutAsync(requestUri, content);
+                var response = await httpClient.PutAsync(requestUri, content) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
                 var responseBody = await response.Content.ReadAsStringAsync();
                 _logger.LogDebug("Response received for speech model update: {ResponseBody}", responseBody);

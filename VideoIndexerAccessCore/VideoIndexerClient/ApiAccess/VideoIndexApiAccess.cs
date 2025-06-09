@@ -107,7 +107,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             foreach (var param in queryParams) query[param.Key] = param.Value;
             builder.Query = query.ToString();
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, builder.ToString());
+            HttpRequestMessage request = new(HttpMethod.Get, builder.ToString());
             request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();

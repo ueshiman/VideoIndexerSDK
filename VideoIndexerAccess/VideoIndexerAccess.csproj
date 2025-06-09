@@ -20,7 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.AutoActivation" Version="9.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VideoIndexerAccessCoreExtension\VideoIndexerAccessCoreExtension.csproj" />
   </ItemGroup>
 	
   <PropertyGroup>
