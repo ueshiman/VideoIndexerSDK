@@ -117,6 +117,13 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
+        /// <summary>
+        /// カスタムロゴグループを作成する非同期メソッド。
+        /// アカウント情報を取得し、APIを呼び出してロゴグループを作成します。
+        /// </summary>
+        /// <param name="request">ロゴグループ作成リクエストモデル</param>
+        /// <returns>作成されたロゴグループのレスポンスモデル</returns>
+        /// <exception cref="ArgumentNullException">アカウント情報が取得できなかった場合</exception>
         public async Task<LogoGroupResponseModel> CreateLogoGroupAsync(ApiLogoGroupRequestModel request)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
@@ -135,6 +142,17 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await CreateLogoGroupAsync(location!, accountId!, request, accessToken);
         }
 
+        /// <summary>
+        /// 指定されたロケーション・アカウントID・リクエスト・アクセストークンでロゴグループを作成します。
+        /// </summary>
+        /// <param name="location">APIのリージョン</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="request">ロゴグループ作成リクエストモデル</param>
+        /// <param name="accessToken">アクセストークン（省略可）</param>
+        /// <returns>作成されたロゴグループのレスポンスモデル</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
         public async Task<LogoGroupResponseModel> CreateLogoGroupAsync(string location, string accountId, ApiLogoGroupRequestModel request, string? accessToken = null)
         {
             try
