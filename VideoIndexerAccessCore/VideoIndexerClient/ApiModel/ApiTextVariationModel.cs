@@ -5,7 +5,8 @@
     /// </summary>
     public class ApiTextVariationModel
     {
-        public string text { get; set; } = "";
+        public string? text { get; set; }
+
         public bool caseSensitive { get; set; }
     }
 }

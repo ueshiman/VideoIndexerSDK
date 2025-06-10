@@ -232,7 +232,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 if (apiBrandModel is null)
                 {
                     // ブランドモデルが見つからない場合は警告ログを出力しnullを返す
-                    _logger.LogWarning("Brand model not found. location: {Location}, accountId:Map {AccountId}, id: {Id}", location, accountId, id);
+                    _logger.LogWarning("Brand model not found. location: {Location}, accountId:MapFrom {AccountId}, id: {Id}", location, accountId, id);
                     return null;
                 }
 

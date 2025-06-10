@@ -9,9 +9,9 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class LogoGroupResponseMapper : ILogoGroupResponseMapper
     {
-        public LogoGroupResponseModel MapFrom(ApiLogoGroupResponseModel model)
+        public ApiLogoLogoGroupContractModel MapFrom(ApiLogoGroupResponseModel model)
         {
-            return new LogoGroupResponseModel
+            return new ApiLogoLogoGroupContractModel
             {
                 Id = model.id,
                 Name = model.name,
@@ -20,7 +20,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
             };
         }
 
-        public ApiLogoGroupResponseModel MapToApiLogoGroupResponseModel(LogoGroupResponseModel model)
+        public ApiLogoGroupResponseModel MapToApiLogoGroupResponseModel(ApiLogoLogoGroupContractModel model)
         {
             return new ApiLogoGroupResponseModel
             {

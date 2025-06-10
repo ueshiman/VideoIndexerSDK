@@ -39,7 +39,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="request">ロゴ作成リクエストデータ</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>作成されたロゴのレスポンス情報</returns>
-        public async Task<ApiLogoResponseModel> CreateCustomLogoAsync(string location, string accountId, ApiLogoRequestModel request, string? accessToken = null)
+        public async Task<ApiLogoContractModel> CreateCustomLogoAsync(string location, string accountId, ApiLogoRequestModel request, string? accessToken = null)
         {
             // APIリクエストを送信し、レスポンスを取得
             var jsonResponse = await SendApiRequestAsync(location, accountId, request, accessToken);
@@ -91,12 +91,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIからのレスポンス文字列</param>
         /// <returns>解析されたレスポンスモデル</returns>
-        public ApiLogoResponseModel ParseApiResponse(string jsonResponse)
+        public ApiLogoContractModel ParseApiResponse(string jsonResponse)
         {
             try
             {
                 // JSONレスポンスをデシリアライズし、モデルに変換
-                return JsonSerializer.Deserialize<ApiLogoResponseModel>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
+                return JsonSerializer.Deserialize<ApiLogoContractModel>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
             }
             catch (JsonException ex)
             {
@@ -426,11 +426,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="jsonResponse">API から取得したロゴグループ情報の JSON</param>
         /// <returns>解析したロゴグループのリスト</returns>
         /// </summary>
-        public ApiLogoGroupContractResponseModel[] ParseLogoGroupsJson(string jsonResponse)
+        public ApiLogoGroupContractModel[] ParseLogoGroupsJson(string jsonResponse)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiLogoGroupContractResponseModel[]>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
+                return JsonSerializer.Deserialize<ApiLogoGroupContractModel[]>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
             }
             catch (JsonException ex)
             {
@@ -446,7 +446,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>解析済みのロゴグループ情報のリスト</returns>
         /// </summary>
-        public async Task<ApiLogoGroupContractResponseModel[]> GetLogoGroupsAsync(string location, string accountId, string? accessToken = null)
+        public async Task<ApiLogoGroupContractModel[]> GetLogoGroupsAsync(string location, string accountId, string? accessToken = null)
         {
             try
             {
@@ -515,11 +515,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">API から取得したロゴグループ情報の JSON</param>
         /// <returns>解析したロゴグループのリスト</returns>
-        public ApiLogoGroupContractResponseModel[] ParseLogoLinkedGroupsJson(string jsonResponse)
+        public ApiLogoGroupContractModel[] ParseLogoLinkedGroupsJson(string jsonResponse)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiLogoGroupContractResponseModel[]>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
+                return JsonSerializer.Deserialize<ApiLogoGroupContractModel[]>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
             }
             catch (JsonException ex)
             {
@@ -696,7 +696,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="updateRequest">更新するロゴグループ情報</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>更新後のロゴグループ情報</returns>
-        public async Task<ApiLogoGroupContractResponseModel> UpdateLogoGroupAsync(string location, string accountId, string logoGroupId, ApiLogoGroupUpdateRequestModel updateRequest, string? accessToken = null)
+        public async Task<ApiLogoGroupContractModel> UpdateLogoGroupAsync(string location, string accountId, string logoGroupId, ApiLogoGroupUpdateRequestModel updateRequest, string? accessToken = null)
         {
             HttpResponseMessage? response;
             try
@@ -738,7 +738,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ApiLogoGroupContractResponseModel>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
+            return JsonSerializer.Deserialize<ApiLogoGroupContractModel>(jsonResponse) ?? throw new JsonException("Failed to deserialize response.");
         }
     }
 }

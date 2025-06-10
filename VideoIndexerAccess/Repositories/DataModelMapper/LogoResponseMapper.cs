@@ -5,32 +5,37 @@ using System.Text;
 using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+using ApiLogoContractModel = VideoIndexerAccessCore.VideoIndexerClient.ApiModel.ApiLogoContractModel;
 
 namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class LogoResponseMapper : ILogoResponseMapper
     {
-        public LogoResponseModel Map(ApiLogoResponseModel apiModel)
+        private readonly ILogoTextVariationMapper _logoTextVariationMapper;
+
+        public LogoResponseMapper(ILogoTextVariationMapper logoTextVariationMapper)
         {
-            if (apiModel == null)
+            _logoTextVariationMapper = logoTextVariationMapper;
+        }
+
+        public LogoContractModel MapFrom(ApiLogoContractModel model)
+        {
+            return new LogoContractModel
             {
-                throw new ArgumentNullException(nameof(apiModel), "API model cannot be null");
-            }
-            return new LogoResponseModel
-            {
-                Id = apiModel.id,
-                Name = apiModel.name,
-                CreatedBy = apiModel.createdBy,
-                WikipediaSearchTerm = apiModel.wikipediaSearchTerm
+                Id = model.id,
+                CreationTime = model.creationTime,
+                LastUpdateTime = model.lastUpdateTime,
+                LastUpdatedBy = model.lastUpdatedBy,
+                CreatedBy = model.createdBy,
+                Name = model.name,
+                WikipediaSearchTerm = model.wikipediaSearchTerm,
+                TextVariations = model.textVariations.Select(_logoTextVariationMapper.MapFrom).ToList()
+
             };
         }
-        public ApiLogoResponseModel MapToApiLogoResponseModel(LogoResponseModel model)
+        public ApiLogoContractModel MapToApiLogoResponseModel(LogoContractModel model)
         {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model), "Model cannot be null");
-            }
-            return new ApiLogoResponseModel
+            return new ApiLogoContractModel
             {
                 id = model.Id,
                 name = model.Name,
