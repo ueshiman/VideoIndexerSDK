@@ -1,9 +1,10 @@
-﻿using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+﻿using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
 namespace VideoIndexerAccess.Repositories.DataModelMapper;
 
 public interface ILogoGroupResponseMapper
 {
-    LogoGroupResponseModel MapFrom(ApiLogoGroupResponseModel model);
-    ApiLogoGroupResponseModel MapToApiLogoGroupResponseModel(LogoGroupResponseModel model);
+    ApiLogoLogoGroupContractModel MapFrom(ApiLogoGroupResponseModel model);
+    ApiLogoGroupResponseModel MapToApiLogoGroupResponseModel(ApiLogoLogoGroupContractModel model);
 }

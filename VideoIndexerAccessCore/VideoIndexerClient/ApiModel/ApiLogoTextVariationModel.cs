@@ -13,7 +13,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     {
         public string text { get; set; } = "";
         public bool caseSensitive { get; set; }
-        public string creationTime { get; set; } = "";
-        public string createdBy { get; set; } = "";
+        public DateTimeOffset creationTime { get; set; }
+        public string? createdBy { get; set; }
     }
 }

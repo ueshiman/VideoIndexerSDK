@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 
-namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+namespace VideoIndexerAccess.Repositories.DataModel
 {
-    public class LogoGroupResponseModel
+    public class LogoGroupRequestModel
     {
         /// <summary>
-        /// グループID
+        /// ロゴのリスト
         /// </summary>
-        public string Id { get; set; } = "";
+        public LogoGroupLinkModel[] Logos { get; set; } = Array.Empty<LogoGroupLinkModel>();
 
         /// <summary>
-        /// グループ名
+        /// ロゴグループの名前
         /// </summary>
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// グループの説明
+        /// ロゴグループの説明
         /// </summary>
         public string Description { get; set; } = "";
-
-        /// <summary>
-        /// 作成者
-        /// </summary>
-        public string CreatedBy { get; set; } = "";
     }
 }

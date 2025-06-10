@@ -9,15 +9,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// <summary>
     /// ロゴグループのレスポンスモデル
     /// </summary>
-    public class ApiLogoGroupContractResponseModel
+    public class ApiLogoGroupContractModel
     {
         public string id { get; set; } = "";
-        public string creationTime { get; set; } = "";
-        public string lastUpdateTime { get; set; } = "";
+        public DateTimeOffset creationTime { get; set; }
+        public DateTimeOffset lastUpdateTime { get; set; }
         public string lastUpdatedBy { get; set; } = "";
         public string createdBy { get; set; } = "";
+        public ApiLogoGroupLinkModel[] logos { get; set; } = [];
         public string name { get; set; } = "";
-        public string wikipediaSearchTerm { get; set; } = "";
-        public ApiLogoTextVariationModel[] textVariations { get; set; } = Array.Empty<ApiLogoTextVariationModel>();
+        public string description { get; set; } = "";
     }
 }

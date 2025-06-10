@@ -39,7 +39,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
             {
                 name = model.Name,
                 wikipediaSearchTerm = model.WikipediaSearchTerm,
-                textVariations = model.TextVariations.Select(_textVariationMapper.MapToApiTextVariationModel).ToArray()
+                textVariations = model.TextVariations.Select(_textVariationMapper.ToApiTextVariationModel).ToArray()
             };
         }
     }

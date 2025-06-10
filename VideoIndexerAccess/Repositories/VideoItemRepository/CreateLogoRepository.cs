@@ -26,18 +26,23 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IAccounApitAccess _accountAccess;
 
         // アカウント検証用リポジトリ
-        private readonly IAccountRepository _accountRepository; private readonly ICustomLogosApiAccess _customLogosApiAccess;
+        private readonly IAccountRepository _accountRepository;
+        private readonly ICustomLogosApiAccess _customLogosApiAccess;
 
         // APIリソース設定
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
         private readonly ILogoResponseMapper _logoResponseMapper;
         private readonly ILogoRequestMapper _logoRequestMapper;
+
         private readonly ILogoGroupResponseMapper _logoGroupResponseMapper;
+        private readonly ILogoGroupRequestMapper _logoGroupRequestMapper;
+        private readonly ILogoGroupContractMapper _logoGroupContractMapper;
+
         // 例外スロー時のパラメータ名
         private const string ParamName = "createLogo";
 
-        public CreateLogoRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, ICustomLogosApiAccess customLogosApiAccess, IApiResourceConfigurations apiResourceConfigurations, ILogoResponseMapper logoResponseMapper, ILogoRequestMapper logoRequestMapper, ILogoGroupResponseMapper logoGroupResponseMapper)
+        public CreateLogoRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, ICustomLogosApiAccess customLogosApiAccess, IApiResourceConfigurations apiResourceConfigurations, ILogoResponseMapper logoResponseMapper, ILogoRequestMapper logoRequestMapper, ILogoGroupResponseMapper logoGroupResponseMapper, ILogoGroupRequestMapper logoGroupRequestMapper, ILogoGroupContractMapper logoGroupContractMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -48,6 +53,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _logoResponseMapper = logoResponseMapper;
             _logoRequestMapper = logoRequestMapper;
             _logoGroupResponseMapper = logoGroupResponseMapper;
+            _logoGroupRequestMapper = logoGroupRequestMapper;
+            _logoGroupContractMapper = logoGroupContractMapper;
         }
 
         /// <summary>
@@ -56,7 +63,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// </summary>
         /// <param name="request">ロゴ作成リクエストモデル</param>
         /// <returns>作成されたロゴのレスポンスモデル</returns>
-        public async Task<LogoResponseModel> CreateCustomLogoAsync(LogoRequestModel request)
+        public async Task<LogoContractModel> CreateCustomLogoAsync(LogoRequestModel request)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -85,7 +92,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <exception cref="ArgumentException">引数が不正な場合</exception>
         /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
         /// <exception cref="Exception">その他の予期しない例外</exception>
-        public async Task<LogoResponseModel> CreateCustomLogoAsync(string location, string accountId, LogoRequestModel request, string? accessToken = null)
+        public async Task<LogoContractModel> CreateCustomLogoAsync(string location, string accountId, LogoRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -96,7 +103,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 var apiResponse = await _customLogosApiAccess.CreateCustomLogoAsync(location, accountId, apiRequest, accessToken);
 
                 // レスポンスをドメインモデルにマッピング
-                var result = _logoResponseMapper.Map(apiResponse);
+                var result = _logoResponseMapper.MapFrom(apiResponse);
 
                 return result;
             }
@@ -124,7 +131,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="request">ロゴグループ作成リクエストモデル</param>
         /// <returns>作成されたロゴグループのレスポンスモデル</returns>
         /// <exception cref="ArgumentNullException">アカウント情報が取得できなかった場合</exception>
-        public async Task<LogoGroupResponseModel> CreateLogoGroupAsync(ApiLogoGroupRequestModel request)
+        public async Task<ApiLogoLogoGroupContractModel> CreateLogoGroupAsync(LogoGroupRequestModel request)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -153,12 +160,14 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <exception cref="ArgumentException">引数が不正な場合</exception>
         /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
         /// <exception cref="Exception">その他の予期しない例外</exception>
-        public async Task<LogoGroupResponseModel> CreateLogoGroupAsync(string location, string accountId, ApiLogoGroupRequestModel request, string? accessToken = null)
+        public async Task<ApiLogoLogoGroupContractModel> CreateLogoGroupAsync(string location, string accountId, LogoGroupRequestModel request, string? accessToken = null)
         {
             try
             {
+                // リクエストモデルをAPI用モデルにマッピング
+                ApiLogoGroupRequestModel apiRequest = _logoGroupRequestMapper.MapToApiLogoGroupRequestModel(request);
                 // API へロゴグループ作成リクエスト送信
-                var apiResponse = await _customLogosApiAccess.CreateLogoGroupAsync(location, accountId, request, accessToken);
+                var apiResponse = await _customLogosApiAccess.CreateLogoGroupAsync(location, accountId, apiRequest, accessToken);
 
                 // レスポンスをドメインモデルにマッピング
                 var result = _logoGroupResponseMapper.MapFrom(apiResponse);
@@ -167,19 +176,80 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
             catch (ArgumentException ex)
             {
-                _logger.LogError(ex, "Argument error: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.name);
+                _logger.LogError(ex, "Argument error: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.Name);
                 throw;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "API request failed: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.name);
+                _logger.LogError(ex, "API request failed: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.Name);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error occurred while creating logo group: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.name);
+                _logger.LogError(ex, "Unexpected error occurred while creating logo group: location={Location}, accountId={AccountId}, groupName={Name}", location, accountId, request.Name);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定したロゴIDのロゴを削除します。
+        /// アカウント情報を取得し、APIを呼び出してロゴを削除します。
+        /// </summary>
+        /// <param name="logoId">削除するロゴのID</param>
+        /// <returns>非同期タスク</returns>
+        /// <exception cref="ArgumentNullException">アカウント情報が取得できなかった場合</exception>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task DeleteLogoAsync(string logoId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+            await DeleteLogoAsync(location!, accountId!, logoId, accessToken);
+        }
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・ロゴID・アクセストークンでロゴを削除します。
+        /// </summary>
+        /// <param name="location">APIのリージョン</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="logoId">削除するロゴのID</param>
+        /// <param name="accessToken">アクセストークン（省略可）</param>
+        /// <returns>非同期タスク</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task DeleteLogoAsync(string location, string accountId, string logoId, string? accessToken = null)
+        {
+            try
+            {
+                // API へロゴ削除リクエスト送信
+                await _customLogosApiAccess.DeleteLogoAsync(location, accountId, logoId, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Argument error: location={Location}, accountId={AccountId}, logoId={LogoId}", location, accountId, logoId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed: location={Location}, accountId={AccountId}, logoId={LogoId}", location, accountId, logoId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while deleting logo: location={Location}, accountId={AccountId}, logoId={LogoId}", location, accountId, logoId);
                 throw;
             }
         }
     }
+
+
 }

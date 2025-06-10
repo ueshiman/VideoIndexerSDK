@@ -14,7 +14,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
         /// <summary>
         /// ロゴID
         /// </summary>
-        public string logoId { get; set; } = "";
+        public Guid logoId { get; set; }
     }
 
 }

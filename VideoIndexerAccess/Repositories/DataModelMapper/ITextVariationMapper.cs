@@ -5,6 +5,6 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper;
 
 public interface ITextVariationMapper
 {
-    TextVariationModel MapFrom(ApiTextVariationModel model);
-    ApiTextVariationModel MapToApiTextVariationModel(TextVariationModel model);
+    TextVariationModel MapFrom(ApiTextVariationModel apiTextVariationModel);
+    ApiTextVariationModel ToApiTextVariationModel(TextVariationModel textVariationModel);
 }

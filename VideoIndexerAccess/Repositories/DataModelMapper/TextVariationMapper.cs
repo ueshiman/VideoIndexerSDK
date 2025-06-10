@@ -5,20 +5,21 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class TextVariationMapper : ITextVariationMapper
     {
-        public TextVariationModel MapFrom(ApiTextVariationModel model)
+        public TextVariationModel MapFrom(ApiTextVariationModel apiTextVariationModel)
         {
             return new TextVariationModel
             {
-                Text = model.text,
-                CaseSensitive = model.caseSensitive
+                Text = apiTextVariationModel.text ?? string.Empty,
+                CaseSensitive = apiTextVariationModel.caseSensitive
             };
         }
-        public ApiTextVariationModel MapToApiTextVariationModel(TextVariationModel model)
+
+        public ApiTextVariationModel ToApiTextVariationModel(TextVariationModel textVariationModel)
         {
             return new ApiTextVariationModel
             {
-                text = model.Text,
-                caseSensitive = model.CaseSensitive
+                text = textVariationModel.Text,
+                caseSensitive = textVariationModel.CaseSensitive
             };
         }
     }
