@@ -265,7 +265,87 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw;
             }
         }
-        
+
+        /// <summary>
+        /// 指定された動画の顔情報を更新します。
+        /// </summary>
+        /// <param name="request">顔情報更新リクエストモデル</param>
+        /// <returns>更新が成功した場合は true、それ以外は false</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task<bool> UpdateVideoFaceAsync(UpdateVideoFaceRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            return await UpdateVideoFaceAsync(location!, accountId!, request, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定された動画の顔情報を更新します。
+        /// </summary>
+        /// <param name="location">Azure のリージョン</param>
+        /// <param name="accountId">Video Indexer アカウント ID</param>
+        /// <param name="request">顔情報更新リクエストモデル</param>
+        /// <param name="accessToken">API アクセストークン（省略可）</param>
+        /// <returns>更新が成功した場合は true、それ以外は false</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task<bool> UpdateVideoFaceAsync(string location, string accountId, UpdateVideoFaceRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                // 処理の開始をログに記録
+                _logger.LogInformation("UpdateVideoFaceAsync started: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+
+                // 顔情報の更新処理を実行
+                var result = await _indexingApiAccess.UpdateVideoFaceAsync(location, accountId, request.VideoId, request.FaceId, request.NewName, request.PersonId, request.CreateNewPerson, accessToken);
+
+                // 処理結果に応じてログを記録
+                if (result)
+                {
+                    _logger.LogInformation("UpdateVideoFaceAsync succeeded: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+                }
+                else
+                {
+                    _logger.LogWarning("UpdateVideoFaceAsync failed: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+                }
+
+                // 処理結果を返却
+                return result;
+            }
+            catch (ArgumentException ex)
+            {
+                // 引数エラーをログに記録し、例外を再スロー
+                _logger.LogError(ex, "Argument error in UpdateVideoFaceAsync: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                // APIリクエスト失敗をログに記録し、例外を再スロー
+                _logger.LogError(ex, "API request failed in UpdateVideoFaceAsync: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // その他の予期しないエラーをログに記録し、例外を再スロー
+                _logger.LogError(ex, "Unexpected error occurred in UpdateVideoFaceAsync: location={Location}, accountId={AccountId}, videoId={VideoId}, faceId={FaceId}", location, accountId, request.VideoId, request.FaceId);
+                throw;
+            }
+        }
 
     }
 }
