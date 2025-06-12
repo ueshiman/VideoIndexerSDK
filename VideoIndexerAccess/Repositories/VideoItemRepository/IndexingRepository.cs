@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,11 +34,14 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         private readonly IIndexingApiAccess _indexingApiAccess;
         private readonly IVideoIndexApiAccess _videoIndexApiAccess;
-        public readonly IVideoItemDataMapper _videoItemDataMapper;
+        private readonly IVideoItemDataMapper _videoItemDataMapper;
+        private readonly IVideoIndexResponseMapper _videoIndexResponseMapper;
+        private readonly IPatchOperationMapper _patchOperationMapper;
+        private readonly IUploadVideoResponseMapper _uploadVideoResponseMapper;
 
         private const string ParamName = "indexing";
 
-        public IndexingRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, ICustomLogosApiAccess customLogosApiAccess, IApiResourceConfigurations apiResourceConfigurations, IIndexingApiAccess indexingApiAccess, IVideoIndexApiAccess videoIndexApiAccess, IVideoItemDataMapper videoItemDataMapper)
+        public IndexingRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, ICustomLogosApiAccess customLogosApiAccess, IApiResourceConfigurations apiResourceConfigurations, IIndexingApiAccess indexingApiAccess, IVideoIndexApiAccess videoIndexApiAccess, IVideoItemDataMapper videoItemDataMapper, IVideoIndexResponseMapper videoIndexResponseMapper, IPatchOperationMapper patchOperationMapper, IUploadVideoResponseMapper uploadVideoResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -47,6 +51,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _indexingApiAccess = indexingApiAccess;
             _videoIndexApiAccess = videoIndexApiAccess;
             _videoItemDataMapper = videoItemDataMapper;
+            _videoIndexResponseMapper = videoIndexResponseMapper;
+            _patchOperationMapper = patchOperationMapper;
+            _uploadVideoResponseMapper = uploadVideoResponseMapper;
         }
 
         /// <summary>
@@ -231,7 +238,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 _logger.LogInformation("ReIndexVideoAsync started: location={Location}, accountId={AccountId}, videoId={VideoId}", location, accountId, request.VideoId);
 
                 // 再インデックス処理を実行
-                var result = await _indexingApiAccess.ReIndexVideoAsync(location, accountId, request.VideoId, accessToken, request.ExcludedAI, request.IsSearchable, request.IndexingPreset, request.StreamingPreset, request.CallbackUrl, request.SourceLanguage, request.SendSuccessEmail, request.LinguisticModelId, request.PersonModelId, request.Priority, request.BrandsCategories, request.CustomLanguages, request.LogoGroupId, request.PunctuationMode);
+                var result = await _indexingApiAccess.ReIndexVideoAsync(location, accountId, request.VideoId, accessToken, request.ExcludedAi, request.IsSearchable, request.IndexingPreset, request.StreamingPreset, request.CallbackUrl, request.SourceLanguage, request.SendSuccessEmail, request.LinguisticModelId, request.PersonModelId, request.Priority, request.BrandsCategories, request.CustomLanguages, request.LogoGroupId, request.PunctuationMode);
 
                 // 処理結果に応じてログを記録
                 if (result)
@@ -347,5 +354,146 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
+        /// <summary>
+        /// 動画インデックスを更新する非同期メソッド。
+        /// アカウント情報の取得・検証、アクセストークンの取得を行い、API呼び出しを実施します。
+        /// </summary>
+        /// <param name="request">更新リクエストモデル</param>
+        /// <returns>更新された動画インデックスのレスポンスモデル</returns>
+        /// <exception cref="ArgumentNullException">アカウント情報が取得できなかった場合</exception>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task<VideoIndexResponseModel?> UpdateVideoIndexAsync(UpdateVideoIndexRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+            return await UpdateVideoIndexAsync(location!, accountId!, request, accessToken);
+        }
+
+
+        /// <summary>
+        /// 動画インデックスを更新する非同期メソッド。
+        /// </summary>
+        /// <param name="location">Azure のリージョン。</param>
+        /// <param name="accountId">Video Indexer アカウント ID。</param>
+        /// <param name="request">更新リクエストモデル。</param>
+        /// <param name="accessToken">アクセストークン（省略可）。</param>
+        /// <returns>更新された動画インデックスのレスポンスモデル。</returns>
+        /// <exception cref="ArgumentException">引数が不正な場合。</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合。</exception>
+        /// <exception cref="Exception">その他の予期しない例外。</exception>
+        public async Task<VideoIndexResponseModel?> UpdateVideoIndexAsync(string location, string accountId, UpdateVideoIndexRequestModel request, string? accessToken = null)
+        {
+
+            try
+            {
+                // アクセストークンが指定されていない場合は取得
+                if (string.IsNullOrEmpty(accessToken)) accessToken = await _authenticationTokenizer.GetAccessToken();
+
+                // APIを呼び出してビデオインデックスを更新
+                var apiResponse = await _indexingApiAccess.UpdateVideoIndexAsync(location, accountId, request.VideoId, request.PatchOperations.Select(_patchOperationMapper.MapToApiPatchOperationModel).ToList(), request.Language, accessToken);
+
+                // APIレスポンスをマッピングして返却
+                // UpdateVideoIndexAsync メソッド内の例外スロー部分を修正
+                return apiResponse != null ? _videoIndexResponseMapper.MapFrom(apiResponse) : throw new InvalidOperationException("Failed to update video index. The API response was null.");
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Argument error in UpdateVideoIndexAsync: location={Location}, accountId={AccountId}, videoId={VideoId}", location, accountId, request.VideoId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed in UpdateVideoIndexAsync: location={Location}, accountId={AccountId}, videoId={VideoId}", location, accountId, request.VideoId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred in UpdateVideoIndexAsync: location={Location}, accountId={AccountId}, videoId={VideoId}", location, accountId, request.VideoId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 動画をアップロードし、インデックス処理を開始します。
+        /// アカウント情報の取得・検証、アクセストークンの取得を行い、API呼び出しを実施します。
+        /// </summary>
+        /// <param name="request">アップロードリクエストモデル</param>
+        /// <returns>アップロード結果を表す UploadVideoResponseModel オブジェクト。失敗時は null。</returns>
+        /// <exception cref="ArgumentNullException">アカウント情報が取得できなかった場合</exception>
+        /// <exception cref="ArgumentException">引数が不正な場合</exception>
+        /// <exception cref="HttpRequestException">APIリクエストに失敗した場合</exception>
+        /// <exception cref="Exception">その他の予期しない例外</exception>
+        public async Task<UploadVideoResponseModel?> UploadVideoAsync(UploadVideoRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 実際のアップロード処理を呼び出し
+            return await UploadVideoAsync(location!, accountId!, request, accessToken);
+        }
+
+
+        /// <summary>
+        /// 動画をアップロードし、インデックス処理を開始します。
+        /// Azure Video Indexer API へ動画ファイルまたは動画URLをアップロードし、
+        /// インデックス作成処理を非同期で開始します。
+        /// </summary>
+        /// <param name="location">Azure のリージョン（例: eastus, japaneast など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID 形式）</param>
+        /// <param name="request">
+        /// アップロードリクエストモデル。
+        /// 必須: VideoName（動画名）、VideoStream（動画ストリーム）、FileName（ファイル名）
+        /// オプション: Privacy（公開/非公開）、Priority（優先度）、ExternalId（外部ID）、ExternalUrl（外部URL）、
+        /// CallbackUrl（コールバックURL）、VideoUrl（動画URL）、IndexingPreset（インデックスプリセット）、
+        /// StreamingPreset（ストリーミングプリセット）、PersonModelId（人物モデルID）、SendSuccessEmail（成功時メール送信）
+        /// </param>
+        /// <param name="accessToken">API アクセストークン (省略可能)。指定しない場合は内部で取得されます。</param>
+        /// <returns>アップロード結果を表す UploadVideoResponseModel オブジェクト。失敗時は null。</returns>
+        public async Task<UploadVideoResponseModel?> UploadVideoAsync(string location, string accountId, UploadVideoRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                ApiUploadVideoResponseModel? apiResponse = await _indexingApiAccess.UploadVideoAsync(location, accountId, request.VideoName, request.VideoStream, request.FileName, accessToken, request.Privacy, request.Priority, request.Description, request.Partition, request.ExternalId, request.ExternalUrl, request.CallbackUrl, request.Metadata, request.Language, request.VideoUrl, request.IndexingPreset, request.StreamingPreset, request.PersonModelId, request.SendSuccessEmail);
+
+                return apiResponse is null ? null : _uploadVideoResponseMapper.MapFrom(apiResponse);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Argument error in UploadVideoAsync: location={Location}, accountId={AccountId}, videoName={VideoName}, fileName={FileName}", location, accountId, request.VideoName, request.FileName);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed in UploadVideoAsync: location={Location}, accountId={AccountId}, videoName={VideoName}, fileName={FileName}", location, accountId, request.VideoName, request.FileName);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred in UploadVideoAsync: location={Location}, accountId={AccountId}, videoName={VideoName}, fileName={FileName}", location, accountId, request.VideoName, request.FileName);
+                throw;
+            }
+        }
     }
 }

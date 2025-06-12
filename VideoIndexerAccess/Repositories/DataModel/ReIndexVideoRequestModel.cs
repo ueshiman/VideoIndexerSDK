@@ -8,8 +8,8 @@ namespace VideoIndexerAccess.Repositories.DataModel
 {
     public class ReIndexVideoRequestModel
     {
-        public string VideoId { get; set; }
-        public List<string>? ExcludedAI { get; set; }
+        public required string VideoId { get; set; }
+        public List<string>? ExcludedAi { get; set; }
         public bool? IsSearchable { get; set; }
         public string? IndexingPreset { get; set; }
         public string? StreamingPreset { get; set; }

@@ -8,7 +8,7 @@ namespace VideoIndexerAccess.Repositories.DataModel
 {
     public class LanguageModelRequestModel
     {
-        public string ModelId { get; set; }
+        public required string ModelId { get; set; }
         public string? ModelName { get; set; }
         public bool? Enable { get; set; }
         public Dictionary<string, string>? FileUrls { get; set; }

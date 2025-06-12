@@ -107,11 +107,32 @@ public interface IIndexingApiAccess
     /// <param name="language">(オプション) インデックスを取得する言語。</param>
     /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
     /// <returns>更新が成功した場合は VideoIndexResponse を返し、失敗した場合は null を返します。</returns>
-    Task<ApiVideoIndexResponseModel?> UpdateVideoIndexAsync(
-        string location,
-        string accountId,
-        string videoId,
-        List<ApiPatchOperationModel> patchOperations,
-        string? language = null,
-        string? accessToken = null);
+    Task<ApiVideoIndexResponseModel?> UpdateVideoIndexAsync(string location, string accountId, string videoId, List<ApiPatchOperationModel> patchOperations, string? language = null, string? accessToken = null);
+
+    /// <summary>
+    /// 動画をアップロードし、インデックス処理を開始する
+    /// </summary>
+    /// <param name="location">Azure リージョン</param>
+    /// <param name="accountId">アカウント ID</param>
+    /// <param name="videoName">アップロードする動画の名前</param>
+    /// <param name="videoStream">動画のストリーム</param>
+    /// <param name="fileName">アップロードする動画のファイル名</param>
+    /// <param name="accessToken">アクセストークン（省略可能）</param>
+    /// <param name="privacy">動画のプライバシーモード（Private/Public）</param>
+    /// <param name="priority">処理の優先度（Low/Normal/High）</param>
+    /// <param name="description">動画の説明</param>
+    /// <param name="partition">動画のパーティション</param>
+    /// <param name="externalId">外部 ID</param>
+    /// <param name="externalUrl">外部 URL</param>
+    /// <param name="callbackUrl">コールバック URL</param>
+    /// <param name="metadata">動画のメタデータ</param>
+    /// <param name="language">言語設定</param>
+    /// <param name="videoUrl">動画の URL</param>
+    /// <param name="indexingPreset">インデックスプリセット</param>
+    /// <param name="streamingPreset">ストリーミングプリセット</param>
+    /// <param name="personModelId">顔認識用のモデル ID</param>
+    /// <param name="sendSuccessEmail">成功時のメール送信</param>
+    /// <returns>アップロード結果の情報</returns>
+    Task<ApiUploadVideoResponseModel?> UploadVideoAsync(string location, string accountId, string videoName, Stream videoStream, string fileName, string? accessToken = null, string? privacy = null, string? priority = null, string? description = null, string? partition = null, string? externalId = null, string? externalUrl = null, string? callbackUrl = null, string? metadata = null, string? language = null, string? videoUrl = null, string? indexingPreset = null, string? streamingPreset = null, string? personModelId = null, bool? sendSuccessEmail = null);
+
 }
