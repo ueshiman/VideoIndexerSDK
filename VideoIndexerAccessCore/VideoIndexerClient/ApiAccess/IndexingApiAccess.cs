@@ -314,13 +314,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="language">(オプション) インデックスを取得する言語。</param>
         /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
         /// <returns>更新が成功した場合はレスポンスの JSON を返し、失敗した場合は null を返します。</returns>
-        public async Task<string?> UpdateVideoIndexJsonAsync(
-            string location,
-            string accountId,
-            string videoId,
-            List<ApiPatchOperationModel> patchOperations,
-            string? language = null,
-            string? accessToken = null)
+        public async Task<string?> UpdateVideoIndexJsonAsync(string location, string accountId, string videoId, List<ApiPatchOperationModel> patchOperations, string? language = null, string? accessToken = null)
         {
 
             HttpResponseMessage? response;
@@ -441,13 +435,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="language">(オプション) インデックスを取得する言語。</param>
         /// <param name="accessToken">(オプション) 認証に必要なアクセストークン。</param>
         /// <returns>更新が成功した場合は VideoIndexResponse を返し、失敗した場合は null を返します。</returns>
-        public async Task<ApiVideoIndexResponseModel?> UpdateVideoIndexAsync(
-            string location,
-            string accountId,
-            string videoId,
-            List<ApiPatchOperationModel> patchOperations,
-            string? language = null,
-            string? accessToken = null)
+        public async Task<ApiVideoIndexResponseModel?> UpdateVideoIndexAsync(string location, string accountId, string videoId, List<ApiPatchOperationModel> patchOperations, string? language = null, string? accessToken = null)
         {
             // ビデオインデックスの更新を実行
             string? jsonResponse = await UpdateVideoIndexJsonAsync(location, accountId, videoId, patchOperations, language, accessToken);
@@ -493,16 +481,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="personModelId">顔認識用のモデル ID</param>
         /// <param name="sendSuccessEmail">成功時のメール送信</param>
         /// <returns>アップロード結果の情報</returns>
-        public async Task<ApiUploadVideoResponseModel?> UploadVideoAsync(
-            string location, string accountId, string videoName, Stream videoStream, string fileName,
-            string? accessToken = null, string? privacy = null, string? priority = null, string? description = null,
-            string? partition = null, string? externalId = null, string? externalUrl = null, string? callbackUrl = null,
-            string? metadata = null, string? language = null, string? videoUrl = null, string? indexingPreset = null,
-            string? streamingPreset = null, string? personModelId = null, bool? sendSuccessEmail = null)
+        public async Task<ApiUploadVideoResponseModel?> UploadVideoAsync(string location, string accountId, string videoName, Stream videoStream, string fileName, string? accessToken = null, string? privacy = null, string? priority = null, string? description = null, string? partition = null, string? externalId = null, string? externalUrl = null, string? callbackUrl = null, string? metadata = null, string? language = null, string? videoUrl = null, string? indexingPreset = null, string? streamingPreset = null, string? personModelId = null, bool? sendSuccessEmail = null)
         {
-            string jsonResponse = await UploadVideoToApiAsync(location, accountId, videoName, videoStream, fileName,
-                accessToken, privacy, priority, description, partition, externalId, externalUrl, callbackUrl,
-                metadata, language, videoUrl, indexingPreset, streamingPreset, personModelId, sendSuccessEmail);
+            string jsonResponse = await UploadVideoToApiAsync(location, accountId, videoName, videoStream, fileName, accessToken, privacy, priority, description, partition, externalId, externalUrl, callbackUrl, metadata, language, videoUrl, indexingPreset, streamingPreset, personModelId, sendSuccessEmail);
             return ParseJson<ApiUploadVideoResponseModel>(jsonResponse);
         }
 
@@ -553,12 +534,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="personModelId">顔認識用のモデル ID</param>
         /// <param name="sendSuccessEmail">成功時のメール送信</param>
         /// <returns>API からの JSON レスポンス</returns>
-        private async Task<string> UploadVideoToApiAsync(
-            string location, string accountId, string videoName, Stream videoStream, string fileName,
-            string? accessToken, string? privacy, string? priority, string? description,
-            string? partition, string? externalId, string? externalUrl, string? callbackUrl,
-            string? metadata, string? language, string? videoUrl, string? indexingPreset,
-            string? streamingPreset, string? personModelId, bool? sendSuccessEmail)
+        private async Task<string> UploadVideoToApiAsync(string location, string accountId, string videoName, Stream videoStream, string fileName, string? accessToken, string? privacy, string? priority, string? description, string? partition, string? externalId, string? externalUrl, string? callbackUrl, string? metadata, string? language, string? videoUrl, string? indexingPreset, string? streamingPreset, string? personModelId, bool? sendSuccessEmail)
         {
             string endpoint = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos?name={Uri.EscapeDataString(videoName)}";
             if (!string.IsNullOrEmpty(accessToken)) endpoint += $"&accessToken={accessToken}";
@@ -597,8 +573,5 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
-
     }
-
-
 }
