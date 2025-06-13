@@ -1,11 +1,5 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
