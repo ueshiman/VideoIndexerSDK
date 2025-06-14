@@ -114,35 +114,5 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw;
             }
         }
-
-        /// <summary>
-        /// プロジェクトのレンダー操作が失敗した場合の結果モデルを生成します。
-        /// </summary>
-        /// <param name="response">HTTPレスポンスメッセージ</param>
-        /// <param name="errorContent">エラー内容</param>
-        /// <returns>失敗状態のProjectRenderOperationModel</returns>
-        private ProjectRenderOperationModel MakeCancelProjectRenderFailedModel(HttpResponseMessage response, string errorContent)
-        {
-            return new ProjectRenderOperationModel
-            {
-                State = "Failed",
-                Error = new ErrorResponseModel
-                {
-                    ErrorType = response.StatusCode.ToString(),
-                    Message = errorContent
-                }
-            };
-        }
-
-        /// <summary>
-        /// JSON文字列からProjectRenderOperationModelオブジェクトをデシリアライズします。
-        /// </summary>
-        /// <param name="json">ProjectRenderOperationModelのJSON文字列</param>
-        /// <returns>デシリアライズされたProjectRenderOperationModelオブジェクト</returns>
-        private ProjectRenderOperationModel? ProjectRenderOperationModel(string json)
-        {
-            var result = JsonSerializer.Deserialize<ProjectRenderOperationModel>(json);
-            return result;
-        }
     }
 }
