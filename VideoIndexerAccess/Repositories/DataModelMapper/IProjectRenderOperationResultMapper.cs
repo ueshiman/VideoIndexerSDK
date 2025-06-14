@@ -1,0 +1,10 @@
+﻿using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+
+namespace VideoIndexerAccess.Repositories.DataModelMapper;
+
+public interface IProjectRenderOperationResultMapper
+{
+    ProjectRenderOperationResultModel MapFrom(ApiProjectRenderOperationResultModel model);
+    ApiProjectRenderOperationResultModel MapToApiProjectRenderOperationResultModel(ProjectRenderOperationResultModel model);
+}

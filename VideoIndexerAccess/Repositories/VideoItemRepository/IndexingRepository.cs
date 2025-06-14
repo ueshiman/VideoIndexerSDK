@@ -12,7 +12,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
     public class IndexingRepository
     {
         // ロガーインスタンス
-        private readonly ILogger<CreateLogoRepository> _logger;
+        private readonly ILogger<IndexingRepository> _logger;
 
         // アクセストークン取得用インターフェース
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
@@ -35,7 +35,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         private const string ParamName = "indexing";
 
-        public IndexingRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, ICustomLogosApiAccess customLogosApiAccess, IApiResourceConfigurations apiResourceConfigurations, IIndexingApiAccess indexingApiAccess, IVideoIndexApiAccess videoIndexApiAccess, IVideoItemDataMapper videoItemDataMapper, IVideoIndexResponseMapper videoIndexResponseMapper, IPatchOperationMapper patchOperationMapper, IUploadVideoResponseMapper uploadVideoResponseMapper)
+        public IndexingRepository(ILogger<IndexingRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IIndexingApiAccess indexingApiAccess, IVideoIndexApiAccess videoIndexApiAccess, IVideoItemDataMapper videoItemDataMapper, IVideoIndexResponseMapper videoIndexResponseMapper, IPatchOperationMapper patchOperationMapper, IUploadVideoResponseMapper uploadVideoResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;

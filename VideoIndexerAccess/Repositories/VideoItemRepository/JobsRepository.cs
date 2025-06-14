@@ -10,7 +10,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
     public class JobsRepository : IJobsRepository
     {
         // ロガーインスタンス
-        private readonly ILogger<CreateLogoRepository> _logger;
+        private readonly ILogger<JobsRepository> _logger;
 
         // アクセストークン取得用インターフェース
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
@@ -26,8 +26,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         private readonly IJobsApiAccess _jobsApiAccess;
         private readonly IJobStatusResponseMapper _jobStatusResponseMapper;
+        private const string ParamName = "jobs";
 
-        public JobsRepository(ILogger<CreateLogoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IJobsApiAccess jobsApiAccess, IJobStatusResponseMapper jobStatusResponseMapper)
+        public JobsRepository(ILogger<JobsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IJobsApiAccess jobsApiAccess, IJobStatusResponseMapper jobStatusResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;

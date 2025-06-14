@@ -135,13 +135,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 if (!string.IsNullOrEmpty(logoGroupId)) query["logoGroupId"] = logoGroupId;
                 if (!string.IsNullOrEmpty(punctuationMode)) query["punctuationMode"] = punctuationMode;
 
-                var logUrl = $"{baseUrl}?{query.ToString()}";
+                var logUrl = $"{baseUrl}?{query}";
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     logUrl += query.Count > 0 ? @"&accessToken=***" : @"?accessToken=***";
                     query["accessToken"] = accessToken;
                 }
-                var url = $"{baseUrl}?{query.ToString()}";
+                var url = $"{baseUrl}?{query}";
 
 
                 if (!string.IsNullOrEmpty(accessToken)) query["accessToken"] = accessToken;
@@ -200,7 +200,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 // 他のパラメータをクエリに追加
                 if (parameters != null) foreach (var param in parameters) query[param.Key] = param.Value;
 
-                var url = $"{baseUrl}?{query.ToString()}";
+                var url = $"{baseUrl}?{query}";
 
                 using var request = new HttpRequestMessage(HttpMethod.Post, url);
 
