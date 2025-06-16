@@ -471,5 +471,11 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw;
             }
         }
+
+        public async Task<string> GetProjectInsightsWidgetAsync(string location, string accountId, string projectId, string? widgetType = null, string? accessToken = null)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
