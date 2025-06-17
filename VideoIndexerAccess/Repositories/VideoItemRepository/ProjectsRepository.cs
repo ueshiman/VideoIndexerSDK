@@ -472,10 +472,196 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
-        public async Task<string> GetProjectInsightsWidgetAsync(string location, string accountId, string projectId, string? widgetType = null, string? accessToken = null)
+        /// <summary>
+        /// Video Indexer API からプロジェクトのインサイトウィジェットURLを取得します。
+        /// アカウント情報を取得し、APIを呼び出してウィジェットURLを取得します。
+        /// </summary>
+        /// <param name="request">インサイトウィジェット取得リクエストモデル（ProjectId, WidgetTypeを含む）</param>
+        /// <returns>インサイトウィジェットのURL文字列</returns>
+        public async Task<string> GetProjectInsightsWidgetAsync(GetProjectInsightsWidgetRequestModel request)
         {
-            throw new NotImplementedException();
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのインサイトウィジェットURLを取得
+            return await GetProjectInsightsWidgetAsync(location!, accountId, request, accessToken);
         }
 
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・ウィジェットタイプ・アクセストークンで
+        /// Video Indexer API からプロジェクトのインサイトウィジェットURLを取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="request">インサイトウィジェット取得リクエストモデル（ProjectId, WidgetTypeを含む）</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>インサイトウィジェットのURL文字列</returns>
+        public async Task<string> GetProjectInsightsWidgetAsync(string location, string accountId, GetProjectInsightsWidgetRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                return await _projectsApiAccess.GetProjectInsightsWidgetAsync(location, accountId, request.ProjectId, request.WidgetType, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectInsightsWidgetAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, widgetType={WidgetType}", location, accountId, request.ProjectId, request.WidgetType);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectInsightsWidgetAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, widgetType={WidgetType}", location, accountId, request.ProjectId, request.WidgetType);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectInsightsWidgetAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, widgetType={WidgetType}", location, accountId, request.ProjectId, request.WidgetType);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・アクセストークンで
+        /// Video Indexer API からプロジェクトのプレイヤーウィジェットURLを取得します。
+        /// </summary>
+        /// <param name="projectId">プレイヤーウィジェットURLを取得するプロジェクトのID</param>
+        /// <returns>プレイヤーウィジェットのURL文字列</returns>
+        public async Task<string> GetProjectPlayerWidgetAsync(string projectId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのプレイヤーウィジェットURLを取得
+            return await GetProjectPlayerWidgetAsync(location!, accountId, projectId, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・アクセストークンで
+        /// Video Indexer API からプロジェクトのプレイヤーウィジェットURLを取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="projectId">プレイヤーウィジェットURLを取得するプロジェクトのID</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>プレイヤーウィジェットのURL文字列</returns>
+        public async Task<string> GetProjectPlayerWidgetAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                return await _projectsApiAccess.GetProjectPlayerWidgetAsync(location, accountId, projectId, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectPlayerWidgetAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectPlayerWidgetAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectPlayerWidgetAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// アカウント情報とプロジェクトIDからVideo Indexer APIのレンダー操作情報を取得します。
+        /// </summary>
+        /// <param name="projectId">レンダー操作情報を取得するプロジェクトのID</param>
+        /// <returns>取得したレンダー操作情報（ApiProjectRenderOperationModel）</returns>
+        public async Task<ApiProjectRenderOperationModel> GetProjectRenderOperationAsync(string projectId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのレンダー操作情報を取得します。
+            return await GetProjectRenderOperationAsync(location!, accountId, projectId, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・アクセストークンで
+        /// Video Indexer API からプロジェクトのレンダー操作情報を取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="projectId">レンダー操作情報を取得するプロジェクトのID</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>取得したレンダー操作情報（ApiProjectRenderOperationModel）</returns>
+        public async Task<ApiProjectRenderOperationModel> GetProjectRenderOperationAsync(string location, string accountId, string projectId, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+                // API呼び出し
+                return await _projectsApiAccess.GetProjectRenderOperationAsync(location, accountId, projectId, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectRenderOperationAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectRenderOperationAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectRenderOperationAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, projectId);
+                throw;
+            }
+        }
     }
 }
