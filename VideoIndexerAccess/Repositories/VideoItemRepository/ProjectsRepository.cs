@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,6 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IProjectRenderOperationMapper _projectRenderOperationMapper;
         private readonly IProjectMapper _projectMapper;
         private readonly IVideoTimeRangeMapper _videoTimeRangeMapper;
-
 
         private const string ParamName = "projects";
 
@@ -122,6 +122,85 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw;
             }
         }
+
+        /// <summary>
+        /// プロジェクトの作成とレンダー操作の進捗を非同期で逐次返却します。
+        /// プロジェクト作成後、レンダー操作の状態をポーリングし、進捗ごとに BuildProjectResponseModel を yield return します。
+        /// </summary>
+        /// <param name="request">プロジェクト作成およびレンダー操作のリクエストモデル</param>
+        /// <returns>進捗ごとに BuildProjectResponseModel を返す非同期イテレータ</returns>
+        public async IAsyncEnumerable<BuildProjectResponseModel> BuildProjectAsync(BuildProjectRequestModel request)
+        {
+            ProjectModel? createResponse;
+
+            try
+            {
+                createResponse = await CreateProjectAsync(request.CreateProjectRequest);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Argument error:");
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API request failed");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred");
+                throw;
+            }
+
+            if (createResponse is null)
+            {
+                _logger.LogWarning("Failed to create project.");
+                yield return new BuildProjectResponseModel
+                {
+                    Status = BuildProjectResponseModelStatus.Failure,
+                    Project = null,
+                    RenderOperation = null
+                };
+            }
+
+
+            _logger.LogInformation("Project created successfully. ProjectId={ProjectId}", createResponse!.Id);
+            // プロジェクトのレンダー操作を開始
+
+            BuildProjectResponseModel renderOperation = new BuildProjectResponseModel
+            {
+                Status = BuildProjectResponseModelStatus.Started,
+                Project = null,
+                RenderOperation = null,
+            };
+            // レンダー操作の結果を待機
+            do
+            {
+                await Task.Delay(request.DelayMilliSecond); // 5秒待機
+                // レンダー操作の状態を取得
+                renderOperation.RenderOperation = await GetProjectRenderOperationAsync(createResponse.Id);
+                if (renderOperation.RenderOperation is null)
+                {
+                    _logger.LogWarning("Failed to get project render operation status. ProjectId={ProjectId}", createResponse.Id);
+                    yield return new BuildProjectResponseModel
+                    {
+                        Status = BuildProjectResponseModelStatus.Failure,
+                        Project = createResponse,
+                        RenderOperation = null
+                    };
+                    yield break;
+                }
+
+                yield return new BuildProjectResponseModel
+                {
+                    RenderOperation = renderOperation.RenderOperation,
+                    Project = null,
+                    Status = BuildProjectResponseModelStatus.InProgress,
+                };
+            } while (renderOperation.Status == BuildProjectResponseModelStatus.Started || renderOperation.Status == BuildProjectResponseModelStatus.InProgress);
+        }
+
 
 
         /// <summary>
@@ -260,6 +339,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <summary>
         /// 指定したロケーション・アカウントID・プロジェクトID・アクセストークンで
         /// Video Indexer API からレンダリング済みプロジェクトのダウンロードURLを取得します。
+        /// Download Project Rendered File Url
         /// </summary>
         /// <param name="projectId">ダウンロードURLを取得するプロジェクトのID</param>
         /// <returns>ダウンロードURL（取得できない場合はnull）</returns>
@@ -605,8 +685,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// アカウント情報とプロジェクトIDからVideo Indexer APIのレンダー操作情報を取得します。
         /// </summary>
         /// <param name="projectId">レンダー操作情報を取得するプロジェクトのID</param>
-        /// <returns>取得したレンダー操作情報（ApiProjectRenderOperationModel）</returns>
-        public async Task<ApiProjectRenderOperationModel> GetProjectRenderOperationAsync(string projectId)
+        /// <returns>取得したレンダー操作情報（ProjectRenderOperationModel）</returns>
+        public async Task<ProjectRenderOperationModel?> GetProjectRenderOperationAsync(string projectId)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -622,7 +702,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string accessToken = await _authenticationTokenizer.GetAccessToken();
 
             // Video Indexer API からプロジェクトのレンダー操作情報を取得します。
-            return await GetProjectRenderOperationAsync(location!, accountId, projectId, accessToken);
+            var apiResult = await GetProjectRenderOperationAsync(location!, accountId, projectId, accessToken);
+            return _projectRenderOperationMapper.MapFrom(apiResult);
         }
 
 
@@ -663,5 +744,21 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 throw;
             }
         }
+
+        public bool IsRetry(ApiProjectRenderOperationModel operationModel)
+        {
+            return operationModel.state switch
+            {
+                "Pending" => true,
+                "InProgress" => true,
+                "Cancelling" => true,
+                "Canceled" => false,
+                "Succeeded" => false,
+                "Failed" => false,
+                _ => false
+            };
+        }
+
+
     }
 }

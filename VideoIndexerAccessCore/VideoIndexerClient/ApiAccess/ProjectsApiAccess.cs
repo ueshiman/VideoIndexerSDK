@@ -625,7 +625,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
                 var response = await httpClient.GetAsync(url) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                response.EnsureSuccessStatusCode(); response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode(); 
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
