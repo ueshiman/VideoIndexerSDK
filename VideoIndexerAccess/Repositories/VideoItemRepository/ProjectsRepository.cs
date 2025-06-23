@@ -1,12 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
@@ -36,12 +28,16 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IProjectsApiAccess _projectsApiAccess;
         private readonly IProjectRenderOperationMapper _projectRenderOperationMapper;
         private readonly IProjectMapper _projectMapper;
+
         private readonly IVideoTimeRangeMapper _videoTimeRangeMapper;
+
+        private readonly IProjectSearchResultMapper _projectSearchResultMapper;
+        private readonly IProjectRenderResponseMapper _projectRenderResponseMapper;
 
         private const string ParamName = "projects";
 
 
-        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper)
+        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper, IProjectSearchResultMapper projectSearchResultMapper, IProjectRenderResponseMapper projectRenderResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -52,6 +48,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _projectRenderOperationMapper = projectRenderOperationMapper;
             _projectMapper = projectMapper;
             _videoTimeRangeMapper = videoTimeRangeMapper;
+            _projectSearchResultMapper = projectSearchResultMapper;
+            _projectRenderResponseMapper = projectRenderResponseMapper;
         }
 
         /// <summary>
@@ -725,6 +723,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 {
                     accessToken = await _authenticationTokenizer.GetAccessToken();
                 }
+
                 // API呼び出し
                 return await _projectsApiAccess.GetProjectRenderOperationAsync(location, accountId, projectId, accessToken);
             }
@@ -745,6 +744,11 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
+        /// <summary>
+        /// レンダー操作の状態からリトライ可能かどうかを判定します。
+        /// </summary>
+        /// <param name="operationModel">レンダー操作モデル</param>
+        /// <returns>リトライ可能な状態の場合は true、それ以外は false</returns>
         public bool IsRetry(ApiProjectRenderOperationModel operationModel)
         {
             return operationModel.state switch
@@ -760,5 +764,289 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         }
 
 
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・サムネイルID・フォーマット・アクセストークンで
+        /// Video Indexer API からプロジェクトのサムネイル画像データ（バイナリストリーム）を取得します。
+        /// </summary>
+        /// <param name="request">サムネイル取得リクエストモデル（ProjectId, ThumbnailId, Formatを含む）</param>
+        /// <returns>サムネイル画像のバイナリストリーム</returns>
+        public async Task<Stream> GetProjectThumbnailBitsAsync(ProjectThumbnailRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのサムネイル画像データを取得します。
+            return await GetProjectThumbnailBitsAsync(location!, accountId, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・サムネイルID・フォーマット・アクセストークンで
+        /// Video Indexer API からプロジェクトのサムネイル画像のURLを取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="request">サムネイル取得リクエストモデル（ProjectId, ThumbnailId, Formatを含む）</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>サムネイル画像のバイナリストリーム</returns>
+        public async Task<Stream> GetProjectThumbnailBitsAsync(string location, string accountId, ProjectThumbnailRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                return await _projectsApiAccess.GetProjectThumbnailBitsAsync(location, accountId, request.ProjectId, request.ThumbnailId, request.Format, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・サムネイルID・フォーマット・アクセストークンで
+        /// Video Indexer API からプロジェクトのサムネイル画像データ（バイナリストリーム）を取得します。
+        /// </summary>
+        /// <param name="request">サムネイル取得リクエストモデル（ProjectId, ThumbnailId, Formatを含む）</param>
+        /// <returns>サムネイル画像のURL文字列</returns>
+        public async Task<string> GetProjectThumbnailUrlAsync(ProjectThumbnailRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのサムネイル画像データを取得します。
+            return await GetProjectThumbnailUrlAsync(location!, accountId, request, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定したロケーション・アカウントID・プロジェクトID・サムネイルID・フォーマット・アクセストークンで
+        /// Video Indexer API からプロジェクトのサムネイル画像のURLを取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="request">サムネイル取得リクエストモデル（ProjectId, ThumbnailId, Formatを含む）</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>サムネイル画像のURL文字列</returns>
+        public async Task<string> GetProjectThumbnailUrlAsync(string location, string accountId, ProjectThumbnailRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                return await _projectsApiAccess.GetProjectThumbnailUrlAsync(location, accountId, request.ProjectId, request.ThumbnailId, request.Format, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectThumbnailBitsAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, thumbnailId={ThumbnailId}", location, accountId, request.ProjectId, request.ThumbnailId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定された条件でプロジェクト一覧を取得します。
+        /// </summary>
+        /// <param name="request">プロジェクト一覧取得リクエストモデル。</param>
+        /// <returns>プロジェクト情報を含むApiProjectSearchResultModel。</returns>
+        public async Task<ProjectSearchResultModel> GetProjectsAsync(ProjectsRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクト一覧を取得します。
+            return await GetProjectsAsync(request);
+        }
+
+        /// <summary>
+        /// 指定された条件でプロジェクト一覧を取得します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="request">プロジェクト一覧取得リクエストモデル。</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）。</param>
+        /// <returns>プロジェクト情報を含むApiProjectSearchResultModel。</returns>
+        public async Task<ProjectSearchResultModel> GetProjectsAsync(string location, string accountId, ProjectsRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                ApiProjectSearchResultModel apiResponse = await _projectsApiAccess.GetProjectsAsync(location, accountId, request.CreatedAfter, request.CreatedBefore, request.PageSize, request.Skip, accessToken);
+                return _projectSearchResultMapper.MapFrom(apiResponse);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "GetProjectsAsync: Argument error location={Location}, accountId={AccountId}, createdAfter={CreatedAfter}, createdBefore={CreatedBefore}, pageSize={PageSize}, skip={Skip}", location, accountId, request.CreatedAfter, request.CreatedBefore, request.PageSize, request.Skip);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "GetProjectsAsync: API request failed location={Location}, accountId={AccountId}, createdAfter={CreatedAfter}, createdBefore={CreatedBefore}, pageSize={PageSize}, skip={Skip}", location, accountId, request.CreatedAfter, request.CreatedBefore, request.PageSize, request.Skip);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProjectsAsync: Unexpected error location={Location}, accountId={AccountId}, createdAfter={CreatedAfter}, createdBefore={CreatedBefore}, pageSize={PageSize}, skip={Skip}", location, accountId, request.CreatedAfter, request.CreatedBefore, request.PageSize, request.Skip);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのレンダリングを開始します。
+        /// </summary>
+        /// <param name="request">レンダリングリクエストモデル。</param>
+        /// <returns>レンダリング結果のレスポンスモデル。</returns>
+        public async Task<ProjectRenderResponseModel> RenderProjectAsync(RenderProjectRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトのレンダリングを開始します。
+            return await RenderProjectAsync(location!, accountId, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトのレンダリングを開始します。
+        /// </summary>
+        /// <param name="location">API呼び出しのAzureリージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="request">レンダリングリクエストモデル。</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）。</param>
+        /// <returns>レンダリング結果のレスポンスモデル。</returns>
+        public async Task<ProjectRenderResponseModel> RenderProjectAsync(string location, string accountId, RenderProjectRequestModel request, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                ApiProjectRenderResponseModel responseModel = await _projectsApiAccess.RenderProjectAsync(location, accountId, request.ProjectId, accessToken, request.SendCompletionEmail);
+                return _projectRenderResponseMapper.MapFrom(responseModel);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, request.ProjectId, request.SendCompletionEmail);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, request.ProjectId, request.SendCompletionEmail);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, request.ProjectId, request.SendCompletionEmail);
+                throw;
+            }
+        }
+
+        public async Task<ApiProjectRenderResponseModel> RenderProjectAsync(string location, string accountId, string projectId, string? accessToken = null, bool sendCompletionEmail = false)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                // API呼び出し
+                return await _projectsApiAccess.RenderProjectAsync(location, accountId, projectId, accessToken, sendCompletionEmail);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "RenderProjectAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                throw;
+            }
+        }
     }
 }

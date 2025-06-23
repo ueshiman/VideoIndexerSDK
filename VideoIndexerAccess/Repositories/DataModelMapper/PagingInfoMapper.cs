@@ -15,5 +15,16 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 TotalCount = dataModel.totalCount,
             };
         }
+
+        public ApiPagingInfoModel? MapToApiPagingInfoModel(PagingInfoModel? dataModel)
+        {
+            return dataModel is null ? null : new ApiPagingInfoModel
+            {
+                pageSize = dataModel.PageSize,
+                skip = dataModel.Skip,
+                done = dataModel.Done,
+                totalCount = dataModel.TotalCount,
+            };
+        }
     }
 }

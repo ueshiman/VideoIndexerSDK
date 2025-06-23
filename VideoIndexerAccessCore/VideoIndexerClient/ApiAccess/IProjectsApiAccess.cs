@@ -261,6 +261,20 @@ public interface IProjectsApiAccess
     ApiProjectRenderOperationModel ParseProjectRenderOperationJson(string json);
 
     /// <summary>
+    /// 指定されたプロジェクトのサムネイル画像データ（バイナリストリーム）を取得します。
+    /// Get Project Thumbnail Bits
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Thumbnail
+    /// </summary>
+    /// <param name="location">Azureのリージョン</param>
+    /// <param name="accountId">対象のアカウントID (GUID)</param>
+    /// <param name="projectId">対象のプロジェクトID</param>
+    /// <param name="thumbnailId">取得するサムネイルのID (GUID)</param>
+    /// <param name="format">オプション: サムネイルのフォーマット (Jpeg / Base64)</param>
+    /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+    /// <returns>サムネイル画像のバイナリデータ（ストリーム）</returns>
+    Task<Stream> GetProjectThumbnailBitsAsync(string location, string accountId, string projectId, string thumbnailId, string? format = null, string? accessToken = null);
+
+    /// <summary>
     /// 指定されたプロジェクトのサムネイルのURLを取得する。
     /// Get Project Thumbnail
     /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Thumbnail
