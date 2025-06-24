@@ -34,11 +34,12 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IProjectSearchResultMapper _projectSearchResultMapper;
         private readonly IProjectRenderResponseMapper _projectRenderResponseMapper;
         private readonly IProjectUpdateRequestMapper _projectUpdateRequestMapper;
+        private readonly IProjectUpdateResponseMapper _projectUpdateResponseMapper;
 
         private const string ParamName = "projects";
 
 
-        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper, IProjectSearchResultMapper projectSearchResultMapper, IProjectRenderResponseMapper projectRenderResponseMapper, IProjectUpdateRequestMapper projectUpdateRequestMapper)
+        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper, IProjectSearchResultMapper projectSearchResultMapper, IProjectRenderResponseMapper projectRenderResponseMapper, IProjectUpdateRequestMapper projectUpdateRequestMapper, IProjectUpdateResponseMapper projectUpdateResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -52,6 +53,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _projectSearchResultMapper = projectSearchResultMapper;
             _projectRenderResponseMapper = projectRenderResponseMapper;
             _projectUpdateRequestMapper = projectUpdateRequestMapper;
+            _projectUpdateResponseMapper = projectUpdateResponseMapper;
         }
 
         /// <summary>
@@ -1089,7 +1091,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// </summary>
         /// <param name="updateRequest">更新するプロジェクトのリクエストモデル。</param>
         /// <returns>更新されたプロジェクトのレスポンスモデル。</returns>
-        public async Task<ApiProjectUpdateResponseModel> UpdateProjectAsync(ProjectUpdateRequestModel updateRequest)
+        public async Task<ProjectUpdateResponseModel> UpdateProjectAsync(ProjectUpdateRequestModel updateRequest)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -1105,7 +1107,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string accessToken = await _authenticationTokenizer.GetAccessToken();
 
             // Video Indexer API からプロジェクトの情報を更新します。
-            return await UpdateProjectAsync(location!, accountId, updateRequest, accessToken);
+            ApiProjectUpdateResponseModel apiProjectUpdateResponseModel = await UpdateProjectAsync(location!, accountId, updateRequest, accessToken);
+            return _projectUpdateResponseMapper.MapFrom(apiProjectUpdateResponseModel);
         }
 
         /// <summary>
