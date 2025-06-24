@@ -840,6 +840,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
+
         /// <summary>
         /// JSONレスポンスを `ApiProjectSearchResultModel` に変換する。
         /// List Projects
@@ -1029,6 +1030,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトの情報を更新する非同期メソッド。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="location">Azureリージョン</param>
         /// <param name="accountId">アカウントのGUID</param>
@@ -1052,6 +1054,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトの更新リクエストをAPIに送信し、レスポンスを取得する。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="location">Azureリージョンの識別子</param>
         /// <param name="accountId">更新対象のアカウントID</param>
@@ -1074,6 +1077,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// APIリクエストを送信し、JSONレスポンスを取得する共通メソッド。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="method">HTTPメソッド (GET, POST, PUT など)</param>
         /// <param name="url">APIのリクエストURL</param>

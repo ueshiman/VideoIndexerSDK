@@ -33,11 +33,12 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         private readonly IProjectSearchResultMapper _projectSearchResultMapper;
         private readonly IProjectRenderResponseMapper _projectRenderResponseMapper;
+        private readonly IProjectUpdateRequestMapper _projectUpdateRequestMapper;
 
         private const string ParamName = "projects";
 
 
-        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper, IProjectSearchResultMapper projectSearchResultMapper, IProjectRenderResponseMapper projectRenderResponseMapper)
+        public ProjectsRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IProjectsApiAccess projectsApiAccess, IProjectRenderOperationMapper projectRenderOperationMapper, IProjectMapper projectMapper, IVideoTimeRangeMapper videoTimeRangeMapper, IProjectSearchResultMapper projectSearchResultMapper, IProjectRenderResponseMapper projectRenderResponseMapper, IProjectUpdateRequestMapper projectUpdateRequestMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -50,6 +51,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _videoTimeRangeMapper = videoTimeRangeMapper;
             _projectSearchResultMapper = projectSearchResultMapper;
             _projectRenderResponseMapper = projectRenderResponseMapper;
+            _projectUpdateRequestMapper = projectUpdateRequestMapper;
         }
 
         /// <summary>
@@ -1019,7 +1021,39 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
-        public async Task<ApiProjectRenderResponseModel> RenderProjectAsync(string location, string accountId, string projectId, string? accessToken = null, bool sendCompletionEmail = false)
+        /// <summary>
+        /// 指定された検索条件でプロジェクトを検索します。
+        /// </summary>
+        /// <param name="request">検索条件を含むリクエストモデル。</param>
+        /// <returns>検索結果のレスポンスモデル。</returns>
+        public async Task<ProjectSearchResultModel> SearchProjectsAsync(SearchProjectsRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトを検索します。
+            return await SearchProjectsAsync(location!, accountId, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された検索条件でプロジェクトを検索します。
+        /// </summary>
+        /// <param name="location">Azureリージョン。</param>
+        /// <param name="accountId">アカウントのGUID。</param>
+        /// <param name="request">検索条件を含むリクエストモデル。</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）。</param>
+        /// <returns>検索結果のレスポンスモデル。</returns>
+        public async Task<ProjectSearchResultModel> SearchProjectsAsync(string location, string accountId, SearchProjectsRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -1030,21 +1064,86 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 }
 
                 // API呼び出し
-                return await _projectsApiAccess.RenderProjectAsync(location, accountId, projectId, accessToken, sendCompletionEmail);
+                ApiProjectSearchResultModel resultModel = await _projectsApiAccess.SearchProjectsAsync(location, accountId, request.Query, request.SourceLanguage, request.PageSize, request.Skip, accessToken);
+                return _projectSearchResultMapper.MapFrom(resultModel);
             }
             catch (ArgumentException ex)
             {
-                _logger.LogError(ex, "RenderProjectAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                _logger.LogError(ex, "SearchProjectsAsync: Argument error location={Location}, accountId={AccountId}, query={Query}, sourceLanguage={SourceLanguage}, pageSize={PageSize}, skip={Skip}", location, accountId, request.Query, request.SourceLanguage, request.PageSize, request.Skip);
                 throw;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "RenderProjectAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                _logger.LogError(ex, "SearchProjectsAsync: API request failed location={Location}, accountId={AccountId}, query={Query}, sourceLanguage={SourceLanguage}, pageSize={PageSize}, skip={Skip}", location, accountId, request.Query, request.SourceLanguage, request.PageSize, request.Skip);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "RenderProjectAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}, sendCompletionEmail={SendCompletionEmail}", location, accountId, projectId, sendCompletionEmail);
+                _logger.LogError(ex, "SearchProjectsAsync: Unexpected error location={Location}, accountId={AccountId}, query={Query}, sourceLanguage={SourceLanguage}, pageSize={PageSize}, skip={Skip}", location, accountId, request.Query, request.SourceLanguage, request.PageSize, request.Skip);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトの情報を更新します。
+        /// </summary>
+        /// <param name="updateRequest">更新するプロジェクトのリクエストモデル。</param>
+        /// <returns>更新されたプロジェクトのレスポンスモデル。</returns>
+        public async Task<ApiProjectUpdateResponseModel> UpdateProjectAsync(ProjectUpdateRequestModel updateRequest)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string accountId = account.properties?.id ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // Video Indexer API からプロジェクトの情報を更新します。
+            return await UpdateProjectAsync(location!, accountId, updateRequest, accessToken);
+        }
+
+        /// <summary>
+        /// 指定されたプロジェクトの情報を更新します。
+        /// </summary>
+        /// <param name="location">Azureリージョン。</param>
+        /// <param name="accountId">アカウントのGUID。</param>
+        /// <param name="updateRequest">更新するプロジェクトのリクエストモデル。</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）。</param>
+        /// <returns>更新されたプロジェクトのレスポンスモデル。</returns>
+        public async Task<ApiProjectUpdateResponseModel> UpdateProjectAsync(string location, string accountId, ProjectUpdateRequestModel updateRequest, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンがなければ取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
+
+                ApiProjectUpdateRequestModel apiModel = _projectUpdateRequestMapper.MapToApiProjectUpdateRequestModel(updateRequest);
+
+                // API呼び出し
+                return await _projectsApiAccess.UpdateProjectAsync(location, accountId, updateRequest.ProjectId, apiModel, accessToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "UpdateProjectAsync: Argument error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, updateRequest.ProjectId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "UpdateProjectAsync: API request failed location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, updateRequest.ProjectId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateProjectAsync: Unexpected error location={Location}, accountId={AccountId}, projectId={ProjectId}", location, accountId, updateRequest.ProjectId);
                 throw;
             }
         }
