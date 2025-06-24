@@ -25,15 +25,23 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         // APIリソース設定
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
+        // IProjectsApiAccess インターフェースのインスタンス
         private readonly IProjectsApiAccess _projectsApiAccess;
+        // プロジェクトレンダー操作のマッピングを行うインターフェース
         private readonly IProjectRenderOperationMapper _projectRenderOperationMapper;
+        // プロジェクトモデルのマッピングを行うインターフェース
         private readonly IProjectMapper _projectMapper;
 
+        // ビデオ時間範囲のマッピングを行うインターフェース
         private readonly IVideoTimeRangeMapper _videoTimeRangeMapper;
 
+        // プロジェクト検索結果のマッピングを行うインターフェース
         private readonly IProjectSearchResultMapper _projectSearchResultMapper;
+        // プロジェクトレンダーレスポンスのマッピングを行うインターフェース
         private readonly IProjectRenderResponseMapper _projectRenderResponseMapper;
+        // プロジェクト更新リクエストのマッピングを行うインターフェース
         private readonly IProjectUpdateRequestMapper _projectUpdateRequestMapper;
+        // プロジェクト更新レスポンスのマッピングを行うインターフェース
         private readonly IProjectUpdateResponseMapper _projectUpdateResponseMapper;
 
         private const string ParamName = "projects";
