@@ -5,16 +5,19 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class ErrorResponseMapper : IErrorResponseMapper
     {
-        public ErrorResponseModel MapFrom(ApiErrorResponseModel model)
+        public ErrorResponseModel? MapFrom(ApiErrorResponseModel? model)
         {
+            if (model is null) return null;
+
             return new ErrorResponseModel
             {
                 ErrorType = model.errorType,
                 Message = model.message,
             };
         }
-        public ApiErrorResponseModel MapToApiErrorResponseModel(ErrorResponseModel model)
+        public ApiErrorResponseModel? MapToApiErrorResponseModel(ErrorResponseModel? model)
         {
+            if (model is null) return null;
             return new ApiErrorResponseModel
             {
                 errorType = model.ErrorType,

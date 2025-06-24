@@ -69,7 +69,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 url += "?" + string.Join("&", queryParams);
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
-            var response = await httpClient.PostAsync(url, null) ?? throw new HttpRequestException("The response was null."); response.EnsureSuccessStatusCode();
+            var response = await httpClient.PostAsync(url, null) ?? throw new HttpRequestException("The response was null.");
+            response.EnsureSuccessStatusCode();
             // responseがnullなら例外を
             return await response.Content.ReadAsStringAsync();
         }
@@ -625,7 +626,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
                 var response = await httpClient.GetAsync(url) ?? throw new HttpRequestException("The response was null.");
                 // responseがnullなら例外を
-                response.EnsureSuccessStatusCode(); response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
@@ -647,6 +648,58 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             return JsonSerializer.Deserialize<ApiProjectRenderOperationModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new JsonException("Failed to parse JSON");
         }
+
+        /// <summary>
+        /// 指定されたプロジェクトのサムネイル画像データ（バイナリストリーム）を取得します。
+        /// Get Project Thumbnail Bits
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Project-Thumbnail
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">対象のアカウントID (GUID)</param>
+        /// <param name="projectId">対象のプロジェクトID</param>
+        /// <param name="thumbnailId">取得するサムネイルのID (GUID)</param>
+        /// <param name="format">オプション: サムネイルのフォーマット (Jpeg / Base64)</param>
+        /// <param name="accessToken">オプション: アクセストークン (省略可)</param>
+        /// <returns>サムネイル画像のバイナリデータ（Stream）</returns>
+        public async Task<Stream> GetProjectThumbnailBitsAsync(string location, string accountId, string projectId, string thumbnailId, string? format = null, string? accessToken = null)
+        {
+            try
+            {
+                // APIエンドポイントのURLを構築
+                string url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Projects/{projectId}/Thumbnails/{thumbnailId}";
+                var queryParams = new List<string>();
+
+                // サムネイルのフォーマットが指定されている場合は、クエリパラメータに追加
+                if (!string.IsNullOrEmpty(format)) queryParams.Add($"format={format}");
+
+                // アクセストークンが指定されている場合は、クエリパラメータに追加
+                if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={accessToken}");
+
+                // クエリパラメータをURLに追加
+                if (queryParams.Count > 0)
+                {
+                    url += "?" + string.Join("&", queryParams);
+                }
+
+                // APIへHTTP GETリクエストを送信
+                HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
+                var response = await httpClient.GetAsync(url) ?? throw new HttpRequestException("The response was null.");
+                // responseがnullなら例外を
+                response.EnsureSuccessStatusCode(); // HTTPレスポンスの成功ステータスを確認
+                return await response.Content.ReadAsStreamAsync(); // サムネイルのStreamを取得
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request error while fetching thumbnail Bits");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching project thumbnail Bits");
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// 指定されたプロジェクトのサムネイルのURLを取得する。
@@ -786,6 +839,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 throw;
             }
         }
+
         /// <summary>
         /// JSONレスポンスを `ApiProjectSearchResultModel` に変換する。
         /// List Projects
@@ -975,6 +1029,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトの情報を更新する非同期メソッド。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="location">Azureリージョン</param>
         /// <param name="accountId">アカウントのGUID</param>
@@ -998,6 +1053,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// 指定されたプロジェクトの更新リクエストをAPIに送信し、レスポンスを取得する。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="location">Azureリージョンの識別子</param>
         /// <param name="accountId">更新対象のアカウントID</param>
@@ -1020,6 +1076,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// APIリクエストを送信し、JSONレスポンスを取得する共通メソッド。
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Update-Project
         /// </summary>
         /// <param name="method">HTTPメソッド (GET, POST, PUT など)</param>
         /// <param name="url">APIのリクエストURL</param>

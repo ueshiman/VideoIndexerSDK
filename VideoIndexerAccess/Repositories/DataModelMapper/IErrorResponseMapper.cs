@@ -5,6 +5,6 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper;
 
 public interface IErrorResponseMapper
 {
-    ErrorResponseModel MapFrom(ApiErrorResponseModel model);
-    ApiErrorResponseModel MapToApiErrorResponseModel(ErrorResponseModel model);
+    ErrorResponseModel? MapFrom(ApiErrorResponseModel? model);
+    ApiErrorResponseModel? MapToApiErrorResponseModel(ErrorResponseModel? model);
 }
