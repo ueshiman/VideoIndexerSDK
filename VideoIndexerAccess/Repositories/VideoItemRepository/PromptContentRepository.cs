@@ -1,16 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
-using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
@@ -53,8 +47,17 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         }
 
 
+        /// <summary>
+        /// プロンプトコンテンツリポジトリクラス。
+        /// Video Indexer API を使用してプロンプトコンテンツを取得するためのメソッドを提供します。
+        /// </summary>
+        /// <remarks>
+        /// このクラスは、アカウント情報の取得、アクセストークンの管理、
+        /// および API 呼び出しのロジックをカプセル化します。
+        /// </remarks>
         public async Task<PromptCreateResponseModel?> GetPromptContentAsync(PromptContentRequestModel requestModel)
         {
+
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
 
@@ -72,6 +75,19 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await GetPromptContentAsync(location!, accountId!, requestModel, accessToken);
         }
 
+
+        /// <summary>
+        /// 指定されたロケーション、アカウントID、リクエストモデル、およびアクセストークンを使用して
+        /// プロンプトコンテンツを取得します。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="requestModel">プロンプトコンテンツ取得リクエストモデル</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>取得したプロンプトコンテンツのレスポンスモデル、失敗時はnull</returns>
+        /// <exception cref="ArgumentException">引数が無効な場合にスローされます</exception>
+        /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされます</exception>
+        /// <exception cref="Exception">その他のエラーが発生した場合にスローされます</exception>
         public async Task<PromptCreateResponseModel?> GetPromptContentAsync(string location, string accountId, PromptContentRequestModel requestModel, string? accessToken = null)
         {
             try
@@ -109,5 +125,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                 return null;
             }
         }
+
+
     }
 }
