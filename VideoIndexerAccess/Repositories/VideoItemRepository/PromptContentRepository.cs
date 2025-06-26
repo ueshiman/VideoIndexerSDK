@@ -126,6 +126,60 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             }
         }
 
+        /// <summary>
+        /// 指定されたロケーション、アカウントID、ビデオID、モデル名、プロンプトスタイル、およびアクセストークンを使用して
+        /// プロンプトコンテンツを作成します。
+        /// </summary>
+        /// <param name="location">Azureのリージョン</param>
+        /// <param name="accountId">アカウントの一意の識別子</param>
+        /// <param name="videoId">ビデオの一意の識別子</param>
+        /// <param name="modelName">使用するLLMモデル名（省略可能）</param>
+        /// <param name="promptStyle">プロンプトのスタイル（省略可能）</param>
+        /// <param name="accessToken">認証用のアクセストークン（省略可能）</param>
+        /// <returns>プロンプトコンテンツの作成が成功した場合はtrue、それ以外はfalse</returns>
+        /// <exception cref="ArgumentException">引数が無効な場合にスローされます</exception>
+        /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされます</exception>
+        /// <exception cref="Exception">その他のエラーが発生した場合にスローされます</exception>
+        public async Task<bool> CreatePromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null)
+        {
+            try
+            {
+                // アクセストークンが指定されていない場合は取得
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    accessToken = await _authenticationTokenizer.GetAccessToken();
+                }
 
+                // プロンプトコンテンツを作成するためのリクエストを送信
+                bool result = await _promptContentApiAccess.CreatePromptContentAsync(location, accountId, videoId, modelName, promptStyle, accessToken);
+
+                // レスポンスが成功かどうかを確認
+                if (result)
+                {
+                    _logger.LogInformation("Prompt content JSON created successfully for video {VideoId} in account {AccountId}.", videoId, accountId);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError("Failed to create prompt content JSON. The API call returned a failure.");
+                    return false;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Argument error creating prompt content. Location: {Location}, AccountId: {AccountId}, video {videoId} in account {AccountId}", location, accountId, videoId, accountId);
+                throw;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed while creating prompt content for video {VideoId} in account {AccountId}.", videoId, accountId);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating prompt content for video {VideoId} in account {AccountId}.", videoId, accountId);
+                return false;
+            }
+        }
     }
 }
