@@ -5,6 +5,20 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 public interface IPromptContentApiAccess
 {
     /// <summary>
+    /// API へプロンプトコンテンツを作成をリクエストするメソッドです。
+    /// Create Prompt Content
+    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Prompt-Content
+    /// </summary>
+    /// <param name="location">Azure のリージョン</param>
+    /// <param name="accountId">アカウント ID</param>
+    /// <param name="videoId">ビデオ ID</param>
+    /// <param name="modelName">使用する LLM モデル名（オプション）</param>
+    /// <param name="promptStyle">プロンプトのスタイル（オプション）</param>
+    /// <param name="accessToken">アクセストークン（オプション）</param>
+    /// <returns>API 呼び出しの成功可否を示す bool 値</returns>
+    Task<bool> CreatePromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null);
+
+    /// <summary>
     /// API からプロンプトコンテンツの JSON データを取得します。
     /// Create Prompt Content
     /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Prompt-Content
