@@ -5,7 +5,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 public interface IRedactionApiAccess
 {
     /// <summary>
-    /// API からビデオ編集 (Redact) の JSON データを取得します。
+    /// API でビデオ編集 (Redact) をRequestします。
     /// Redact Video
     /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Redact-Video
     /// </summary>
@@ -14,8 +14,8 @@ public interface IRedactionApiAccess
     /// <param name="videoId">ビデオ ID</param>
     /// <param name="request">ビデオの編集リクエストオブジェクト</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
-    /// <returns>API から取得した JSON 文字列</returns>
-    Task<string> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null);
+    /// <returns>pe成功時はture</returns>
+    Task<bool> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null);
 
     /// <summary>
     /// 取得した JSON をパースして ApiRedactVideoResponseModel オブジェクトに変換します。
@@ -36,6 +36,6 @@ public interface IRedactionApiAccess
     /// <param name="videoId">ビデオ ID</param>
     /// <param name="request">ビデオの編集リクエストオブジェクト</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
-    /// <returns>編集リクエストのステータス、エラー時は null</returns>
-    Task<ApiRedactVideoResponseModel?> RedactVideoAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null);
+    /// <returns>pe成功時はture</returns>
+    Task<bool> RedactVideoAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null);
 }

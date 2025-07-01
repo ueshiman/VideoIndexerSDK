@@ -65,8 +65,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             var queryParams = new List<string>();
             if (!string.IsNullOrEmpty(accessToken)) queryParams.Add($"accessToken={Uri.EscapeDataString(accessToken)}");
 
-            if (queryParams.Count > 0)
-                url += "?" + string.Join("&", queryParams);
+            if (queryParams.Count > 0) url += "?" + string.Join("&", queryParams);
 
             HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
             var response = await httpClient.PostAsync(url, null) ?? throw new HttpRequestException("The response was null.");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -21,7 +22,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// API からビデオ編集 (Redact) の JSON データを取得します。
+        /// API でビデオ編集 (Redact) をRequestします。
         /// Redact Video
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Redact-Video
         /// </summary>
@@ -30,8 +31,8 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="videoId">ビデオ ID</param>
         /// <param name="request">ビデオの編集リクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
-        /// <returns>API から取得した JSON 文字列</returns>
-        public async Task<string> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
+        /// <returns>pe成功時はture</returns>
+        public async Task<bool> FetchRedactVideoJsonAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
         {
             try
             {
@@ -59,7 +60,27 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 // responseがnullなら例外を
                 if (response is null) throw new HttpRequestException("The response was null.");
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
+                string message = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrEmpty(message))
+                {
+                    _logger.LogError("Redact video request returned an empty response.");
+                    return false;
+                }
+
+                _logger.LogInformation("Redact video request succeeded: {message}", message);
+
+                response.EnsureSuccessStatusCode();
+
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.Accepted: break;
+                    default:
+                        _logger.LogWarning("Redact video request failed with status code: {StatusCode}", response.StatusCode);
+                        break;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -98,11 +119,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="videoId">ビデオ ID</param>
         /// <param name="request">ビデオの編集リクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
-        /// <returns>編集リクエストのステータス、エラー時は null</returns>
-        public async Task<ApiRedactVideoResponseModel?> RedactVideoAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
+        /// <returns>pe成功時はture</returns>
+        public async Task<bool> RedactVideoAsync(string location, string accountId, string videoId, ApiRedactVideoRequestModel request, string? accessToken = null)
         {
-            var json = await FetchRedactVideoJsonAsync(location, accountId, videoId, request, accessToken);
-            return ParseRedactVideoJson(json);
+            return await FetchRedactVideoJsonAsync(location, accountId, videoId, request, accessToken);
         }
     }
 }

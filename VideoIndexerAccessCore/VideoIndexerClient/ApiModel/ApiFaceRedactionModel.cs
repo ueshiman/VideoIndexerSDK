@@ -3,6 +3,6 @@
     public class ApiFaceRedactionModel
     {
         public string blurringKind { get; set; } = "HighBlur";
-        public ApiFaceFilterModel FilterModel { get; set; } = new ApiFaceFilterModel();
+        public ApiFaceFilterModel filter { get; set; } = new ApiFaceFilterModel();
     }
 }
