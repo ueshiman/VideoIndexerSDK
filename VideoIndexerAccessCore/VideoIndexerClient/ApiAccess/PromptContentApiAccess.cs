@@ -124,11 +124,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiPromptCreateResponseModel オブジェクト、エラー時は null</returns>
-        public ApiPromptCreateResponseModel? ParsePromptContentJson(string json)
+        public ApiPromptContentContractModel? ParsePromptContentJson(string json)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiPromptCreateResponseModel>(json);
+                return JsonSerializer.Deserialize<ApiPromptContentContractModel>(json);
             }
             catch (JsonException ex)
             {
@@ -149,7 +149,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="promptStyle">プロンプトのスタイル（オプション）</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>プロンプトコンテンツのデータ、エラー時は null</returns>
-        public async Task<ApiPromptCreateResponseModel?> GetPromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null)
+        public async Task<ApiPromptContentContractModel?> GetPromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null)
         {
             var json = await FetchPromptContentJsonAsync(location, accountId, videoId, modelName, promptStyle, accessToken);
             return ParsePromptContentJson(json);

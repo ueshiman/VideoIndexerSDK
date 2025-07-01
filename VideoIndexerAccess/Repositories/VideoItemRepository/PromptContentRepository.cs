@@ -8,7 +8,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class PromptContentRepository
+    public class PromptContentRepository : IPromptContentRepository
     {
         // ロガーインスタンス
         private readonly ILogger<ProjectsRepository> _logger;
@@ -31,11 +31,13 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         // プロンプトコンテンツのレスポンスをマッピングするインターフェース
         private readonly IPromptCreateResponseMapper _promptCreateResponseMapper;
 
+        private readonly IPromptContentContractMapper _promptContentContractMapper; 
+
         // パラメータ名
         private const string ParamName = "promptContent";
 
 
-        public PromptContentRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IPromptContentApiAccess promptContentApiAccess, IPromptCreateResponseMapper promptCreateResponseMapper)
+        public PromptContentRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IPromptContentApiAccess promptContentApiAccess, IPromptCreateResponseMapper promptCreateResponseMapper, IPromptContentContractMapper promptContentContractMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -44,6 +46,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _apiResourceConfigurations = apiResourceConfigurations;
             _promptContentApiAccess = promptContentApiAccess;
             _promptCreateResponseMapper = promptCreateResponseMapper;
+            _promptContentContractMapper = promptContentContractMapper;
         }
 
 
@@ -55,7 +58,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// このクラスは、アカウント情報の取得、アクセストークンの管理、
         /// および API 呼び出しのロジックをカプセル化します。
         /// </remarks>
-        public async Task<PromptCreateResponseModel?> GetPromptContentAsync(PromptContentRequestModel requestModel)
+        public async Task<PromptContentContractModel?> GetPromptContentAsync(PromptContentRequestModel requestModel)
         {
 
             // アカウント情報を取得し、存在しない場合は例外をスロー
@@ -88,7 +91,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <exception cref="ArgumentException">引数が無効な場合にスローされます</exception>
         /// <exception cref="HttpRequestException">APIリクエストが失敗した場合にスローされます</exception>
         /// <exception cref="Exception">その他のエラーが発生した場合にスローされます</exception>
-        public async Task<PromptCreateResponseModel?> GetPromptContentAsync(string location, string accountId, PromptContentRequestModel requestModel, string? accessToken = null)
+        public async Task<PromptContentContractModel?> GetPromptContentAsync(string location, string accountId, PromptContentRequestModel requestModel, string? accessToken = null)
         {
             try
             {
@@ -105,9 +108,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
                     return null;
                 }
                 // プロンプトコンテンツを取得
-                ApiPromptCreateResponseModel? promptContent = await _promptContentApiAccess.GetPromptContentAsync(location, accountId, requestModel.VideoId, requestModel.ModelName, requestModel.PromptStyle, accessToken);
+                ApiPromptContentContractModel? promptContent = await _promptContentApiAccess.GetPromptContentAsync(location, accountId, requestModel.VideoId, requestModel.ModelName, requestModel.PromptStyle, accessToken);
 
-                return promptContent is null ? null : _promptCreateResponseMapper.MapFrom(promptContent);
+                return promptContent is null ? null : _promptContentContractMapper.MapFrom(promptContent);
             }
             catch (ArgumentException ex)
             {

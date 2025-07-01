@@ -51,7 +51,7 @@ public interface IPromptContentApiAccess
     /// </summary>
     /// <param name="json">API から取得した JSON 文字列</param>
     /// <returns>パースした ApiPromptCreateResponseModel オブジェクト、エラー時は null</returns>
-    ApiPromptCreateResponseModel? ParsePromptContentJson(string json);
+    ApiPromptContentContractModel? ParsePromptContentJson(string json);
 
     /// <summary>
     /// API を呼び出してプロンプトコンテンツのデータを取得します。
@@ -65,7 +65,7 @@ public interface IPromptContentApiAccess
     /// <param name="promptStyle">プロンプトのスタイル（オプション）</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>プロンプトコンテンツのデータ、エラー時は null</returns>
-    Task<ApiPromptCreateResponseModel?> GetPromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null);
+    Task<ApiPromptContentContractModel?> GetPromptContentAsync(string location, string accountId, string videoId, string? modelName = null, string? promptStyle = null, string? accessToken = null);
 
     /// <summary>
     /// API を呼び出してプロンプトコンテンツのデータを取得します。
