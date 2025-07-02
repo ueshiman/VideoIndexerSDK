@@ -1,20 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
-using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class TrialAccountAccessTokensRepository
+    public class TrialAccountAccessTokensRepository : ITrialAccountAccessTokensRepository
     {
         // ロガーインスタンス
         private readonly ILogger<TrialAccountAccessTokensRepository> _logger;
@@ -37,7 +30,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private const string ParamName = "accountAccessToken";
 
         // マッパーインターフェース
-        private IAccountSlimMapper _accountSlimMapper;
+        private readonly IAccountSlimMapper _accountSlimMapper;
 
 
         public TrialAccountAccessTokensRepository(ILogger<TrialAccountAccessTokensRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, ITrialAccountAccessTokensApiAccess accountAccessTokensApiAccess, IAccountSlimMapper accountSlimMapper)
