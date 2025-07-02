@@ -10,7 +10,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
     public class RedactVideoRepository : IRedactVideoRepository
     {
         // ロガーインスタンス
-        private readonly ILogger<ProjectsRepository> _logger;
+        private readonly ILogger<RedactVideoRepository> _logger;
 
         // アクセストークン取得用インターフェース
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
@@ -34,7 +34,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private const string ParamName = "redactVideo";
 
 
-        public RedactVideoRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IRedactionApiAccess redactionApiAccess, IRedactVideoRequestMapper redactVideoRequestMapper)
+        public RedactVideoRepository(ILogger<RedactVideoRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IRedactionApiAccess redactionApiAccess, IRedactVideoRequestMapper redactVideoRequestMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;

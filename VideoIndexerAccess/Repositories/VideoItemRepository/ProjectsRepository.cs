@@ -178,7 +178,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _logger.LogInformation("Project created successfully. ProjectId={ProjectId}", createResponse!.Id);
             // プロジェクトのレンダー操作を開始
 
-            BuildProjectResponseModel renderOperation = new BuildProjectResponseModel
+            BuildProjectResponseModel renderOperation = new()
             {
                 Status = BuildProjectResponseModelStatus.Started,
                 Project = null,
@@ -926,7 +926,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string accessToken = await _authenticationTokenizer.GetAccessToken();
 
             // Video Indexer API からプロジェクト一覧を取得します。
-            return await GetProjectsAsync(request);
+            return await GetProjectsAsync(location!, accountId, request, accessToken);
         }
 
         /// <summary>

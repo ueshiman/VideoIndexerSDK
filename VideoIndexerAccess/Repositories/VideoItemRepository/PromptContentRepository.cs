@@ -11,7 +11,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
     public class PromptContentRepository : IPromptContentRepository
     {
         // ロガーインスタンス
-        private readonly ILogger<ProjectsRepository> _logger;
+        private readonly ILogger<PromptContentRepository> _logger;
 
         // アクセストークン取得用インターフェース
         private readonly IAuthenticationTokenizer _authenticationTokenizer;
@@ -37,7 +37,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private const string ParamName = "promptContent";
 
 
-        public PromptContentRepository(ILogger<ProjectsRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IPromptContentApiAccess promptContentApiAccess, IPromptCreateResponseMapper promptCreateResponseMapper, IPromptContentContractMapper promptContentContractMapper)
+        public PromptContentRepository(ILogger<PromptContentRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IPromptContentApiAccess promptContentApiAccess, IPromptCreateResponseMapper promptCreateResponseMapper, IPromptContentContractMapper promptContentContractMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
