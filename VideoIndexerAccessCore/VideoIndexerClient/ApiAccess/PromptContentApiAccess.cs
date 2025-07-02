@@ -1,5 +1,5 @@
-﻿using System.Net;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;

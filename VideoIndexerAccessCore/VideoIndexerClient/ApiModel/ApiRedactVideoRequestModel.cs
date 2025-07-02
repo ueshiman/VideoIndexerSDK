@@ -2,6 +2,6 @@
 {
     public class ApiRedactVideoRequestModel
     {
-        public ApiFaceRedactionModel? ApiFaces { get; set; }
+        public ApiFaceRedactionModel? faces { get; set; }
     }
 }
