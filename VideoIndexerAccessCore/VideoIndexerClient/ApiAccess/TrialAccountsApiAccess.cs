@@ -32,9 +32,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="includeStatistics">統計情報を含めるか</param>
         /// <param name="accessToken">オプションのアクセストークン</param>
         /// <returns>ApiTrialAccountModel オブジェクトの配列</returns>
-        public async Task<ApiTrialAccountModel[]> GetAccountAsync(string location, string accountId, bool? includeUsage = null, bool? includeStatistics = null, string? accessToken = null)
+        public async Task<ApiTrialAccountModel[]> GetAccountsAsync(string location, string accountId, bool? includeUsage = null, bool? includeStatistics = null, string? accessToken = null)
         {
-            var json = await FetchAccountJsonAsync(location, accountId, includeUsage, includeStatistics, accessToken);
+            var json = await FetchAccountsJsonAsync(location, accountId, includeUsage, includeStatistics, accessToken);
             return ParseAccountJson(json);
         }
 
@@ -49,7 +49,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="includeStatistics">統計情報の有無</param>
         /// <param name="accessToken">アクセストークン（省略可）</param>
         /// <returns>レスポンスJSON文字列</returns>
-        public async Task<string> FetchAccountJsonAsync(string location, string accountId, bool? includeUsage, bool? includeStatistics, string? accessToken)
+        public async Task<string> FetchAccountsJsonAsync(string location, string accountId, bool? includeUsage, bool? includeStatistics, string? accessToken)
         {
             try
             {
@@ -115,10 +115,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="allowEdit">アクセストークンに書き込み権限（Contributor）を含めるかどうか。</param>
         /// <param name="accessToken">（任意）クエリパラメータまたは Authorization ヘッダーで渡すアクセストークン。</param>
         /// <returns>取得したアカウント情報の配列。</returns>
-        public async Task<ApiTrialAccountModel[]> GetAccountsAsync(string location, bool? generateAccessTokens = null, bool? allowEdit = null, string? accessToken = null)
+        public async Task<ApiTrialAccountWithTokenModel[]?> GetAccountsWithTokenAsync(string location, bool? generateAccessTokens = null, bool? allowEdit = null, string? accessToken = null)
         {
-            var json = await FetchAccountsJsonAsync(location, generateAccessTokens, allowEdit, accessToken);
-            return ParseAccountJson(json);
+            var json = await FetchAccountsWithTokenJsonAsync(location, generateAccessTokens, allowEdit, accessToken);
+            return ParseAccountWithTokenJson(json);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="allowEdit">編集許可付きトークンを生成するかどうか。</param>
         /// <param name="accessToken">（任意）アクセストークン。</param>
         /// <returns>レスポンスとして返却された JSON 文字列。</returns>
-        public async Task<string> FetchAccountsJsonAsync(string location, bool? generateAccessTokens, bool? allowEdit, string? accessToken)
+        public async Task<string> FetchAccountsWithTokenJsonAsync(string location, bool? generateAccessTokens, bool? allowEdit, string? accessToken)
         {
             try
             {
@@ -160,6 +160,24 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred: {Message}", ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// JSON文字列を ApiTrialAccountWithTokenModel オブジェクトに変換します。
+        /// </summary>
+        /// <param name="json">JSON文字列</param>
+        /// <returns>ApiTrialAccountWithTokenModel オブジェクト</returns>
+        public ApiTrialAccountWithTokenModel[]? ParseAccountWithTokenJson(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ApiTrialAccountWithTokenModel[]>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse JSON: {Message}", ex.Message);
                 throw;
             }
         }
