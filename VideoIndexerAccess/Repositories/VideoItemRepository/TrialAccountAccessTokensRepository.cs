@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
+using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
@@ -34,8 +36,19 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private const string ParamName = "accountAccessToken";
 
         // マッパーインターフェース
+        private IAccountSlimMapper _accountSlimMapper;
 
 
+        public TrialAccountAccessTokensRepository(ILogger<TrialAccountAccessTokensRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, ITrialAccountAccessTokensApiAccess accountAccessTokensApiAccess, IAccountSlimMapper accountSlimMapper)
+        {
+            _logger = logger;
+            _authenticationTokenizer = authenticationTokenizer;
+            _accountAccess = accountAccess;
+            _accountRepository = accountRepository;
+            _apiResourceConfigurations = apiResourceConfigurations;
+            _accountAccessTokensApiAccess = accountAccessTokensApiAccess;
+            _accountSlimMapper = accountSlimMapper;
+        }
 
         /// <summary>
         /// アカウントアクセストークンを取得する非同期メソッド。
@@ -106,10 +119,73 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await _accountAccessTokensApiAccess.GetAccountAccessTokenWithPermissionAsync(location, accountId, permission, clientRequestId);
         }
 
-        public async Task<List<ApiAccountSlimModel>?> GetAccountsAsync(string location, bool? generateAccessTokens = null, bool? allowEdit = null, string? clientRequestId = null)
+        /// <summary>
+        /// アカウント情報のリストを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="generateAccessTokens">各アカウントにアクセストークンを含めるかどうか。省略可。</param>
+        /// <returns>アカウント情報のリスト。エラーが発生した場合は null。</returns>
+        public async Task<List<AccountSlimModel>?> GetAccountsAsync(bool generateAccessTokens = true)
         {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
 
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+
+            return await GetAccountsAsync(location!, generateAccessTokens);
         }
 
+        /// <summary>
+        /// 指定されたロケーションに基づいてアカウント情報のリストを取得します。
+        /// </summary>
+        /// <param name="location">Azureリージョン（例: "japaneast"）。</param>
+        /// <param name="generateAccessTokens">各アカウントにアクセストークンを含めるかどうか。省略可。</param>
+        /// <param name="allowEdit">アクセストークンに編集権限を与えるかどうか。省略可。</param>
+        /// <param name="clientRequestId">リクエスト識別用のGUID文字列。省略可。</param>
+        /// <returns>アカウント情報のリスト。エラーが発生した場合は null。</returns>
+        public async Task<List<AccountSlimModel>?> GetAccountsAsync(string location, bool? generateAccessTokens = null, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            var results = await _accountAccessTokensApiAccess.GetAccountsAsync(location, generateAccessTokens, allowEdit, clientRequestId);
+            return results?.Select(_accountSlimMapper.MapFrom).ToList();
+        }
+
+        /// <summary>
+        /// プロジェクトに対するアクセストークンを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="projectId">プロジェクト ID。</param>
+        /// <returns>アクセストークンの文字列。失敗時は null。</returns>
+        public async Task<string?> GetProjectAccessTokenAsync(string projectId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+
+            // プロジェクトアクセストークンを取得
+            return await GetProjectAccessTokenAsync(location!, accountId!, projectId);
+        }
+
+        /// <summary>
+        /// プロジェクトに対するアクセストークンを取得する非同期メソッド。
+        /// </summary>
+        /// <param name="location">Azure リージョン（例: "japaneast"）。</param>
+        /// <param name="accountId">アカウント ID（GUID形式）。</param>
+        /// <param name="projectId">プロジェクト ID。</param>
+        /// <param name="allowEdit">編集を許可するかどうか（true で書き込み可）。省略可。</param>
+        /// <param name="clientRequestId">リクエストトラッキング用の GUID（省略可）。</param>
+        /// <returns>アクセストークンの文字列。失敗時は null。</returns>
+        public async Task<string?> GetProjectAccessTokenAsync(string location, string accountId, string projectId, bool? allowEdit = null, string? clientRequestId = null)
+        {
+            // アカウントアクセストークンを取得
+            return await _accountAccessTokensApiAccess.GetProjectAccessTokenAsync(location, accountId, projectId, allowEdit, clientRequestId);
+        }
     }
 }
