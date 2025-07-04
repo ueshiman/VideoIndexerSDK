@@ -53,6 +53,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         /// <summary>
         /// 指定されたビデオを削除します。
+        /// Delete Video
+        /// Deletes the specified video and all related insights created from when the video was indexed
         /// </summary>
         /// <param name="videoId">削除対象のビデオID</param>
         /// <returns>削除結果を示す <see cref="DeleteVideoResultModel"/> オブジェクト</returns>
@@ -78,6 +80,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         /// <summary>
         /// 指定されたロケーション、アカウントID、ビデオIDを使用してビデオを削除します。
+        /// Delete Video
+        /// Deletes the specified video and all related insights created from when the video was indexed
         /// </summary>
         /// <param name="location">Azureリージョン名</param>
         /// <param name="accountId">Video IndexerアカウントID</param>
@@ -89,5 +93,43 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             ApiDeleteVideoResultModel? resultModel = await _videosApiAccess.DeleteVideoAsync(location, accountId, videoId, accessToken);
             return resultModel is null ? null : _deleteVideoResultMapper.MapFrom(resultModel);
         }
+        /// <summary>
+        /// 指定されたビデオのソースファイルを削除します。
+        /// Delete Video Source File
+        /// </summary>
+        /// <param name="videoId">ソースファイルを削除するビデオのID</param>
+        /// <returns>削除に成功した場合は true、失敗や例外発生時には false を返します。</returns>
+        public async Task<bool> DeleteVideoSourceFileAsync(string videoId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+            // ビデオソースファイルを削除する
+            return await DeleteVideoSourceFileAsync(location!, accountId!, videoId, accessToken);
+        }
+        
+        /// <summary>
+        /// 指定された動画のソースファイルとストリーミングアセットを削除します（インサイトは保持）。
+        /// Delete Video Source File
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Delete-Video-Source-File
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast"、"westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウントの一意な GUID 文字列</param>
+        /// <param name="videoId">ソースファイルを削除するビデオの ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>
+        /// 削除に成功した場合は true を返し、失敗や例外発生時には false を返します。
+        /// </returns>
+        public async Task<bool> DeleteVideoSourceFileAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            return await _videosApiAccess.DeleteVideoSourceFileAsync(location, accountId, videoId, accessToken);
+        }
+
     }
 }
