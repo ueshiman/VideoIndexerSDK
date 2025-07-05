@@ -222,5 +222,160 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             // ビデオのキャプションを取得する
             return await _videosApiAccess.GetVideoCaptionsAsync(location, accountId, videoId, indexId, format, language, includeAudioEffects, includeSpeakers, accessToken);
         }
+
+        /// <summary>
+        /// 指定された動画から抽出されたフレーム画像の SAS URL 一覧を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、SAS URL 一覧（JSON文字列）を返します。
+        /// </summary>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="urlsLifetimeSeconds">URL の有効期限（秒単位、オプション）</param>
+        /// <param name="pageSize">1ページあたりの取得件数（省略可能）</param>
+        /// <param name="skip">スキップするフレーム数（省略可能）</param>
+        /// <returns>JSON 文字列として返される SAS URL 一覧（または null）</returns>
+        public async Task<string?> GetVideoFramesFilePathsAsync(string videoId, int? urlsLifetimeSeconds = null, int? pageSize = null, int? skip = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 指定された動画から抽出されたフレーム画像の SAS URL 一覧を取得する
+            return await GetVideoFramesFilePathsAsync(location!, accountId!, videoId, urlsLifetimeSeconds, pageSize, skip, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画から抽出されたフレーム画像の SAS URL 一覧を取得します。
+        /// Get Video Frames File Paths
+        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Video-Frames-File-Paths
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="urlsLifetimeSeconds">URL の有効期限（秒単位、オプション）</param>
+        /// <param name="pageSize">1ページあたりの取得件数（省略可能）</param>
+        /// <param name="skip">スキップするフレーム数（省略可能）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>JSON 文字列として返される SAS URL 一覧（または null）</returns>
+        public async Task<string?> GetVideoFramesFilePathsAsync(string location, string accountId, string videoId, int? urlsLifetimeSeconds = null, int? pageSize = null, int? skip = null, string? accessToken = null)
+        {
+            // ビデオフレームのファイルパスを取得する
+            return await _videosApiAccess.GetVideoFramesFilePathsAsync(location, accountId, videoId, urlsLifetimeSeconds, pageSize, skip, accessToken);
+        }
+
+        /// <summary>
+        /// 外部IDからVideo IDを取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、Video IDを返します。
+        /// </summary>
+        /// <param name="externalId">検索対象の外部ID（ExternalId）</param>
+        /// <returns>対応するVideo ID（string）。見つからない場合やエラー時はnull。</returns>
+        public async Task<string?> GetVideoIdByExternalIdAsync(string externalId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // ビデオIDを取得する
+            return await GetVideoIdByExternalIdAsync(location!, accountId!, externalId, accessToken);
+        }
+
+        /// <summary>
+        /// 指定されたロケーション・アカウントID・外部IDからVideo IDを取得します。
+        /// </summary>
+        /// <param name="location">Azureのリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video IndexerのアカウントID（GUID）</param>
+        /// <param name="externalId">検索対象の外部ID（ExternalId）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>対応するVideo ID（string）。見つからない場合やエラー時はnull。</returns>
+        public async Task<string?> GetVideoIdByExternalIdAsync(string location, string accountId, string externalId, string? accessToken = null)
+        {
+            // ビデオIDを取得する
+            return await _videosApiAccess.GetVideoIdByExternalIdAsync(location, accountId, externalId, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のソースファイル（元動画）のダウンロード用一時 URL を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、ダウンロード URL を返します。
+        /// </summary>
+        /// <param name="videoId">ダウンロード URL を取得したいビデオの ID</param>
+        /// <returns>ダウンロード可能な一時的な URL（文字列）。取得できなければ null。</returns>
+        public async Task<string?> GetVideoSourceFileDownloadUrlAsync(string videoId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 指定された動画のソースファイルのダウンロード用一時 URL を取得する
+            return await GetVideoSourceFileDownloadUrlAsync(location!, accountId!, videoId, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定された動画のソースファイル（元動画）のダウンロード用一時 URL を取得します。
+        /// Get Video Source File Download Url
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>ソースファイルのダウンロード URL（SAS 付きの一時 URL）。取得できなければ null。</returns>
+        public async Task<string?> GetVideoSourceFileDownloadUrlAsync(string location, string accountId, string videoId, string? accessToken = null)
+        {
+            // ビデオソースファイルのダウンロードURLを取得する
+            return await _videosApiAccess.GetVideoSourceFileDownloadUrlAsync(location, accountId, videoId, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のストリーミング再生用 URL を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、ストリーミング URL を返します。
+        /// </summary>
+        /// <param name="request">ストリーミング URL 取得リクエストモデル（VideoId, UseProxy, UrlFormat, TokenLifetimeInMinutes を指定可能）</param>
+        /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
+        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(GetVideoStreamingUrlRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 指定された動画のソースファイルのダウンロード用一時 URL を取得する
+            return await GetVideoStreamingUrlAsync(location!, accountId!, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のストリーミング再生用 URL を取得します。
+        /// Get Video Streaming URL
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="request">ストリーミング URL 取得リクエストモデル（VideoId, UseProxy, UrlFormat, TokenLifetimeInMinutes を指定可能）</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
+        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(string location, string accountId, GetVideoStreamingUrlRequestModel request, string? accessToken = null)
+        {
+            // ビデオのストリーミングURLを取得する
+            return await _videosApiAccess.GetVideoStreamingUrlAsync(location, accountId, request.VideoId, request.UseProxy, request.UrlFormat, request.TokenLifetimeInMinutes, accessToken);
+        }
     }
 }

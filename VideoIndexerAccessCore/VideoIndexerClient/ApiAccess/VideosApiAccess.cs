@@ -314,14 +314,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="skip">スキップするフレーム数（省略可能）</param>
         /// <param name="accessToken">アクセストークン（省略可能）</param>
         /// <returns>JSON 文字列として返される SAS URL 一覧（または null）</returns>
-        public async Task<string?> GetVideoFramesFilePathsAsync(
-            string location,
-            string accountId,
-            string videoId,
-            int? urlsLifetimeSeconds = null,
-            int? pageSize = null,
-            int? skip = null,
-            string? accessToken = null)
+        public async Task<string?> GetVideoFramesFilePathsAsync(string location, string accountId, string videoId, int? urlsLifetimeSeconds = null, int? pageSize = null, int? skip = null, string? accessToken = null)
         {
             try
             {
@@ -380,11 +373,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="externalId">検索対象の外部 ID（ExternalId）</param>
         /// <param name="accessToken">アクセストークン（省略可能）</param>
         /// <returns>対応する Video ID（string）を返します。見つからない場合やエラー時は null。</returns>
-        public async Task<string?> GetVideoIdByExternalIdAsync(
-            string location,
-            string accountId,
-            string externalId,
-            string? accessToken = null)
+        public async Task<string?> GetVideoIdByExternalIdAsync(string location, string accountId, string externalId, string? accessToken = null)
         {
             try
             {
@@ -442,11 +431,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="videoId">対象のビデオ ID</param>
         /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
         /// <returns>ソースファイルのダウンロード URL（SAS 付きの一時 URL）。取得できなければ null。</returns>
-        public async Task<string?> GetVideoSourceFileDownloadUrlAsync(
-            string location,
-            string accountId,
-            string videoId,
-            string? accessToken = null)
+        public async Task<string?> GetVideoSourceFileDownloadUrlAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
             try
             {
@@ -506,14 +491,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="tokenLifetimeInMinutes">トークンの有効期限（分）※省略時は既定値（60分）</param>
         /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
         /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
-        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(
-            string location,
-            string accountId,
-            string videoId,
-            bool? useProxy = null,
-            string? urlFormat = null,
-            int? tokenLifetimeInMinutes = null,
-            string? accessToken = null)
+        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(string location, string accountId, string videoId, bool? useProxy = null, string? urlFormat = null, int? tokenLifetimeInMinutes = null, string? accessToken = null)
         {
             try
             {
