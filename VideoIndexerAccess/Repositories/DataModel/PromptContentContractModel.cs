@@ -1,6 +1,4 @@
-﻿using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
-
-namespace VideoIndexerAccess.Repositories.DataModel
+﻿namespace VideoIndexerAccess.Repositories.DataModel
 {
     public class PromptContentContractModel
     {
