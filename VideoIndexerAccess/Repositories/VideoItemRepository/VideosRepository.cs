@@ -39,8 +39,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         // マッパーインターフェース
         private readonly IDeleteVideoResultMapper _deleteVideoResultMapper;
         private readonly IArtifactTypeMapper _artifactTypeMapper;
+        private readonly IStreamingUrlMapper _streamingUrlMapper;
 
-        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper)
+        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper, IStreamingUrlMapper streamingUrlMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -51,6 +52,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _videoDownloadApiAccess = videoDownloadApiAccess;
             _deleteVideoResultMapper = deleteVideoResultMapper;
             _artifactTypeMapper = artifactTypeMapper;
+            _streamingUrlMapper = streamingUrlMapper;
         }
 
         /// <summary>
@@ -347,7 +349,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// </summary>
         /// <param name="request">ストリーミング URL 取得リクエストモデル（VideoId, UseProxy, UrlFormat, TokenLifetimeInMinutes を指定可能）</param>
         /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
-        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(GetVideoStreamingUrlRequestModel request)
+        public async Task<StreamingUrlModel?> GetVideoStreamingUrlAsync(GetVideoStreamingUrlRequestModel request)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -372,10 +374,11 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="request">ストリーミング URL 取得リクエストモデル（VideoId, UseProxy, UrlFormat, TokenLifetimeInMinutes を指定可能）</param>
         /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
         /// <returns>ストリーミング URL と JWT トークンを含む ApiStreamingUrlModel オブジェクト。取得できなければ null。</returns>
-        public async Task<ApiStreamingUrlModel?> GetVideoStreamingUrlAsync(string location, string accountId, GetVideoStreamingUrlRequestModel request, string? accessToken = null)
+        public async Task<StreamingUrlModel?> GetVideoStreamingUrlAsync(string location, string accountId, GetVideoStreamingUrlRequestModel request, string? accessToken = null)
         {
             // ビデオのストリーミングURLを取得する
-            return await _videosApiAccess.GetVideoStreamingUrlAsync(location, accountId, request.VideoId, request.UseProxy, request.UrlFormat, request.TokenLifetimeInMinutes, accessToken);
+            ApiStreamingUrlModel? result = await _videosApiAccess.GetVideoStreamingUrlAsync(location, accountId, request.VideoId, request.UseProxy, request.UrlFormat, request.TokenLifetimeInMinutes, accessToken);
+            return result is null ? null : _streamingUrlMapper.MapFrom(result);
         }
     }
 }
