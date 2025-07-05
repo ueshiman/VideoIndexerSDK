@@ -38,8 +38,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         // マッパーインターフェース
         private readonly IDeleteVideoResultMapper _deleteVideoResultMapper;
+        private readonly IArtifactTypeMapper _artifactTypeMapper;
 
-        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper)
+        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -49,6 +50,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _videosApiAccess = videosApiAccess;
             _videoDownloadApiAccess = videoDownloadApiAccess;
             _deleteVideoResultMapper = deleteVideoResultMapper;
+            _artifactTypeMapper = artifactTypeMapper;
         }
 
         /// <summary>
@@ -93,6 +95,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             ApiDeleteVideoResultModel? resultModel = await _videosApiAccess.DeleteVideoAsync(location, accountId, videoId, accessToken);
             return resultModel is null ? null : _deleteVideoResultMapper.MapFrom(resultModel);
         }
+
         /// <summary>
         /// 指定されたビデオのソースファイルを削除します。
         /// Delete Video Source File
@@ -113,7 +116,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             // ビデオソースファイルを削除する
             return await DeleteVideoSourceFileAsync(location!, accountId!, videoId, accessToken);
         }
-        
+
         /// <summary>
         /// 指定された動画のソースファイルとストリーミングアセットを削除します（インサイトは保持）。
         /// Delete Video Source File
@@ -131,5 +134,93 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await _videosApiAccess.DeleteVideoSourceFileAsync(location, accountId, videoId, accessToken);
         }
 
+        /// <summary>
+        /// 指定されたビデオIDに対するアーティファクト（例: 字幕、顔データ、ラベルなど）のダウンロードURLを取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、ダウンロードURLを返します。
+        /// </summary>
+        /// <param name="videoId">ダウンロードURLを取得したいビデオのID</param>
+        /// <returns>ダウンロード可能な一時的なURL（文字列）。取得できなければnull。</returns>
+        public async Task<string?> GetArtifactDownloadUrlAsync(string videoId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // ビデオアーティファクトのダウンロード URL を取得する
+            return await GetArtifactDownloadUrlAsync(location!, accountId!, videoId, null, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画の指定された種類のアーティファクトのダウンロード URL を取得します。
+        /// Get Video Artifact Download Url
+        /// Artifacts are intermediate outputs of the indexing process.They are essentially raw outputs of the various AI engines that analyze the videos.For this reason, the output formats may change over time.
+        /// We do not recommend that you use data directly from the artifacts folder for production purposes. It is recommended that you use the Get Video Index API for most insights.
+        /// This API returns a URL only with a link to the specific resource type you request. An additional GET request must be made to this URL for the specific artifact.
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast"、"westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウントの GUID</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="artifactType">アーティファクトの種類（例: Transcript, Faces, Labels など）</param>
+        /// <param name="accessToken">アクセストークン（省略可能）</param>
+        /// <returns>ダウンロード可能な一時的な URL（文字列）</returns>
+        public async Task<string?> GetArtifactDownloadUrlAsync(string location, string accountId, string videoId, ArtifactType? artifactType = null, string? accessToken = null)
+        {
+            // ビデオダウンロードURLを取得する
+            string? artifactTypeString = artifactType is null ? null : _artifactTypeMapper.MapToString(artifactType.Value);
+            return await _videosApiAccess.GetArtifactDownloadUrlAsync(location, accountId, videoId, artifactTypeString, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のキャプション（字幕）を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、字幕データを返します。
+        /// </summary>
+        /// <param name="request">字幕取得リクエストモデル（VideoId, IndexId, Format, Language, IncludeAudioEffects, IncludeSpeakers を指定可能）</param>
+        /// <returns>取得された字幕データ（文字列）。失敗時は null。</returns>
+        public async Task<string?> GetVideoCaptionsAsync(GetVideoCaptionsRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // ビデオのキャプションを取得する
+            return await GetVideoCaptionsAsync(location!, accountId!, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画に対して字幕（キャプション）を取得します。
+        /// Get Video Captions
+        /// Get video captions
+        /// </summary>
+        /// <param name="location">Azure リージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象となるビデオ ID</param>
+        /// <param name="request">字幕取得リクエストモデル（IndexId, Format, Language, IncludeAudioEffects, IncludeSpeakers を指定可能）</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>取得された字幕データ（文字列）を返します。失敗時は null。</returns>
+        public async Task<string?> GetVideoCaptionsAsync(string location, string accountId, GetVideoCaptionsRequestModel request, string? accessToken = null)
+        {
+            // nullチェックとプロパティ取得
+            string videoId = request.VideoId;
+            string? indexId = request.IndexId;
+            string? format = request.Format;
+            string? language = request.Language;
+            bool? includeAudioEffects = request.IncludeAudioEffects;
+            bool? includeSpeakers = request.IncludeSpeakers;
+
+            // ビデオのキャプションを取得する
+            return await _videosApiAccess.GetVideoCaptionsAsync(location, accountId, videoId, indexId, format, language, includeAudioEffects, includeSpeakers, accessToken);
+        }
     }
 }

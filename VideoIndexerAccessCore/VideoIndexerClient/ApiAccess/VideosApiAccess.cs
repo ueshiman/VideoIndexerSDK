@@ -250,16 +250,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="includeSpeakers">話者情報を含めるか（true/false）</param>
         /// <param name="accessToken">アクセストークン（省略可能だが、必要な場合あり）</param>
         /// <returns>取得された字幕データ（文字列）を返します。失敗時は null。</returns>
-        public async Task<string?> GetVideoCaptionsAsync(
-            string location,
-            string accountId,
-            string videoId,
-            string? indexId = null,
-            string? format = null,
-            string? language = null,
-            bool? includeAudioEffects = null,
-            bool? includeSpeakers = null,
-            string? accessToken = null)
+        public async Task<string?> GetVideoCaptionsAsync(string location, string accountId, string videoId, string? indexId = null, string? format = null, string? language = null, bool? includeAudioEffects = null, bool? includeSpeakers = null, string? accessToken = null)
         {
             try
             {
