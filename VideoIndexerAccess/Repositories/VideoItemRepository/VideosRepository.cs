@@ -35,8 +35,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IDeleteVideoResultMapper _deleteVideoResultMapper;
         private readonly IArtifactTypeMapper _artifactTypeMapper;
         private readonly IStreamingUrlMapper _streamingUrlMapper;
+        private readonly IVideoThumbnailFormatTypeMapper _videoThumbnailFormatTypeMapper;
 
-        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper, IStreamingUrlMapper streamingUrlMapper)
+        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper, IStreamingUrlMapper streamingUrlMapper, IVideoThumbnailFormatTypeMapper videoThumbnailFormatTypeMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -48,6 +49,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _deleteVideoResultMapper = deleteVideoResultMapper;
             _artifactTypeMapper = artifactTypeMapper;
             _streamingUrlMapper = streamingUrlMapper;
+            _videoThumbnailFormatTypeMapper = videoThumbnailFormatTypeMapper;
         }
 
         /// <summary>
@@ -374,6 +376,49 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             // ビデオのストリーミングURLを取得する
             ApiStreamingUrlModel? result = await _videosApiAccess.GetVideoStreamingUrlAsync(location, accountId, request.VideoId, request.UseProxy, request.UrlFormat, request.TokenLifetimeInMinutes, accessToken);
             return result is null ? null : _streamingUrlMapper.MapFrom(result);
+        }
+
+        /// <summary>
+        /// 指定された動画のサムネイル画像を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、サムネイル画像のバイト配列を返します。
+        /// </summary>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="thumbnailId">取得したいサムネイルの ID（GUID）</param>
+        /// <param name="format">返却されるサムネイルの形式（"Jpeg" または "Base64"）※省略時はデフォルト形式</param>
+        /// <returns>サムネイル画像のバイナリ配列（JPEG）または PNG 。取得に失敗した場合は null。</returns>
+        public async Task<byte[]?> GetVideoThumbnailAsync(string videoId, string thumbnailId, VideoThumbnailFormatType? format = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 指定された動画のサムネイル画像を取得する
+            return await GetVideoThumbnailAsync(location!, accountId!, videoId, thumbnailId, format, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のサムネイル画像を取得します。
+        /// Get Video Thumbnail
+        /// Content-Type：おそらく image/jpeg
+        /// </summary>
+        /// <param name="location">Azure のリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video Indexer アカウント ID（GUID）</param>
+        /// <param name="videoId">対象のビデオ ID</param>
+        /// <param name="thumbnailId">取得したいサムネイルの ID（GUID）</param>
+        /// <param name="format">返却されるサムネイルの形式（"Jpeg" または "Base64"）※省略時はデフォルト形式</param>
+        /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
+        /// <returns>サムネイル画像のバイナリ配列（JPEG）または PNG 。取得に失敗した場合は null。</returns>
+        public async Task<byte[]?> GetVideoThumbnailAsync(string location, string accountId, string videoId, string thumbnailId, VideoThumbnailFormatType? format = null, string? accessToken = null)
+        {
+            string? typedFormat = format is null ? null : _videoThumbnailFormatTypeMapper.MapToString(format!.Value);
+            // ビデオのサムネイルを取得する
+            return await _videosApiAccess.GetVideoThumbnailAsync(location, accountId, videoId, thumbnailId, typedFormat, accessToken);
         }
     }
 }

@@ -523,14 +523,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="tokenLifetimeInMinutes">トークン有効期限（分）</param>
         /// <param name="accessToken">アクセストークン（任意）</param>
         /// <returns>ストリーミング URL 情報の JSON テキスト。失敗時は null。</returns>
-        public async Task<string?> FetchStreamingUrlJsonAsync(
-            string location,
-            string accountId,
-            string videoId,
-            bool? useProxy,
-            string? urlFormat,
-            int? tokenLifetimeInMinutes,
-            string? accessToken)
+        public async Task<string?> FetchStreamingUrlJsonAsync(string location, string accountId, string videoId, bool? useProxy, string? urlFormat, int? tokenLifetimeInMinutes, string? accessToken)
         {
             var url = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Videos/{videoId}/streaming-url";
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
@@ -598,13 +591,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="format">返却されるサムネイルの形式（"Jpeg" または "Base64"）※省略時はデフォルト形式</param>
         /// <param name="accessToken">アクセストークン（省略可能／必要に応じて）</param>
         /// <returns>サムネイル画像のバイナリ配列（JPEG）または Base64 文字列。取得に失敗した場合は null。</returns>
-        public async Task<byte[]?> GetVideoThumbnailAsync(
-            string location,
-            string accountId,
-            string videoId,
-            string thumbnailId,
-            string? format = null,
-            string? accessToken = null)
+        public async Task<byte[]?> GetVideoThumbnailAsync(string location, string accountId, string videoId, string thumbnailId, string? format = null, string? accessToken = null)
         {
             try
             {
@@ -666,15 +653,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <returns>
         /// <see cref="VideoSearchResult"/> オブジェクト。成功時は動画の一覧情報を含みます。失敗時は null を返します。
         /// </returns>
-        public async Task<ApiVideoSearchResultModel?> ListVideosAsync(
-            string location,
-            string accountId,
-            string? createdAfter = null,
-            string? createdBefore = null,
-            int? pageSize = null,
-            int? skip = null,
-            string[]? partitions = null,
-            string? accessToken = null)
+        public async Task<ApiVideoSearchResultModel?> ListVideosAsync(string location, string accountId, string? createdAfter = null, string? createdBefore = null, int? pageSize = null, int? skip = null, string[]? partitions = null, string? accessToken = null)
         {
             var url = BuildListVideosUrl(location, accountId, createdAfter, createdBefore, pageSize, skip, partitions, accessToken);
             var json = await FetchVideoListJsonAsync(url);
