@@ -36,8 +36,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
         // マッパーインターフェース
         private readonly IVideoInsightsWidgetResponseMapper _insightsWidgetResponseMapper;
+        private readonly IVideoPlayerWidgetResponseMapper _videoPlayerWidgetResponseMapper;
 
-        public WidgetRepository(ILogger<WidgetRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IWidgetsApiAccess widgetsApiAccess, IVideoInsightsWidgetResponseMapper insightsWidgetResponseMapper)
+        public WidgetRepository(ILogger<WidgetRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IWidgetsApiAccess widgetsApiAccess, IVideoInsightsWidgetResponseMapper insightsWidgetResponseMapper, IVideoPlayerWidgetResponseMapper videoPlayerWidgetResponseMapper)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -46,6 +47,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _apiResourceConfigurations = apiResourceConfigurations;
             _widgetsApiAccess = widgetsApiAccess;
             _insightsWidgetResponseMapper = insightsWidgetResponseMapper;
+            _videoPlayerWidgetResponseMapper = videoPlayerWidgetResponseMapper;
         }
 
 
@@ -169,7 +171,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// </summary>
         /// <param name="videoId">対象のビデオID</param>
         /// <returns>Player Widget URLを格納した <see cref="ApiVideoPlayerWidgetResponseModel"/>。失敗時は null</returns>
-        public async Task<ApiVideoPlayerWidgetResponseModel?> GetVideoPlayerWidgetAsync(string videoId)
+        public async Task<VideoPlayerWidgetResponseModel?> GetVideoPlayerWidgetAsync(string videoId)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -196,9 +198,10 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="videoId">対象のビデオID</param>
         /// <param name="accessToken">（任意）アクセストークン。プライベートビデオなどに必要</param>
         /// <returns>Player Widget URLを格納した <see cref="ApiVideoPlayerWidgetResponseModel"/>。失敗時は null</returns>
-        public async Task<ApiVideoPlayerWidgetResponseModel?> GetVideoPlayerWidgetAsync(string location, string accountId, string videoId, string? accessToken = null)
+        public async Task<VideoPlayerWidgetResponseModel?> GetVideoPlayerWidgetAsync(string location, string accountId, string videoId, string? accessToken = null)
         {
-            return await _widgetsApiAccess.GetVideoPlayerWidgetAsync(location, accountId, videoId, accessToken);
+            ApiVideoPlayerWidgetResponseModel? responseModel = await _widgetsApiAccess.GetVideoPlayerWidgetAsync(location, accountId, videoId, accessToken);
+            return responseModel is null ? null : _videoPlayerWidgetResponseMapper.MapFrom(responseModel);
         }
     }
 }
