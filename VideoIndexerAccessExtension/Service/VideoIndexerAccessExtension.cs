@@ -34,16 +34,31 @@ public static class VideoIndexerAccessExtension
 
     public static IServiceCollection AddVideoIndexerDataModelMapper(this IServiceCollection services)
     {
+        services.TryAddTransient<IAccountMigrationStatusMapper, AccountMigrationStatusMapper>();
+        services.TryAddTransient<IAccountSlimMapper, AccountSlimMapper>();
         services.TryAddTransient<IAppearanceMapper, AppearanceMapper>();
         services.TryAddTransient<IAudioEffectsMapper, AudioEffectsMapper>();
+        services.TryAddTransient<IBlockMapper, BlockMapper>();
         services.TryAddTransient<IBrandMapper, BrandMapper>();
+        services.TryAddTransient<IBrandModelMapper, BrandModelMapper>();
+        services.TryAddTransient<IBrandModelSettingsMapper, BrandModelSettingsMapper>();
+        services.TryAddTransient<IBrandsMapper, BrandsMapper>();
+        services.TryAddTransient<ICustomLanguageMapper, CustomLanguageMapper>();
+        services.TryAddTransient<ICustomLanguageModelTrainingDataFileMapper, ICustomLanguageModelTrainingDataFileMapper>();
+        services.TryAddTransient<ICustomLanguageRequestMapper, CustomLanguageRequestMapper>();
+        services.TryAddTransient<IDeleteVideoResultMapper, DeleteVideoResultMapper>();
         services.TryAddTransient<IDurationMapper, DurationMapper>();
         services.TryAddTransient<IEmotionsMapper, EmotionsMapper>();
+        services.TryAddTransient<IErrorResponseMapper, ErrorResponseMapper>();
+        services.TryAddTransient<IFaceFilterMapper, FaceFilterMapper>();
         services.TryAddTransient<IFaceMapper, FaceMapper>();
+        services.TryAddTransient<IFaceRedactionMapper, FaceRedactionMapper>();
         services.TryAddTransient<IFramePatternsMapper, FramePatternsMapper>();
         services.TryAddTransient<IInsightsMapper, InsightsMapper>();
         services.TryAddTransient<IInstanceMapper, InstanceMapper>();
         services.TryAddTransient<IItemVideoMapper, ItemVideoMapper>();
+        services.TryAddTransient<IJobStatusResponseMapper, JobStatusResponseMapper>();
+        services.TryAddTransient<IKeyFrameMapper, KeyFrameMapper>();
         services.TryAddTransient<IKeyWordMapper, KeyWordMapper>();
         services.TryAddTransient<ILabelMapper, LabelMapper>();
         services.TryAddTransient<INamedLocationMapper, NamedLocationMapper>();
@@ -83,8 +98,6 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
         services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
         services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
-        services.TryAddTransient<IClassicLanguageCustomizationApiAccess, ClassicLanguageCustomizationApiAccess>();
-        services.TryAddTransient<IAccountMigrationStatusMapper, AccountMigrationStatusMapper>();
 
         return services;
     }

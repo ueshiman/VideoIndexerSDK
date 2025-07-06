@@ -30,6 +30,7 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<ISecureLogMessageBuilder, SecureLogMessageBuilder>();
             services.TryAddTransient<IAccounApitAccess, AccountApiAccess>();
             services.TryAddTransient<IBrandsApiAccess, BrandsApiAccess>();
+            services.TryAddTransient<IClassicLanguageCustomizationApiAccess, ClassicLanguageCustomizationApiAccess>();
             services.TryAddTransient<IProjectMigrationApiAccess, ProjectMigrationApiAccess>();
             services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
             services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
