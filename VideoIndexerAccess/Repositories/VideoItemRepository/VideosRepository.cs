@@ -633,6 +633,5 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             return await _videosApiAccess.UpdateVideoTranscriptAsync(location, accountId, request.VideoId, request.VttContent, request.Language, request.SetAsSourceLanguage, request.CallbackUrl, request.SendSuccessEmail, accessToken);
         }
-
-}
+    }
 }
