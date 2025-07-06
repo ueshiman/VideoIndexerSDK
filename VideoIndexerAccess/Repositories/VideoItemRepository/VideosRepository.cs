@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.Extensions.Logging;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
@@ -598,6 +599,40 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             return await _videoListApiAccess.SearchVideosAsync(location, accountId, request.SourceLanguage, request.HasSourceVideoFile, request.SourceVideoId, request.State, request.Privacy, request.Id, request.Partition, request.ExternalId, request.Owner, request.Face, request.AnimatedCharacter, request.Query, request.TextScope, request.Language, request.CreatedAfter, request.CreatedBefore, pageSize, skip, accessToken);
         }
 
+        /// <summary>
+        /// 指定された動画のトランスクリプト（VTT形式）をアップロードし、再インデックスを実行します。
+        /// アカウント情報とアクセストークンを自動的に取得し、アップロード・再インデックスを行います。
+        /// </summary>
+        /// <param name="request">トランスクリプト更新リクエストモデル（VideoId, VttContent, Language, SetAsSourceLanguage, CallbackUrl, SendSuccessEmail を指定可能）</param>
+        /// <returns>成功時は true、失敗時は false を返します。</returns>
+        public async Task<bool> UpdateVideoTranscriptAsync(UpdateVideoTranscriptRequestModel request)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
 
-    }
+            // 指定された動画のトランスクリプト（VTT形式）をアップロードし、再インデックスを実行する
+            return await UpdateVideoTranscriptAsync(location!, accountId!, request, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された動画のトランスクリプト（VTT形式）をアップロードし、再インデックスを実行します。
+        /// </summary>
+        /// <param name="location">APIの地域（例: "japaneast"）</param>
+        /// <param name="accountId">Video IndexerアカウントのGUID</param>
+        /// <param name="request">トランスクリプト更新リクエストモデル（VideoId, VttContent, Language, SetAsSourceLanguage, CallbackUrl, SendSuccessEmail を指定可能）</param>
+        /// <param name="accessToken">アクセストークン（Contributor 権限、オプション）</param>
+        /// <returns>成功時は true、失敗時は false を返します。</returns>
+        public async Task<bool> UpdateVideoTranscriptAsync(string location, string accountId, UpdateVideoTranscriptRequestModel request, string? accessToken = null)
+        {
+            return await _videosApiAccess.UpdateVideoTranscriptAsync(location, accountId, request.VideoId, request.VttContent, request.Language, request.SetAsSourceLanguage, request.CallbackUrl, request.SendSuccessEmail, accessToken);
+        }
+
+}
 }
