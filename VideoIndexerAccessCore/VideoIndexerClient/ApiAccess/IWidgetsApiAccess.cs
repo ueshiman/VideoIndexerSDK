@@ -17,6 +17,19 @@ public interface IWidgetsApiAccess
     Task<ApiVideoInsightsWidgetResponseModel?> GetVideoInsightsWidgetAsync(string location, string accountId, string videoId, string? widgetType = null, bool? allowEdit = null, string? accessToken = null);
 
     /// <summary>
+    /// Insights Widget のURLを取得します。
+    /// Video Indexer API から Insights Widget のリダイレクトURLを取得し返却します。
+    /// </summary>
+    /// <param name="location">API呼び出し先のリージョン（例：trial）</param>
+    /// <param name="accountId">Video Indexer アカウントの GUID</param>
+    /// <param name="videoId">インサイトを取得する対象のビデオID</param>
+    /// <param name="widgetType">（任意）表示するウィジェットの種類（People / Sentiments / Keywords / Search）</param>
+    /// <param name="allowEdit">（任意）ウィジェットが編集可能かどうか</param>
+    /// <param name="accessToken">（任意）アクセストークン。編集やプライベートビデオの場合に必要</param>
+    /// <returns>リダイレクトされた Insights Widget のURL。失敗時は null</returns>
+    Task<string?> GetVideoInsightsWidgetUrl(string location, string accountId, string videoId, string? widgetType, bool? allowEdit, string? accessToken);
+
+    /// <summary>
     /// Insights Widget API にアクセスし JSON レスポンスを取得します。
     /// </summary>
     /// <param name="location">API呼び出し先のリージョン（例：trial）</param>
@@ -34,6 +47,18 @@ public interface IWidgetsApiAccess
     /// <param name="json">APIから取得したJSON文字列</param>
     /// <returns>デシリアライズされた <see cref="ApiVideoInsightsWidgetResponseModel"/> オブジェクト。失敗時は null</returns>
     ApiVideoInsightsWidgetResponseModel? ParseVideoInsightsJson(string json);
+
+    /// <summary>
+    /// Video Player Widget のリダイレクトURLを取得します。
+    /// Video Indexer API から Player Widget のリダイレクトURLを取得し返却します。
+    /// </summary>
+    /// <param name="location">API呼び出し先のリージョン（例：trial）</param>
+    /// <param name="accountId">Video Indexer アカウントの GUID</param>
+    /// <param name="videoId">対象のビデオID</param>
+    /// <param name="accessToken">（任意）アクセストークン。プライベートビデオなどに必要</param>
+    /// <returns>リダイレクトされた Player Widget のURL。失敗時は null</returns>
+    Task<string?> GetVideoPlayerWidgetUrl(string location, string accountId, string videoId, string? accessToken = null);
+
 
     /// <summary>
     /// 外部公開用メソッド。Video Player Widget の情報を取得します。
