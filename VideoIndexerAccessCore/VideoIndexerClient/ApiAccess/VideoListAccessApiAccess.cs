@@ -158,11 +158,22 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
+        /// <summary>
+        /// 非同期でビデオリストを取得し、パースして返す（フィルタ付き）
+        /// </summary>
+        /// <param name="location">Azureリージョン</param>
+        /// <param name="accountId">アカウントID</param>
+        /// <param name="accessToken">アクセストークン</param>
+        /// <param name="createdAfter">作成日（以降）</param>
+        /// <param name="createdBefore">作成日（以前）</param>
+        /// <param name="pageSize">ページサイズ</param>
+        /// <param name="skip">スキップ数</param>
+        /// <param name="partitions">パーティション</param>
+        /// <returns>ビデオリストのコレクション</returns>
         public async Task<IEnumerable<ApiVideoListItemModel>> ListVideosAsync(string location, string accountId, string? accessToken = null, string? createdAfter = null, string? createdBefore = null, int? pageSize = null, int? skip = null, string[]? partitions = null)
         {
             var videoListJson = await ListVideosAsyncJson(location, accountId, accessToken: accessToken, createdAfter: createdAfter, createdBefore: createdBefore, pageSize: pageSize, skip: skip, partitions: partitions);
             return _videoListParser.ParseVideoList(videoListJson);
         }
-
     }
 }
