@@ -9,7 +9,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class VideosRepository
+    public class VideosRepository : IVideosRepository
     {
         // ロガーインスタンス
         private readonly ILogger<VideosRepository> _logger;
@@ -633,6 +633,5 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             return await _videosApiAccess.UpdateVideoTranscriptAsync(location, accountId, request.VideoId, request.VttContent, request.Language, request.SetAsSourceLanguage, request.CallbackUrl, request.SendSuccessEmail, accessToken);
         }
-
-}
+    }
 }
