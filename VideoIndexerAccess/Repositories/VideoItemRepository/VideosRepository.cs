@@ -28,7 +28,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         // API設定
         private readonly IVideosApiAccess _videosApiAccess;
         private readonly IVideoDownloadApiAccess _videoDownloadApiAccess;
-
+        private readonly IVideoListApiAccess _videoListApiAccess;
         private const string ParamName = "videos";
 
         // マッパーインターフェース
@@ -36,8 +36,9 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         private readonly IArtifactTypeMapper _artifactTypeMapper;
         private readonly IStreamingUrlMapper _streamingUrlMapper;
         private readonly IVideoThumbnailFormatTypeMapper _videoThumbnailFormatTypeMapper;
+        private readonly IVideoSearchResultMapper _videoSearchResultMapper;
 
-        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper, IStreamingUrlMapper streamingUrlMapper, IVideoThumbnailFormatTypeMapper videoThumbnailFormatTypeMapper)
+        public VideosRepository(ILogger<VideosRepository> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideosApiAccess videosApiAccess, IVideoDownloadApiAccess videoDownloadApiAccess, IDeleteVideoResultMapper deleteVideoResultMapper, IArtifactTypeMapper artifactTypeMapper, IStreamingUrlMapper streamingUrlMapper, IVideoThumbnailFormatTypeMapper videoThumbnailFormatTypeMapper, IVideoSearchResultMapper videoSearchResultMapper, IVideoListApiAccess videoListApiAccess)
         {
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
@@ -50,6 +51,8 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             _artifactTypeMapper = artifactTypeMapper;
             _streamingUrlMapper = streamingUrlMapper;
             _videoThumbnailFormatTypeMapper = videoThumbnailFormatTypeMapper;
+            _videoSearchResultMapper = videoSearchResultMapper;
+            _videoListApiAccess = videoListApiAccess;
         }
 
         /// <summary>
@@ -420,5 +423,181 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             // ビデオのサムネイルを取得する
             return await _videosApiAccess.GetVideoThumbnailAsync(location, accountId, videoId, thumbnailId, typedFormat, accessToken);
         }
+        
+        /// <summary>
+        /// 指定された Video Indexer アカウント内の動画一覧を取得します。
+        /// アカウント情報とアクセストークンを自動的に取得し、動画一覧を返します。
+        /// </summary>
+        /// <param name="createdAfter">指定日以降に作成された動画にフィルタリング（RFC3339形式、オプション）</param>
+        /// <param name="createdBefore">指定日以前に作成された動画にフィルタリング（RFC3339形式、オプション）</param>
+        /// <param name="pageSize">1ページあたりの取得件数（オプション）</param>
+        /// <param name="skip">先頭からスキップする動画数（オプション）</param>
+        /// <param name="partitions">パーティションに基づいて動画をフィルタ（オプション）</param>
+        /// <returns>
+        /// <see cref="VideoSearchResultModel"/> オブジェクト。成功時は動画の一覧情報を含みます。失敗時は null を返します。
+        /// </returns>
+        public async Task<VideoSearchResultModel?> ListVideosAsync(string? createdAfter = null, string? createdBefore = null, int? pageSize = null, int? skip = null, string[]? partitions = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            return await ListVideosAsync(location!, accountId!, createdAfter, createdBefore, pageSize, skip, partitions, accessToken);
+        }
+
+        /// <summary>
+        /// 指定された Video Indexer アカウント内の動画一覧を取得します。
+        /// List Videos
+        /// Search videos and projects in the specified account
+        /// </summary>
+        /// <param name="location">Azureリージョン。例: "japaneast"</param>
+        /// <param name="accountId">Video IndexerアカウントのGUID</param>
+        /// <param name="createdAfter">指定日以降に作成された動画にフィルタリング（RFC3339形式）</param>
+        /// <param name="createdBefore">指定日以前に作成された動画にフィルタリング（RFC3339形式）</param>
+        /// <param name="pageSize">1ページあたりの取得件数</param>
+        /// <param name="skip">先頭からスキップする動画数</param>
+        /// <param name="partitions">パーティションに基づいて動画をフィルタ</param>
+        /// <param name="accessToken">APIアクセス用のアクセストークン</param>
+        /// <returns>
+        /// <see cref="VideoSearchResultModel"/> オブジェクト。成功時は動画の一覧情報を含みます。失敗時は null を返します。
+        /// </returns>
+        public async Task<VideoSearchResultModel?> ListVideosAsync(string location, string accountId, string? createdAfter = null, string? createdBefore = null, int? pageSize = null, int? skip = null, string[]? partitions = null, string? accessToken = null)
+        {
+            ApiVideoSearchResultModel? resultModel = await _videosApiAccess.ListVideosAsync(location, accountId, createdAfter, createdBefore, pageSize, skip, partitions, accessToken);
+            return resultModel is null ? null : _videoSearchResultMapper.MapFrom(resultModel);
+        }
+
+        /// <summary>
+        /// 指定された条件で動画を検索します。
+        /// アカウント情報とアクセストークンを自動的に取得し、検索結果のJSON文字列を返します。
+        /// </summary>
+        /// <param name="request">
+        /// 検索条件を指定する <see cref="SearchVideosResponseModel"/> オブジェクト。
+        /// 各プロパティの意味は <see cref="SearchVideosAsync(string, string, SearchVideosResponseModel, int?, int?, string?)"/> を参照。
+        /// </param>
+        /// <param name="pageSize">1ページあたりの取得件数（省略可能）</param>
+        /// <param name="skip">スキップする動画数（省略可能）</param>
+        /// <returns>検索結果のJSON文字列</returns>
+        public async Task<string> SearchVideosAsync(SearchVideosResponseModel request, int? pageSize = null, int? skip = null)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+            // 指定された条件で動画を検索する
+            return await SearchVideosAsync(location!, accountId!, request, pageSize, skip, accessToken);
+        }
+
+
+        /// <summary>
+        /// 指定された条件で動画を検索します。
+        /// </summary>
+        /// <param name="location">Azureリージョン名（例: "japaneast", "westus" など）</param>
+        /// <param name="accountId">Video IndexerアカウントID（GUID）</param>
+        /// <param name="request">
+        /// 検索条件を指定する <see cref="SearchVideosResponseModel"/> オブジェクト。各プロパティの意味は以下の通り:
+        /// - SourceLanguage: ソース言語が一致する動画・プロジェクトのみを含めます（例: ja-JP, en-US など）
+        ///     ar-AE: アラビア語（アラブ首長国連邦）  
+        ///     ar-BH: アラビア語（バーレーン）  
+        ///     ar-EG: アラビア語（エジプト）  
+        ///     ar-IL: アラビア語（イスラエル）  
+        ///     ar-IQ: アラビア語（イラク）  
+        ///     ar-JO: アラビア語（ヨルダン）  
+        ///     ar-KW: アラビア語（クウェート）  
+        ///     ar-LB: アラビア語（レバノン）  
+        ///     ar-OM: アラビア語（オマーン）  
+        ///     ar-PS: アラビア語（パレスチナ）  
+        ///     ar-QA: アラビア語（カタール）  
+        ///     ar-SA: アラビア語（サウジアラビア）  
+        ///     ar-SY: アラビア語（シリア）  
+        ///     bg-BG: ブルガリア語  
+        ///     ca-ES: カタルーニャ語  
+        ///     cs-CZ: チェコ語  
+        ///     da-DK: デンマーク語  
+        ///     de-DE: ドイツ語  
+        ///     el-GR: ギリシャ語  
+        ///     en-AU: 英語（オーストラリア）  
+        ///     en-GB: 英語（イギリス）  
+        ///     en-US: 英語（アメリカ）  
+        ///     es-ES: スペイン語（スペイン）  
+        ///     es-MX: スペイン語（メキシコ）  
+        ///     et-EE: エストニア語  
+        ///     fa-IR: ペルシャ語  
+        ///     fi-FI: フィンランド語  
+        ///     fil-PH: フィリピン語  
+        ///     fr-CA: フランス語（カナダ）  
+        ///     fr-FR: フランス語  
+        ///     ga-IE: アイルランド語  
+        ///     gu-IN: グジャラート語  
+        ///     he-IL: ヘブライ語  
+        ///     hi-IN: ヒンディー語  
+        ///     hr-HR: クロアチア語  
+        ///     hu-HU: ハンガリー語  
+        ///     hy-AM: アルメニア語  
+        ///     id-ID: インドネシア語  
+        ///     is-IS: アイスランド語  
+        ///     it-IT: イタリア語  
+        ///     ja-JP: 日本語  
+        ///     kn-IN: カンナダ語  
+        ///     ko-KR: 韓国語  
+        ///     lt-LT: リトアニア語  
+        ///     lv-LV: ラトビア語  
+        ///     ml-IN: マラヤーラム語  
+        ///     ms-MY: マレー語  
+        ///     nb-NO: ノルウェー語  
+        ///     nl-NL: オランダ語  
+        ///     pl-PL: ポーランド語  
+        ///     pt-BR: ポルトガル語（ブラジル）  
+        ///     pt-PT: ポルトガル語（ポルトガル）  
+        ///     ro-RO: ルーマニア語  
+        ///     ru-RU: ロシア語  
+        ///     sk-SK: スロバキア語  
+        ///     sl-SI: スロベニア語  
+        ///     sv-SE: スウェーデン語  
+        ///     ta-IN: タミル語  
+        ///     te-IN: テルグ語  
+        ///     th-TH: タイ語  
+        ///     tr-TR: トルコ語  
+        ///     uk-UA: ウクライナ語  
+        ///     vi-VN: ベトナム語  
+        ///     zh-Hans: 中国語（簡体字）  
+        ///     zh-HK: 中国語（広東語、繁体字）  
+        /// - HasSourceVideoFile: trueの場合はソース動画ファイルを持つ動画のみ、falseの場合はプロジェクトやソースのない動画も含む
+        /// - SourceVideoId: 指定された動画IDに一致する動画、またはその動画を含むプロジェクトのみ
+        /// - State: 処理状態でフィルター（Uploaded, Processing, Processed, Failed）
+        /// - Privacy: プライバシーレベルでフィルター（Private, Public）
+        /// - Id: 検索対象とする動画ID
+        /// - Partition: 検索対象とするパーティション
+        /// - ExternalId: アップロード時に紐付けた外部IDで検索
+        /// - Owner: 動画の所有者で検索
+        /// - Face: 検出された顔に基づいて検索
+        /// - AnimatedCharacter: 検出されたアニメキャラクターに基づいて検索
+        /// - Query: フリーテキストで動画を検索（例: "north america" など）
+        /// - TextScope: テキスト検索のスコープ（Transcript, Topics, Ocr, など）
+        /// - Language: 検索対象の言語（複数指定可）
+        /// - CreatedAfter: 指定日以降に作成されたアイテム（RFC3339形式）
+        /// - CreatedBefore: 指定日以前に作成されたアイテム（RFC3339形式）
+        /// </param>       /// <param name="pageSize">1ページあたりの取得件数（省略可能）</param>
+        /// <param name="skip">スキップする動画数（省略可能）</param>
+        /// <param name="accessToken">APIアクセス用のアクセストークン（省略可能）</param>
+        /// <returns>検索結果のJSON文字列</returns>
+        public async Task<string> SearchVideosAsync(string location, string accountId, SearchVideosResponseModel request, int? pageSize = null, int? skip = null, string? accessToken = null)
+        {
+            return await _videoListApiAccess.SearchVideosAsync(location, accountId, request.SourceLanguage, request.HasSourceVideoFile, request.SourceVideoId, request.State, request.Privacy, request.Id, request.Partition, request.ExternalId, request.Owner, request.Face, request.AnimatedCharacter, request.Query, request.TextScope, request.Language, request.CreatedAfter, request.CreatedBefore, pageSize, skip, accessToken);
+        }
+
+
     }
 }
