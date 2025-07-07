@@ -1,8 +1,8 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using Azure.Core;
+﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 using VideoIndexerAccessCore.VideoIndexerClient.HttpAccess;
 

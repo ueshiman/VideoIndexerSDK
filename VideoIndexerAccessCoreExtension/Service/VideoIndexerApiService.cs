@@ -28,22 +28,17 @@ namespace VideoIndexerAccessCoreExtension.Service
         public static IServiceCollection AddVideoIndexerApi(this IServiceCollection services)
         {
             services.TryAddTransient<ISecureLogMessageBuilder, SecureLogMessageBuilder>();
+
             services.TryAddTransient<IAccounApitAccess, AccountApiAccess>();
+            services.TryAddTransient<IAccountMigrationStatusApiAccess, AccountMigrationStatusApiAccess>();
             services.TryAddTransient<IBrandsApiAccess, BrandsApiAccess>();
             services.TryAddTransient<IClassicLanguageCustomizationApiAccess, ClassicLanguageCustomizationApiAccess>();
-            services.TryAddTransient<IProjectMigrationApiAccess, ProjectMigrationApiAccess>();
-            services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
-            services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
-            services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
-            services.TryAddTransient<IVideoItemParser, VideoItemParser>();
-            services.TryAddTransient<IVideoListParser, VideoListParser>();
-            services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
-            services.TryAddTransient<IVideoMigrationApiAccess, VideoMigrationApiAccess>();
             services.TryAddTransient<ICustomLogosApiAccess, CustomLogosApiAccess>();
             services.TryAddTransient<IIndexingApiAccess, IndexingApiAccess>();
             services.TryAddTransient<IJobsApiAccess, JobsApiAccess>();
             services.TryAddTransient<ILanguagesApiAccess, LanguagesApiAccess>();
             services.TryAddTransient<IPersonModelsApiAccess, PersonModelsApiAccess>();
+            services.TryAddTransient<IProjectMigrationApiAccess, ProjectMigrationApiAccess>();
             services.TryAddTransient<IProjectsApiAccess, ProjectsApiAccess>();
             services.TryAddTransient<IPromptContentApiAccess, PromptContentApiAccess>();
             services.TryAddTransient<IRedactionApiAccess, RedactionApiAccess>();
@@ -51,8 +46,16 @@ namespace VideoIndexerAccessCoreExtension.Service
             services.TryAddTransient<ITextualSummarizationApiAccess, TextualSummarizationApiAccess>();
             services.TryAddTransient<ITrialAccountAccessTokensApiAccess, TrialAccountAccessTokensApiAccess>();
             services.TryAddTransient<ITrialAccountsApiAccess, TrialAccountsApiAccess>();
+            services.TryAddTransient<IVideoArtifactApiAccess, VideoArtifactApiAccess>();
+            services.TryAddTransient<IVideoDownloadApiAccess, VideoDownloadApiAccess>();
+            services.TryAddTransient<IVideoIndexApiAccess, VideoIndexApiAccess>();
+            services.TryAddTransient<IVideoListApiAccess, VideoListAccessApiAccess>();
+            services.TryAddTransient<IVideoMigrationApiAccess, VideoMigrationApiAccess>();
             services.TryAddTransient<IVideosApiAccess, VideosApiAccess>();
             services.TryAddTransient<IWidgetsApiAccess, WidgetsApiAccess>();
+            
+            services.TryAddTransient<IVideoListParser, VideoListParser>();
+            services.TryAddTransient<IVideoItemParser, VideoItemParser>();
             
             return services;
         }
