@@ -1,9 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
@@ -13,7 +8,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class WidgetRepository
+    public class WidgetRepository : IWidgetRepository
     {
         // ロガーインスタンス
         private readonly ILogger<WidgetRepository> _logger;
