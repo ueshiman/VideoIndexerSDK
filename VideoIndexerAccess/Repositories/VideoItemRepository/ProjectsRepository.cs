@@ -8,7 +8,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class ProjectsRepository
+    public class ProjectsRepository : IProjectsRepository
     {
         // ロガーインスタンス
         private readonly ILogger<ProjectsRepository> _logger;
