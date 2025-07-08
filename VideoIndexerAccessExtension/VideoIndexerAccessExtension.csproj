@@ -25,23 +25,23 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\VideoIndexerAccessCore\VideoIndexerAccessCore.csproj" />
-    <ProjectReference Include="..\VideoIndexerAccess\VideoIndexerAccess.csproj" />
+    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.5" />
+    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.5" />
   </ItemGroup>
 
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.4</Version>
+	<Version>1.0.1-alpha05.5</Version>
 	<!-- 新しいバージョン番号 -->
 	<!-- NuGet メタデータ -->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageProjectUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</PackageProjectUrl>
-	<RepositoryUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccessExtension</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccessExtension</RepositoryUrl>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<Copyright>Copyright (c) 2025 Ueshiman</Copyright>
+	<Authors>Ueshiman</Authors>
+	<Company>LLC Beans</Company>
+	<RepositoryType>git</RepositoryType>
 	<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 

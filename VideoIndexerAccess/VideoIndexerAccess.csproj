@@ -20,14 +20,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.AutoActivation" Version="9.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\VideoIndexerAccessCoreExtension\VideoIndexerAccessCoreExtension.csproj" />
+    <PackageReference Include="VideoIndexerAccessCore" Version="1.0.1-alpha05.5" />
   </ItemGroup>
 	
   <PropertyGroup>
-	<Version>1.0.1-alpha05.4</Version>
+	<Version>1.0.1-alpha05.5</Version>
 	<PackageReleaseNotes>Azure AI Video アクセス SDK </PackageReleaseNotes>
 	<PackageIcon>AirTurn02-240x240.jpg</PackageIcon>
 	<SignAssembly>False</SignAssembly>
@@ -36,10 +33,12 @@
 	<Company>LLC Beans</Company><!-- 新しいバージョン番号 -->
 	<!-- NuGet メタデータ -->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageProjectUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</PackageProjectUrl>
-	<RepositoryUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccess</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccess</RepositoryUrl>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<Copyright>Copyright (c) 2025 Ueshiman</Copyright>
+	<RepositoryType>git</RepositoryType>
+	<Authors>Ueshiman</Authors>
 	<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 

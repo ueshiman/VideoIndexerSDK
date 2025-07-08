@@ -32,14 +32,17 @@
   </ItemGroup>
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.2</Version>
+	<Version>1.0.1-alpha05.5</Version>
 	<IncludeSymbols>True</IncludeSymbols><!-- 新しいバージョン番号 -->
 	  <!-- NuGet メタデータ -->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <PackageProjectUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</PackageProjectUrl>
-	  <RepositoryUrl>https://fairuse@dev.azure.com/fairuse/AzureVideoIndexer/_git/videoIndexerPocMark</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccessCore</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccessCore</RepositoryUrl>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	  <Copyright>Copyright (c) 2025 Ueshiman</Copyright>
+	  <RepositoryType>git</RepositoryType>
+	  <Authors>Ueshiman</Authors>
+	  <Company>LLP Honjo open source</Company>
 	  <!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 
