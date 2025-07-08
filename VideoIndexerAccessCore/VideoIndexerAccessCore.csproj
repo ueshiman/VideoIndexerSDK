@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="C:\Users\taten\OneDrive\画像\AirTurn02-240x240.jpg">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -43,6 +47,7 @@
 	  <RepositoryType>git</RepositoryType>
 	  <Authors>Ueshiman</Authors>
 	  <Company>LLP Honjo open source</Company>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 
