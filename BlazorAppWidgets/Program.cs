@@ -1,3 +1,4 @@
+using AspireApp1.ServiceDefaults;
 using BlazorAppWidgets.Components;
 
 var builder = WebApplication.CreateBuilder(args);
