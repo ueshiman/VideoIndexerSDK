@@ -25,12 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
-    <PackageReference Include="VideoIndexerAccessCore" Version="1.0.1-alpha05.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.73.1" />
+    <PackageReference Include="VideoIndexerAccessCore" Version="1.0.1-alpha05.6" />
   </ItemGroup>
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.5</Version><!-- 新しいバージョン番号 -->
+	<Version>1.0.1-alpha05.6</Version><!-- 新しいバージョン番号 -->
 	<!-- NuGet メタデータ -->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/ueshiman/VideoIndexerSDK/tree/main/VideoIndexerAccessCoreExtension</PackageProjectUrl>

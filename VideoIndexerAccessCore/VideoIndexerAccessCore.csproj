@@ -30,13 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.13.2" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
+    <PackageReference Include="Azure.Identity" Version="1.14.1" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.7.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.73.1" />
   </ItemGroup>
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.5</Version>
+	<Version>1.0.1-alpha05.6</Version>
 	<IncludeSymbols>True</IncludeSymbols><!-- 新しいバージョン番号 -->
 	  <!-- NuGet メタデータ -->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
