@@ -15,6 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="C:\Users\taten\OneDrive\画像\AirTurn02-240x240.jpg">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -22,16 +26,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
-    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.5" />
-    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.73.1" />
+    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.6" />
+    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.6" />
   </ItemGroup>
 
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.5</Version>
+	<Version>1.0.1-alpha05.6</Version>
 	<!-- 新しいバージョン番号 -->
 	<!-- NuGet メタデータ -->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -42,6 +47,7 @@
 	<Authors>Ueshiman</Authors>
 	<Company>LLC Beans</Company>
 	<RepositoryType>git</RepositoryType>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 

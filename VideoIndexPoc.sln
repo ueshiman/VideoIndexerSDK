@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoIndexerAccessTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoIndexBoot", "VideoIndexBoot\VideoIndexBoot.csproj", "{77A42BA0-D5EA-4290-860D-3015A32CE159}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppWidgets", "BlazorAppWidgets\BlazorAppWidgets.csproj", "{62F989EB-5C5F-36AD-FB03-2821094F387C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -150,6 +152,18 @@ Global
 		{77A42BA0-D5EA-4290-860D-3015A32CE159}.Release|x64.Build.0 = Release|Any CPU
 		{77A42BA0-D5EA-4290-860D-3015A32CE159}.Release|x86.ActiveCfg = Release|Any CPU
 		{77A42BA0-D5EA-4290-860D-3015A32CE159}.Release|x86.Build.0 = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|x64.Build.0 = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Debug|x86.Build.0 = Debug|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|ARM64.Build.0 = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|x64.ActiveCfg = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|x64.Build.0 = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|x86.ActiveCfg = Release|Any CPU
+		{62F989EB-5C5F-36AD-FB03-2821094F387C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
