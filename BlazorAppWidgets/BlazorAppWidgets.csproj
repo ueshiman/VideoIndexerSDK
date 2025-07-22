@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\Component.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AspireApp1\AspireApp1.ServiceDefaults\AspireApp1.ServiceDefaults.csproj" />
   </ItemGroup>
 
