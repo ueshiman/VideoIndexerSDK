@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <Content Remove="Components\Pages\Component.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.6" />
+    <PackageReference Include="VideoIndexerAccessCore" Version="1.0.1-alpha05.6" />
+    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.6" />
+    <PackageReference Include="VideoIndexerAccessExtension" Version="1.0.1-alpha05.6" />
   </ItemGroup>
 
   <ItemGroup>

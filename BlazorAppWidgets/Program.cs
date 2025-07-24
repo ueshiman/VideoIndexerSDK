@@ -1,5 +1,7 @@
 using AspireApp1.ServiceDefaults;
 using BlazorAppWidgets.Components;
+using BlazorAppWidgets.Components.Services;
+using VideoIndexerAccessExtension.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddVideoIndexerAccess();
+builder.Services.AddScoped<VideoPlayerService>();
 
 var app = builder.Build();
 

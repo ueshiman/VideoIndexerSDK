@@ -1,4 +1,6 @@
 ﻿@page "/video"
+@using BlazorAppWidgets.Components.Services
+@inject VideoPlayerService Service
 <h3>Azure Video Indexer プレイヤー</h3>
 
 @if (!string.IsNullOrEmpty(VideoEmbedUrl))
@@ -16,17 +18,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         // サーバーサイドでアクセストークン含めたURL生成（仮）
-        var accountId = "YOUR_ACCOUNT_ID";
-        var videoId = "YOUR_VIDEO_ID";
-        var region = "japaneast";
-
-        var accessToken = await GetVideoIndexerToken(); // ← 自前でAPI叩いて取得する関数
+        var accountId = Service.AccountId;
+        var videoList = await Service.GetVideoListAsync();
+        var videoId = videoList.FirstOrDefault();
+        var region = Service.Region;
+        var accessToken = Service.AccessToken;
         VideoEmbedUrl = $"https://www.videoindexer.ai/embed/player/{region}/{accountId}/{videoId}?accessToken={accessToken}";
     }
 
-    private async Task<string> GetVideoIndexerToken()
-    {
-        // Azure Video Indexer APIを呼び出すロジックをここに書く（例：HttpClientでPOST）
-        return "abc123"; // 仮のアクセストークン
-    }
+    // private async Task<string> GetVideoIndexerToken()
+    // {
+    //     // Azure Video Indexer APIを呼び出すロジックをここに書く（例：HttpClientでPOST）
+    //     return "abc123"; // 仮のアクセストークン
+    // }
 }
