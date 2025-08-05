@@ -14,7 +14,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
     public class AccountApiAccess : IAccounApitAccess
     {
         private const string ParamName = "JsonSerializer.Deserialize<ApiTrialAccountModel>(jsonResponseBody)";
-        private ApiAccountModel? _account;
+        private static ApiAccountModel? _account;
         private readonly ILogger<AccountApiAccess> _logger;
         private readonly IDurableHttpClient? _durableHttpClient;
         private readonly IAccountTokenProviderDynamic _accountTokenProvider;
@@ -109,12 +109,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accountTokenProvider.GetArmAccessToken());
 
                 var result = await _client.GetAsync(requestUri);
+                //var result = _client.GetAsync(requestUri).Result;
 
                 result.VerifyStatus(System.Net.HttpStatusCode.OK);
                 var jsonResponseBody = await result.Content.ReadAsStringAsync();
                 ApiAccountModel? account = JsonSerializer.Deserialize<ApiAccountModel>(jsonResponseBody) ?? throw new ArgumentNullException(paramName: ParamName);
                 VerifyValidAccount(account, accountName);
-                _logger.LogInformation("[ApiTrialAccountModel Details] Id:{account!.properties!.id}, Location: {account.location}", account!.properties!.id, account.location);
+                _logger.LogInformation("[ApiTrialAccountModel Details] Id:{account!.properties!.id}, Location: {account.location}", account!.properties?.id, account.location);
                 _account = account;
                 return account;
             }
@@ -136,7 +137,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             {
                 _logger.LogError("{nameof(accountName)} {accountName} not found. Check {nameof(_apiResourceConfigurations.SubscriptionId)}, {nameof(_apiResourceConfigurations.ResourceGroup)}, {nameof(accountName)} are valid."
                     , nameof(accountName), accountName, nameof(_apiResourceConfigurations.SubscriptionId), nameof(_apiResourceConfigurations.ResourceGroup), nameof(accountName));
-                throw new Exception($"ApiTrialAccountModel {accountName} not found.");
+                //throw new Exception($"ApiTrialAccountModel {accountName} not found.");
+                account.properties ??= new ApiAccountProperties();
+                account.properties.id = string.IsNullOrEmpty(account.properties.id) ? _apiResourceConfigurations.ViAccountId : account.properties.id;
             }
         }
     }

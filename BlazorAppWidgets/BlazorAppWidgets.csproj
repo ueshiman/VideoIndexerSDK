@@ -11,14 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha05.6" />
-    <PackageReference Include="VideoIndexerAccessCore" Version="1.0.1-alpha05.6" />
-    <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha05.6" />
-    <PackageReference Include="VideoIndexerAccessExtension" Version="1.0.1-alpha05.6" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AspireApp1\AspireApp1.ServiceDefaults\AspireApp1.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\VideoIndexerAccessCoreExtension\VideoIndexerAccessCoreExtension.csproj" />
+    <ProjectReference Include="..\VideoIndexerAccessCore\VideoIndexerAccessCore.csproj" />
+    <ProjectReference Include="..\VideoIndexerAccessExtension\VideoIndexerAccessExtension.csproj" />
+    <ProjectReference Include="..\VideoIndexerAccess\VideoIndexerAccess.csproj" />
   </ItemGroup>
 
 </Project>

@@ -92,8 +92,10 @@ public interface ITrialAccountAccessTokensRepository
     /// ビデオに対するアクセストークンを取得する非同期メソッド。
     /// </summary>
     /// <param name="videoId">ビデオ ID。</param>
+    /// <param name="allowEdit"></param>
+    /// <param name="clientRequestId"></param>
     /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-    Task<string?> GetVideoAccessTokenAsync(string videoId);
+    Task<string?> GetVideoAccessTokenAsync(string videoId, bool? allowEdit = null, string? clientRequestId = null);
 
     /// <summary>
     /// ビデオに対するアクセストークンを取得する非同期メソッド。
@@ -101,8 +103,9 @@ public interface ITrialAccountAccessTokensRepository
     /// <param name="location">Azure リージョン。</param>
     /// <param name="accountId">アカウント ID。</param>
     /// <param name="videoId">ビデオ ID。</param>
+    /// <param name="accessToken"></param>
     /// <param name="allowEdit">編集を許可するかどうか（true または false）。省略可。</param>
     /// <param name="clientRequestId">リクエスト識別用の GUID（省略可）。</param>
     /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-    Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null);
+    Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, string? accessToken, bool? allowEdit = null, string? clientRequestId = null);
 }

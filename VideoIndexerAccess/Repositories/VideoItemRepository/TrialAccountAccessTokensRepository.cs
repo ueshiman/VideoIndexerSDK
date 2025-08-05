@@ -212,13 +212,15 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         {
             return await _accountAccessTokensApiAccess.GetUserAccessTokenAsync(location, allowEdit, clientRequestId);
         }
-        
+
         /// <summary>
         /// ビデオに対するアクセストークンを取得する非同期メソッド。
         /// </summary>
         /// <param name="videoId">ビデオ ID。</param>
+        /// <param name="allowEdit"></param>
+        /// <param name="clientRequestId"></param>
         /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-        public async Task<string?> GetVideoAccessTokenAsync(string videoId)
+        public async Task<string?> GetVideoAccessTokenAsync(string videoId, bool? allowEdit = null, string? clientRequestId = null)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -230,8 +232,12 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string? location = account.location;
             string? accountId = account.properties?.id;
 
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+
+
             // ビデオアクセストークンを取得
-            return await GetVideoAccessTokenAsync(location!, accountId!, videoId, allowEdit: null, clientRequestId: null);
+            return await GetVideoAccessTokenAsync(location!, accountId!, videoId, accessToken, allowEdit, clientRequestId);
         }
 
         /// <summary>
@@ -240,12 +246,13 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="location">Azure リージョン。</param>
         /// <param name="accountId">アカウント ID。</param>
         /// <param name="videoId">ビデオ ID。</param>
+        /// <param name="accessToken"></param>
         /// <param name="allowEdit">編集を許可するかどうか（true または false）。省略可。</param>
         /// <param name="clientRequestId">リクエスト識別用の GUID（省略可）。</param>
         /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-        public async Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null)
+        public async Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, string? accessToken, bool? allowEdit = null, string? clientRequestId = null)
         {
-            return await _accountAccessTokensApiAccess.GetVideoAccessTokenAsync(location, accountId, videoId, allowEdit, clientRequestId);
+            return await _accountAccessTokensApiAccess.GetVideoAccessTokenAsync(location, accountId, videoId, accessToken, allowEdit, clientRequestId);
         }
 
     }
