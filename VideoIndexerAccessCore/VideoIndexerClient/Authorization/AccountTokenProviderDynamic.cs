@@ -105,14 +105,18 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
         /// <param name="armAccessToken">ARMアクセス トークン</param>
         /// <param name="permission">アクセス許可</param>
         /// <param name="scope">スコープ</param>
+        /// <param name="projectId"></param>
+        /// <param name="videoId"></param>
         /// <param name="ct">キャンセレーション トークン</param>
         /// <returns>アカウントアクセス トークン</returns>
-        public async Task<string> GetAccountAccessTokenAsync(string armAccessToken, ArmAccessTokenPermission permission = ArmAccessTokenPermission.Contributor, ArmAccessTokenScope scope = ArmAccessTokenScope.Account, CancellationToken ct = default)
+        public async Task<string> GetAccountAccessTokenAsync(string armAccessToken, ArmAccessTokenPermission permission = ArmAccessTokenPermission.Contributor, ArmAccessTokenScope scope = ArmAccessTokenScope.Account, string? projectId = null, string? videoId = null, CancellationToken ct = default)
         {
             var accessTokenRequest = new AccessTokenRequest
             {
                 PermissionType = permission,
-                Scope = scope
+                Scope = scope,
+                ProjectId = projectId, // Optional, can be set if needed
+                VideoId = videoId // Optional, can be set if needed
             };
 
             try

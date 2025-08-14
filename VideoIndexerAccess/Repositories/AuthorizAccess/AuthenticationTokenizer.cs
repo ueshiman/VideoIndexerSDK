@@ -32,5 +32,16 @@ namespace VideoIndexerAccess.Repositories.AuthorizAccess
             _logger.LogInformation("Get Access Token: {accessToken}", string.IsNullOrEmpty(accessToken));
             return accessToken;
         }
+
+        /// <summary>
+        /// アクセストークンを非同期で取得する
+        /// </summary>
+        /// <returns>アクセストークン</returns>
+        public async Task<string> GetVideoAccessToken(string videoId)
+        {
+            string accessToken = await _authenticator.GetVideoAccessTokenAsync(videoId);
+            _logger.LogInformation("Get Access Token: {accessToken}", string.IsNullOrEmpty(accessToken));
+            return accessToken;
+        }
     }
 }

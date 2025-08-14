@@ -3,4 +3,7 @@
 public interface IAuthenticator
 {
     Task<string> GetAccessTkenAsync();
+
+    Task<string> GetVideoAccessTokenAsync(string videoId);
+
 }

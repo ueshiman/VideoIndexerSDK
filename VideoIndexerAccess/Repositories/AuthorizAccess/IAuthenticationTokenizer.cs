@@ -10,4 +10,6 @@ public interface IAuthenticationTokenizer
     /// </summary>
     /// <returns>アクセストークン</returns>
     Task<string> GetAccessToken();
+    Task<string> GetVideoAccessToken(string videoId);
+
 }

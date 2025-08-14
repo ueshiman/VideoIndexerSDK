@@ -6,6 +6,9 @@ public interface IWidgetRepository
 {
     Task<string?> GetVideoInsightsWidgetUrl(GetVideoInsightsWidgetResponseModel requestModel);
 
+    Task<string?> GetVideoInsightsWidgetUrl(string videoId);
+
+
     /// <summary>
     /// Insights Widget のURLを取得します。
     /// Video Indexer API から Insights Widget のリダイレクトURLを取得し返却します。

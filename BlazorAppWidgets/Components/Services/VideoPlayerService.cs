@@ -1,5 +1,6 @@
 ﻿using Microsoft.Identity.Client;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
+using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.VideoItemRepository;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
@@ -11,11 +12,12 @@ namespace BlazorAppWidgets.Components.Services
     {
         private const string ParamName = "videoPlayerService";
 
-        public  VideoPlayerService(ILogger<VideoPlayerService> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideoListRepository videoListRepository, ITrialAccountAccessTokensRepository trialAccountAccessTokensRepository)
+        public  VideoPlayerService(ILogger<VideoPlayerService> logger, IAuthenticationTokenizer authenticationTokenizer, IAccounApitAccess accountAccess, IAccountRepository accountRepository, IApiResourceConfigurations apiResourceConfigurations, IVideoListRepository videoListRepository, ITrialAccountAccessTokensRepository trialAccountAccessTokensRepository, IWidgetRepository widgetRepository)
         {
             _apiResourceConfigurations = apiResourceConfigurations;
             _videoListRepository = videoListRepository;
             _trialAccountAccessTokensRepository = trialAccountAccessTokensRepository;
+            _widgetRepository = widgetRepository;
             _logger = logger;
             _authenticationTokenizer = authenticationTokenizer;
             _accountAccess = accountAccess;
@@ -47,6 +49,13 @@ namespace BlazorAppWidgets.Components.Services
             //return await _accountAccess.G(videoId, allowEdit: null, clientRequestId: null);
             //return await _trialAccountAccessTokensRepository.GetVideoAccessTokenAsync(videoId, allowEdit: null, clientRequestId: null);
         }
+
+        public async Task<string?> GetVideoAccessToken(string videoId)
+        {
+            // アクセストークンを取得
+            return await _authenticationTokenizer.GetVideoAccessToken(videoId);
+        }
+
         // APIリソース設定
         private readonly IApiResourceConfigurations _apiResourceConfigurations;
 
@@ -66,11 +75,18 @@ namespace BlazorAppWidgets.Components.Services
 
         private readonly ITrialAccountAccessTokensRepository _trialAccountAccessTokensRepository;
 
+        private readonly IWidgetRepository _widgetRepository;
+
         public async Task<string[]> GetVideoListAsync()
         {
             var list = await _videoListRepository.ListVideosAsync();
             var array = list.Where(item => item.Id is not null).Select(item => item.Id ?? string.Empty);
             return array.ToArray();
+        }
+
+        public async Task<string> GetInsightAsync(string videoId)
+        {
+            return await _widgetRepository.GetVideoInsightsWidgetUrl(videoId) ?? string.Empty;
         }
     }
 }

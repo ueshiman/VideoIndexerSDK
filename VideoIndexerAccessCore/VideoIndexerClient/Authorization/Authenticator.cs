@@ -31,6 +31,20 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.Authorization
         }
 
 
+        public async Task<string> GetVideoAccessTokenAsync(string videoId)
+        {
+            try
+            {
+                var armAccessToken = await _accountTokenProvider.GetArmAccessTokenAsync();
+                return await _accountTokenProvider.GetAccountAccessTokenAsync(armAccessToken, scope:ArmAccessTokenScope.Video, videoId: videoId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while authenticating.");
+                throw;
+            }
+        }
+
         public string GetAccessToken()
         {
             try

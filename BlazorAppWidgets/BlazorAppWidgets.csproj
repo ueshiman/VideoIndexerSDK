@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\script.js" />
+    <None Include="wwwroot\style.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AspireApp1\AspireApp1.ServiceDefaults\AspireApp1.ServiceDefaults.csproj" />
     <ProjectReference Include="..\VideoIndexerAccessCoreExtension\VideoIndexerAccessCoreExtension.csproj" />
     <ProjectReference Include="..\VideoIndexerAccessCore\VideoIndexerAccessCore.csproj" />
