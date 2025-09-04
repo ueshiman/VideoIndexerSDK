@@ -375,3 +375,4 @@ FodyWeavers.xsd
 /VideoIndexPoc2/VideoIndexerClient/access.txt
 /nuget.txt
 /VideoIndexerAccessCore/VideoIndexerClient/ApiAccess/VideoIndexerApiAccess.cs
+/video-indexer-widgets/video-indexer-widgets.esproj

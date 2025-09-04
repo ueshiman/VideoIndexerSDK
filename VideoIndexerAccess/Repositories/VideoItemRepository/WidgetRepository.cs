@@ -60,9 +60,35 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
 
             // アクセストークンを取得
             string accessToken = await _authenticationTokenizer.GetAccessToken();
+            string accessVideoToken = await _authenticationTokenizer.GetVideoAccessToken(requestModel.VideoId);
+            // Insights Widget のURLを取得
+            return await GetVideoInsightsWidgetUrl(location!, accountId!, requestModel, accessVideoToken);
+        }
+
+        public async Task<string?> GetVideoInsightsWidgetUrl(string videoId)
+        {
+            // アカウント情報を取得し、存在しない場合は例外をスロー
+            var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
+
+            // アカウント情報のチェック
+            _accountRepository.CheckAccount(account);
+
+            // アカウントのロケーションとIDを取得
+            string? location = account.location;
+            string? accountId = account.properties?.id;
+
+            // アクセストークンを取得
+            string accessToken = await _authenticationTokenizer.GetAccessToken();
+            string accessVideoToken = await _authenticationTokenizer.GetVideoAccessToken(videoId);
 
             // Insights Widget のURLを取得
-            return await GetVideoInsightsWidgetUrl(location!, accountId!, requestModel, accessToken);
+            GetVideoInsightsWidgetResponseModel requestModel = new GetVideoInsightsWidgetResponseModel
+            {
+                VideoId = videoId,
+                //WidgetType = "Insights",
+                AllowEdit = false // デフォルト値。必要に応じて変更可能
+            };
+            return await GetVideoInsightsWidgetUrl(location!, accountId!, requestModel, accessVideoToken);
         }
 
         /// <summary>

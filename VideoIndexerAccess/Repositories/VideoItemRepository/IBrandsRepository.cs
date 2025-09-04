@@ -79,7 +79,7 @@ public interface IBrandsRepository
     /// Video Indexer API から全ブランドモデルを取得します。
     /// </summary>
     /// <returns>取得したブランドモデルの配列。存在しない場合は null。</returns>
-    Task<BrandModel[]?> GetApiBrandsAsync();
+    Task<BrandModel[]?> GetBrandsAsync();
 
     /// <summary>
     /// 指定されたロケーション、アカウントID、アクセストークンを使用して
@@ -89,7 +89,7 @@ public interface IBrandsRepository
     /// <param name="accountId">アカウントID</param>
     /// <param name="accessToken">アクセストークン（省略可能）</param>
     /// <returns>取得したブランドモデルの配列。存在しない場合は null。</returns>
-    Task<BrandModel[]?> GetApiBrandsAsync(string location, string accountId, string? accessToken);
+    Task<BrandModel[]?> GetBrandsAsync(string location, string accountId, string? accessToken);
 
     /// <summary>
     /// Video Indexer API からブランドモデル設定を取得し、パースして返します。
@@ -131,7 +131,7 @@ public interface IBrandsRepository
     /// </summary>
     /// <param name="settings">更新するブランドモデル設定</param>
     /// <returns>更新されたブランドモデル設定のJSONレスポンス</returns>
-    Task<string> UpdateApiBrandModelSettingsAsync(BrandModelSettingsModel settings);
+    Task<string> UpdateBrandModelSettingsAsync(BrandModelSettingsModel settings);
 
     /// <summary>
     /// 指定されたロケーション、アカウントID、アクセストークンを使用して
@@ -142,5 +142,5 @@ public interface IBrandsRepository
     /// <param name="accessToken">アクセストークン（省略可能）</param>
     /// <param name="settings">更新するブランドモデル設定</param>
     /// <returns>更新されたブランドモデル設定のJSONレスポンス</returns>
-    Task<string> UpdateApiBrandModelSettingsAsync(string location, string accountId, string? accessToken, BrandModelSettingsModel settings);
+    Task<string> UpdateBrandModelSettingsAsync(string location, string accountId, string? accessToken, BrandModelSettingsModel settings);
 }

@@ -1,4 +1,6 @@
-﻿namespace VideoIndexerAccess.Repositories.DataModel
+﻿using VideoIndexerAccess.Repositories.DataModel;
+
+namespace VideoIndexerAccess.Repositories.DataModelMapper
 {
     public class ArtifactTypeMapper : IArtifactTypeMapper
     {

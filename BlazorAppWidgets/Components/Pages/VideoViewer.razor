@@ -1,0 +1,50 @@
+﻿<h3>VideoViewer</h3>
+
+@page "/video/{VideoId}"
+@using BlazorAppWidgets.Components.Items
+@inject IJSRuntime JS
+
+<h3>Azure Video Indexer Viewer</h3>
+
+<div id="playerContainer"></div>
+<div id="insightsContainer" style="margin-top: 30px;"></div>
+
+@code {
+    [Parameter] public string VideoId { get; set; } = string.Empty;
+
+    private VideoContext? Context;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Context = await LoadVideoContextAsync(VideoId);
+
+            await JS.InvokeVoidAsync(
+                "viInterop.init",
+                "playerContainer",
+                "insightsContainer",
+                Context
+            );
+        }
+    }
+
+    private async Task<VideoContext> LoadVideoContextAsync(string videoId)
+    {
+        // 実際はDBやAPI経由で取得する構成
+        return new VideoContext
+        {
+            AccountId = "your-account-id",
+            VideoId = videoId,
+            Region = "japaneast",
+            AccessToken = await GetAccessTokenAsync()
+        };
+    }
+
+    private async Task<string> GetAccessTokenAsync()
+    {
+        // 実際にはAzure APIから取得
+        return "your-access-token";
+    }
+}
+

@@ -1,0 +1,72 @@
+﻿@page "/viewfromapi"
+@using System.Diagnostics
+@using BlazorAppWidgets.Components.Services
+@inject VideoPlayerService Service
+
+<h3>CustumIndexLocation</h3>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>custom index location</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Embedding widgets with a different index & image location (Preview)</h2>
+    <div class="form-container">
+        <label for="indexLocation">Custom Index Location</label>
+        <input id="indexLocation" value="https://moriaresources.blob.core.windows.net/public/HistoryMovieJSON.json" type="text" placeholder="Enter external index location" />
+        <label for="imageLocation">Custom Images Location</label>
+        <input type="text" id="imagesLocation"
+               value="https://moriaresources.blob.core.windows.net/public">
+        <label for="iframeUrl">Iframe URL</label>
+        <input type="text" readonly id="iframeUrl" value="@VideoEmbedInsightsUrl">
+        @* <input type="text" readonly id="iframeUrl" value="https://www.videoindexer.ai/embed/insights/00000000-0000-0000-0000-000000000000/c19ab92882"> *@
+        <br>
+        <button id="loadBtn">Load external index</button>
+    </div>
+
+    <div class="iframe-container">
+        <iframe id="insights" width="680" height="780" src="@VideoEmbedInsightsUrl" frameborder="0" allowfullscreen></iframe>
+        @* <iframe id="insights" width="680" height="780" src="https://www.videoindexer.ai/embed/insights/00000000-0000-0000-0000-000000000000/c19ab92882" frameborder="0" allowfullscreen></iframe> *@
+    </div>
+
+    <div class="iframe-container">
+        <iframe width="560" height="315" src="@VideoEmbedPlayerUrl" frameborder="0" allowfullscreen></iframe>
+        @* <iframe width="560" height="315" src="https://www.videoindexer.ai/embed/player/00000000-0000-0000-0000-000000000000/c19ab92882" frameborder="0" allowfullscreen></iframe> *@
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+
+
+@code {
+    private string VideoEmbedPlayerUrl;
+    private string VideoEmbedInsightsUrl;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // サーバーサイドでアクセストークン含めたURL生成（仮）
+        var accountId = Service.AccountId;
+        var videoList = await Service.GetVideoListAsync();
+        var videoId = videoList.LastOrDefault();
+        var region = Service.Region;
+        var accessToken = await Service.GetAccessToken(videoId);
+        var videoAccessToken = await Service.GetVideoAccessToken(videoId);
+        // VideoEmbedPlayerUrl =  await Service.GetInsightAsync(videoId);
+        VideoEmbedPlayerUrl = $"https://www.videoindexer.ai/embed/player/{accountId}/{videoId}/?accessToken={accessToken}&locale=ja&location={region}";
+        // VideoEmbedPlayerUrl = $"https://www.videoindexer.ai/embed/player/{accountId}/{videoId}?accessToken={accessToken}";
+        // VideoEmbedPlayerUrl = "https://www.videoindexer.ai/embed/player/00000000-0000-0000-0000-000000000000/4dc0aa32bf";
+        // VideoEmbedPlayerUrl = "https://www.videoindexer.ai/embed/player/00000000-0000-0000-0000-000000000000/4dc0aa32bf";
+        // VideoEmbedPlayerUrl = "https:www.videoindexer.ai/embed/player/ce2db91f-b261-449e-8687-b83546ebef77/dtx18k48lw/?accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJWZXJzaW9uIjoiMi4wLjAuMCIsIktleVZlcnNpb24iOiJjNTgzMDU1YjU5MmI0MTE5YTY3Njg1ZDg5NzI0NmVjOCIsIkFjY291bnRJZCI6ImNlMmRiOTFmLWIyNjEtNDQ5ZS04Njg3LWI4MzU0NmViZWY3NyIsIkFjY291bnRUeXBlIjoiQXJtIiwiVmlkZW9JZCI6ImR0eDE4azQ4bHciLCJQZXJtaXNzaW9uIjoiUmVhZGVyIiwiRXh0ZXJuYWxVc2VySWQiOiI3MTZGMzMzOTVENDM0NUVCOEMzMEIzMjY4MjI2RkIyMyIsIlVzZXJUeXBlIjoiTWljcm9zb2Z0Q29ycEFhZCIsIklzc3VlckxvY2F0aW9uIjoiZWFzdHVzIiwibmJmIjoxNzUzNjc3NzI5LCJleHAiOjE3NTM2ODE2MjksImlzcyI6Imh0dHBzOi8vYXBpLnZpZGVvaW5kZXhlci5haS8iLCJhdWQiOiJodHRwczovL2FwaS52aWRlb2luZGV4ZXIuYWkvIn0.IHOrs16N71SEJN-WC95DxPUAwmiqhvOT9on-SijTCZtbycZXfvrPGEnDZ5yjNjJEOaPIk3kILn8yCpA418_zGXPUpM3LMtNoccH0IeYzwSfaIyPnt_SDxvxqKAt9GzBpD9cQHI4_7HzwI4iLtFGxWZWuC1gFwJZ1bjbCWbIVfAFQf1_QJq6XVWpgBDUs4vh4Efbgp3X3OSWFMgrWV9GtiKmn65XYL-uhD0GwufLwyQIpGZ4ZWhOXE7pqnEprq1zItoscrFneoUHvAatFauYseCGLZIifgts7EWF8hZAt2AT9qle0IRnoK-TL3vbDNxdpWmjDPcwaciH6Ij8eR-aBwg&locale=ja&location=eastus";
+        VideoEmbedInsightsUrl = await Service.GetInsightAsync(videoId);
+        // VideoEmbedInsightsUrl = $"https://www.videoindexer.ai/embed/insights/{accountId}/{videoId}/?accessToken={accessToken}&locale=ja&location={region}";
+        // VideoEmbedPlayerUrl = "https:www.videoindexer.ai/embed/insights/ce2db91f-b261-449e-8687-b83546ebef77/dtx18k48lw/?accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJWZXJzaW9uIjoiMi4wLjAuMCIsIktleVZlcnNpb24iOiJjNTgzMDU1YjU5MmI0MTE5YTY3Njg1ZDg5NzI0NmVjOCIsIkFjY291bnRJZCI6ImNlMmRiOTFmLWIyNjEtNDQ5ZS04Njg3LWI4MzU0NmViZWY3NyIsIkFjY291bnRUeXBlIjoiQXJtIiwiVmlkZW9JZCI6ImR0eDE4azQ4bHciLCJQZXJtaXNzaW9uIjoiUmVhZGVyIiwiRXh0ZXJuYWxVc2VySWQiOiI3MTZGMzMzOTVENDM0NUVCOEMzMEIzMjY4MjI2RkIyMyIsIlVzZXJUeXBlIjoiTWljcm9zb2Z0Q29ycEFhZCIsIklzc3VlckxvY2F0aW9uIjoiZWFzdHVzIiwibmJmIjoxNzUzNjc3NzI5LCJleHAiOjE3NTM2ODE2MjksImlzcyI6Imh0dHBzOi8vYXBpLnZpZGVvaW5kZXhlci5haS8iLCJhdWQiOiJodHRwczovL2FwaS52aWRlb2luZGV4ZXIuYWkvIn0.IHOrs16N71SEJN-WC95DxPUAwmiqhvOT9on-SijTCZtbycZXfvrPGEnDZ5yjNjJEOaPIk3kILn8yCpA418_zGXPUpM3LMtNoccH0IeYzwSfaIyPnt_SDxvxqKAt9GzBpD9cQHI4_7HzwI4iLtFGxWZWuC1gFwJZ1bjbCWbIVfAFQf1_QJq6XVWpgBDUs4vh4Efbgp3X3OSWFMgrWV9GtiKmn65XYL-uhD0GwufLwyQIpGZ4ZWhOXE7pqnEprq1zItoscrFneoUHvAatFauYseCGLZIifgts7EWF8hZAt2AT9qle0IRnoK-TL3vbDNxdpWmjDPcwaciH6Ij8eR-aBwg&locale=ja&location=eastus";
+        Debug.WriteLine(VideoEmbedPlayerUrl);
+    }
+
+}

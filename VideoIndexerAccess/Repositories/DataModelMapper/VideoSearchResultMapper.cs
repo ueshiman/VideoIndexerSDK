@@ -6,9 +6,9 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
     public class VideoSearchResultMapper: IVideoSearchResultMapper
     {
         private readonly IVideoSearchResultItemMapper _videoSearchResultItemMapper;
-        private readonly PagingInfoMapper _pagingInfoMapper;
+        private readonly IPagingInfoMapper _pagingInfoMapper;
 
-        public VideoSearchResultMapper(IVideoSearchResultItemMapper videoSearchResultItemMapper, PagingInfoMapper pagingInfoMapper)
+        public VideoSearchResultMapper(IVideoSearchResultItemMapper videoSearchResultItemMapper, IPagingInfoMapper pagingInfoMapper)
         {
             _videoSearchResultItemMapper = videoSearchResultItemMapper;
             _pagingInfoMapper = pagingInfoMapper;

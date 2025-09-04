@@ -177,10 +177,11 @@ public interface ITrialAccountAccessTokensApiAccess
     /// <param name="location">Azure リージョン（例: "japaneast"）。</param>
     /// <param name="accountId">対象のアカウント ID（GUID形式）。</param>
     /// <param name="videoId">対象のビデオ ID。</param>
+    /// <param name="accessToken"></param>
     /// <param name="allowEdit">アクセストークンに編集権限を含めるか（true: 編集可、false: 読み取り専用）。省略可。</param>
     /// <param name="clientRequestId">リクエストを識別するための GUID（省略可）。</param>
     /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-    Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null);
+    Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, string? accessToken, bool? allowEdit = null, string? clientRequestId = null);
 
     /// <summary>
     /// Video Indexer API からビデオアクセストークンの JSON データを取得する非同期メソッド。
@@ -190,10 +191,11 @@ public interface ITrialAccountAccessTokensApiAccess
     /// <param name="location">API 呼び出し対象の Azure リージョン。</param>
     /// <param name="accountId">アカウント ID（GUID形式）。</param>
     /// <param name="videoId">ビデオ ID。</param>
+    /// <param name="accessToken"></param>
     /// <param name="allowEdit">編集権限を付与するか（true または false）。省略可。</param>
     /// <param name="clientRequestId">リクエストトラッキング用の GUID（任意）。</param>
     /// <returns>API 応答の JSON 文字列。</returns>
-    Task<string> FetchVideoAccessTokenJsonAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null);
+    Task<string> FetchVideoAccessTokenJsonAsync(string location, string accountId, string videoId, string? accessToken = null, bool? allowEdit = null, string? clientRequestId = null);
 
     /// <summary>
     /// ビデオアクセストークンの JSON を解析してトークン文字列を抽出する。

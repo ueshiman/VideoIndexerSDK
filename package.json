@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@azure/video-indexer-widgets": "^1.0.5"
+  }
+}

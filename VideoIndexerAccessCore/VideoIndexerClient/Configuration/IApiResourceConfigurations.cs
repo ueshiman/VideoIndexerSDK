@@ -39,6 +39,12 @@ public interface IApiResourceConfigurations
     string? ViAccountName { get; }
 
     /// <summary>
+    /// アカウントID
+    /// コンストラクターで設定された値がない場合は環境変数から取得
+    /// </summary>
+    string? ViAccountId { get; }
+
+    /// <summary>
     /// HttpClient名
     /// コンストラクターで設定された値がない場合は環境変数から取得
     /// </summary>

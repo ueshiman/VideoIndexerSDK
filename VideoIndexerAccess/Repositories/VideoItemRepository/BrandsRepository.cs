@@ -287,7 +287,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// Video Indexer API から全ブランドモデルを取得します。
         /// </summary>
         /// <returns>取得したブランドモデルの配列。存在しない場合は null。</returns>
-        public async Task<BrandModel[]?> GetApiBrandsAsync()
+        public async Task<BrandModel[]?> GetBrandsAsync()
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -299,7 +299,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             // アクセストークンを取得
             string accessToken = await _authenticationTokenizer.GetAccessToken();
             // ブランドモデル取得API呼び出し
-            return await GetApiBrandsAsync(location!, accountId!, accessToken);
+            return await GetBrandsAsync(location!, accountId!, accessToken);
         }
 
 
@@ -311,7 +311,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="accountId">アカウントID</param>
         /// <param name="accessToken">アクセストークン（省略可能）</param>
         /// <returns>取得したブランドモデルの配列。存在しない場合は null。</returns>
-        public async Task<BrandModel[]?> GetApiBrandsAsync(string location, string accountId, string? accessToken)
+        public async Task<BrandModel[]?> GetBrandsAsync(string location, string accountId, string? accessToken)
         {
             try
             {
@@ -446,7 +446,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// </summary>
         /// <param name="settings">更新するブランドモデル設定</param>
         /// <returns>更新されたブランドモデル設定のJSONレスポンス</returns>
-        public async Task<string> UpdateApiBrandModelSettingsAsync(BrandModelSettingsModel settings)
+        public async Task<string> UpdateBrandModelSettingsAsync(BrandModelSettingsModel settings)
         {
             // アカウント情報を取得し、存在しない場合は例外をスロー
             var account = await _accountAccess.GetAccountAsync(_apiResourceConfigurations.ViAccountName) ?? throw new ArgumentNullException(paramName: ParamName);
@@ -459,7 +459,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
             string accessToken = await _authenticationTokenizer.GetAccessToken();
 
             // ブランドモデル設定更新API呼び出し
-            return await UpdateApiBrandModelSettingsAsync(location!, accountId!, accessToken, settings);
+            return await UpdateBrandModelSettingsAsync(location!, accountId!, accessToken, settings);
         }
 
 
@@ -472,7 +472,7 @@ namespace VideoIndexerAccess.Repositories.VideoItemRepository
         /// <param name="accessToken">アクセストークン（省略可能）</param>
         /// <param name="settings">更新するブランドモデル設定</param>
         /// <returns>更新されたブランドモデル設定のJSONレスポンス</returns>
-        public async Task<string> UpdateApiBrandModelSettingsAsync(string location, string accountId, string? accessToken, BrandModelSettingsModel settings)
+        public async Task<string> UpdateBrandModelSettingsAsync(string location, string accountId, string? accessToken, BrandModelSettingsModel settings)
         {
             try
             {

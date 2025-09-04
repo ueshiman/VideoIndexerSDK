@@ -435,14 +435,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="location">Azure リージョン（例: "japaneast"）。</param>
         /// <param name="accountId">対象のアカウント ID（GUID形式）。</param>
         /// <param name="videoId">対象のビデオ ID。</param>
+        /// <param name="accessToken"></param>
         /// <param name="allowEdit">アクセストークンに編集権限を含めるか（true: 編集可、false: 読み取り専用）。省略可。</param>
         /// <param name="clientRequestId">リクエストを識別するための GUID（省略可）。</param>
         /// <returns>アクセストークンの文字列。失敗時は null。</returns>
-        public async Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null)
+        public async Task<string?> GetVideoAccessTokenAsync(string location, string accountId, string videoId, string? accessToken, bool? allowEdit = null, string? clientRequestId = null)
         {
             try
             {
-                var json = await FetchVideoAccessTokenJsonAsync(location, accountId, videoId, allowEdit, clientRequestId);
+                var json = await FetchVideoAccessTokenJsonAsync(location, accountId, videoId, accessToken, allowEdit, clientRequestId);
                 return ParseVideoAccessTokenJson(json);
             }
             catch (HttpRequestException ex)
@@ -471,7 +472,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="allowEdit">編集権限を付与するか（true または false）。省略可。</param>
         /// <param name="clientRequestId">リクエストトラッキング用の GUID（任意）。</param>
         /// <returns>API 応答の JSON 文字列。</returns>
-        public async Task<string> FetchVideoAccessTokenJsonAsync(string location, string accountId, string videoId, bool? allowEdit = null, string? clientRequestId = null)
+        public async Task<string> FetchVideoAccessTokenJsonAsync(string location, string accountId, string videoId, string? accessToknn = null, bool? allowEdit = null, string? clientRequestId = null)
         {
             var uri = new UriBuilder($"{_apiResourceConfigurations.ApiEndpoint}/Auth/{location}/Accounts/{accountId}/Videos/{videoId}/AccessToken");
             if (allowEdit.HasValue)

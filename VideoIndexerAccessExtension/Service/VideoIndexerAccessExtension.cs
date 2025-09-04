@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using VideoIndexerAccess.Repositories.AuthorizAccess;
+using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccess.Repositories.VideoItemRepository;
 using VideoIndexerAccessCoreExtension.Service;
@@ -31,6 +32,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IAccountMigrationStatusMapper, AccountMigrationStatusMapper>();
         services.TryAddTransient<IAccountSlimMapper, AccountSlimMapper>();
         services.TryAddTransient<IAppearanceMapper, AppearanceMapper>();
+        services.TryAddTransient<IArtifactTypeMapper, ArtifactTypeMapper>();
         services.TryAddTransient<IAudioEffectsMapper, AudioEffectsMapper>();
         services.TryAddTransient<IBlockMapper, BlockMapper>();
         services.TryAddTransient<IBrandMapper, BrandMapper>();
@@ -118,6 +120,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<ITrialAccountMapper, TrialAccountMapper>();
         services.TryAddTransient<ITrialAccountQuotaUsageMapper, TrialAccountQuotaUsageMapper>();
         services.TryAddTransient<ITrialAccountStatisticsMapper, TrialAccountStatisticsMapper>();
+        services.TryAddTransient<ITrialAccountUserMapper, TrialAccountUserMapper>();
         services.TryAddTransient<ITrialAccountWithTokenMapper, TrialAccountWithTokenMapper>();
         services.TryAddTransient<ITrialLimitedAccessFeaturesMapper, TrialLimitedAccessFeaturesMapper>();
         services.TryAddTransient<IUploadVideoResponseMapper, UploadVideoResponseMapper>();

@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-	<Version>1.0.1-alpha05.6</Version>
+	<Version>1.0.1-alpha06-00</Version>
 	<IncludeSymbols>True</IncludeSymbols><!-- 新しいバージョン番号 -->
 	  <!-- NuGet メタデータ -->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
