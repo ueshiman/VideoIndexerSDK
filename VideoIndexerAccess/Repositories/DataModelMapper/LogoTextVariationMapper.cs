@@ -15,7 +15,7 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper
                 CreatedBy = model.createdBy ?? string.Empty
             };
         }
-        public ApiLogoTextVariationModel MapToApiTextVariationModel(LogoTextVariationModel model)
+        public ApiLogoTextVariationModel MapToApiLogoTextVariationModel(LogoTextVariationModel model)
         {
             return new ApiLogoTextVariationModel
             {

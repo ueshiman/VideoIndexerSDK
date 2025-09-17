@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 {
-    /// <summary>
-    /// ロゴ作成レスポンスモデル
-    /// </summary>
-    public class ApiLogoContractModel
+    public class ApiLogoGroupLinkedLogosModel
     {
         public Guid id { get; set; }
 
-        public DateTimeOffset creationTime { get; set; }
+        public DateTime creationTime { get; set; }
 
-        public DateTimeOffset lastUpdateTime { get; set; }
+        public DateTime lastUpdateTime { get; set; }
 
         public string? lastUpdatedBy { get; set; }
 
@@ -25,6 +22,6 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
 
         public string? wikipediaSearchTerm { get; set; }
 
-        public List<ApiLogoTextVariationModel>? textVariations { get; set; } = new ();
+        public List<ApiLogoTextVariationModel>? textVariations { get; set; }
     }
 }

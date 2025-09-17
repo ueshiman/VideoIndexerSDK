@@ -11,8 +11,7 @@ namespace VideoIndexerAccess.Repositories.DataModel
         /// <summary>
         /// グループID（GUID）
         /// </summary>
-        public string Id { get; set; } = string.Empty;
-
+        public Guid Id { get; set; }
         /// <summary>
         /// 作成日時（ISO 8601形式）
         /// </summary>

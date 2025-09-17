@@ -6,5 +6,5 @@ namespace VideoIndexerAccess.Repositories.DataModelMapper;
 public interface ILogoTextVariationMapper
 {
     LogoTextVariationModel MapFrom(ApiLogoTextVariationModel model);
-    ApiLogoTextVariationModel MapToApiTextVariationModel(LogoTextVariationModel model);
+    ApiLogoTextVariationModel MapToApiLogoTextVariationModel(LogoTextVariationModel model);
 }

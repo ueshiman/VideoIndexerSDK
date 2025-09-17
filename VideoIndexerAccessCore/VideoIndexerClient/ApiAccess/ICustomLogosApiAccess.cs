@@ -39,7 +39,7 @@ public interface ICustomLogosApiAccess
     /// <param name="request">ロゴグループ作成リクエストデータ</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>作成されたロゴグループのレスポンス情報</returns>
-    Task<ApiLogoGroupResponseModel> CreateLogoGroupAsync(string location, string accountId, ApiLogoGroupRequestModel request, string? accessToken = null);
+    Task<ApiLogoGroupContractModel> CreateLogoGroupAsync(string location, string accountId, ApiLogoGroupRequestModel request, string? accessToken = null);
 
     /// <summary>
     /// POST リクエストを送信する
@@ -49,7 +49,7 @@ public interface ICustomLogosApiAccess
     /// <summary>
     /// JSON を解析しロゴグループレスポンスモデルを生成する
     /// </summary>
-    ApiLogoGroupResponseModel ParseLogoGroupJson(string jsonResponse);
+    ApiLogoGroupContractModel ParseLogoGroupJson(string jsonResponse);
 
     /// <summary>
     /// API にロゴを削除するリクエストを送信する
@@ -84,7 +84,7 @@ public interface ICustomLogosApiAccess
     /// </summary>
     /// <param name="jsonResponse">API から取得したロゴ情報の JSON</param>
     /// <returns>解析したロゴレスポンスモデル</returns>
-    ApiLogoContractResponseModel ParseLogoJson(string jsonResponse);
+    ApiLogoContractModel ParseLogoJson(string jsonResponse);
 
     /// <summary>
     /// ロゴ情報を取得し、オブジェクトとして返す
@@ -94,7 +94,27 @@ public interface ICustomLogosApiAccess
     /// <param name="logoId">取得するロゴのID</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>解析済みのロゴレスポンスモデル</returns>
-    Task<ApiLogoContractResponseModel> GetLogoAsync(string location, string accountId, string logoId, string? accessToken = null);
+    Task<ApiLogoContractModel> GetLogoAsync(string location, string accountId, string logoId, string? accessToken = null);
+
+    /// <summary>
+    /// API からロゴグループ情報の JSON を取得する
+    /// </summary>
+    /// <param name="location">APIのリージョン</param>
+    /// <param name="accountId">アカウントID</param>
+    /// <param name="logoGroupId">取得するロゴグループのID</param>
+    /// <param name="accessToken">アクセストークン（オプション）</param>
+    /// <returns>取得したロゴグループ情報の JSON 文字列</returns>
+    Task<string> GetLogoGroupJsonAsync(string location, string accountId, string logoGroupId, string? accessToken = null);
+
+    /// <summary>
+    /// ロゴ情報を取得し、オブジェクトとして返す
+    /// </summary>
+    /// <param name="location">APIのリージョン</param>
+    /// <param name="accountId">アカウントID</param>
+    /// <param name="logoId">取得するロゴのID</param>
+    /// <param name="accessToken">アクセストークン（オプション）</param>
+    /// <returns>解析済みのロゴレスポンスモデル</returns>
+    Task<ApiLogoGroupContractModel> GetLogoGroupAsync(string location, string accountId, string logoId, string? accessToken = null);
 
     /// <summary>
     /// API からロゴグループに関連するすべてのロゴ情報の JSON を取得する
@@ -111,7 +131,15 @@ public interface ICustomLogosApiAccess
     /// </summary>
     /// <param name="jsonResponse">API から取得したロゴ情報の JSON</param>
     /// <returns>解析したロゴリスト</returns>
-    ApiLogoContractResponseModel[] ParseLogoGroupLinkedLogosJson(string jsonResponse);
+    ApiLogoGroupContractModel[] ParseLogoGroupLinkedLogosJson(string jsonResponse);
+
+    /// <summary>
+    /// JSON を解析しロゴグループに関連するロゴ情報のリストを生成する
+    /// </summary>
+    /// <param name="jsonResponse">API から取得したロゴ情報の JSON</param>
+    /// <returns>解析したロゴリスト</returns>
+    ApiLogoGroupLinkedLogosModel ParseLogoGroupLinkedLogoJson(string jsonResponse);
+
 
     /// <summary>
     /// ロゴグループに関連するロゴ情報を取得し、オブジェクトとして返す
@@ -121,7 +149,7 @@ public interface ICustomLogosApiAccess
     /// <param name="logoGroupId">取得するロゴグループのID</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>解析済みのロゴグループに関連するロゴリスト</returns>
-    Task<ApiLogoContractResponseModel[]> GetLogoGroupLinkedLogosAsync(string location, string accountId, string logoGroupId, string? accessToken = null);
+    Task<ApiLogoGroupLinkedLogosModel> GetLogoGroupLinkedLogosAsync(string location, string accountId, string logoGroupId, string? accessToken = null);
 
     /// <summary>
     /// API からすべてのロゴグループ情報の JSON を取得する
@@ -149,6 +177,24 @@ public interface ICustomLogosApiAccess
     Task<ApiLogoGroupContractModel[]> GetLogoGroupsAsync(string location, string accountId, string? accessToken = null);
 
     /// <summary>
+    /// 指定したロゴIDに関連するロゴグループ情報を取得する
+    /// </summary>
+    /// <param name="location">APIのリージョン</param>
+    /// <param name="accountId">アカウントID</param>
+    /// <param name="logoId">取得するロゴのID</param>
+    /// <param name="accessToken">アクセストークン（オプション）</param>
+    /// <returns>ロゴIDに関連するロゴグループ情報のリスト</returns>
+    Task<ApiLogoGroupLinkedLogosModel[]> GetLogoLinkedGroupsAsync(string location, string accountId, string logoId, string? accessToken = null);
+
+    /// <summary>
+    /// JSON を解析しロゴIDに関連するロゴグループ情報のリストを生成する
+    /// </summary>
+    /// <param name="jsonResponse">API から取得したロゴグループ情報の JSON</param>
+    /// <returns>解析したロゴグループのリスト</returns>
+    ApiLogoGroupLinkedLogosModel[] ParseLogoLinkedGroupsJson(string jsonResponse);
+
+
+    /// <summary>
     /// API から特定のロゴが関連するロゴグループ情報の JSON を取得する
     /// </summary>
     /// <param name="location">APIのリージョン</param>
@@ -163,7 +209,7 @@ public interface ICustomLogosApiAccess
     /// </summary>
     /// <param name="jsonResponse">API から取得したロゴグループ情報の JSON</param>
     /// <returns>解析したロゴグループのリスト</returns>
-    ApiLogoGroupContractModel[] ParseLogoLinkedGroupsJson(string jsonResponse);
+    ApiLogoGroupContractModel[] ParseLogoGroupContractJson(string jsonResponse);
 
     /// <summary>
     /// API からすべてのロゴ情報の JSON を取得する
@@ -199,7 +245,7 @@ public interface ICustomLogosApiAccess
     /// <param name="updateRequest">更新するロゴ情報</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>更新後のロゴ情報</returns>
-    Task<ApiLogoContractResponseModel> UpdateLogoAsync(string location, string accountId, string logoId, ApiLogoUpdateRequestModel updateRequest, string? accessToken = null);
+    Task<ApiLogoContractModel> UpdateLogoAsync(string location, string accountId, string logoId, ApiLogoUpdateRequestModel updateRequest, string? accessToken = null);
 
     /// <summary>
     /// API にロゴグループ情報の更新リクエストを送信する

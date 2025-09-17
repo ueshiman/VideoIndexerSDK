@@ -63,13 +63,17 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<ILanguageModelEditMapper, LanguageModelEditMapper>();
         services.TryAddTransient<ILanguageModelFileDataMapper, LanguageModelFileDataMapper>();
         services.TryAddTransient<ILanguageModelFileMetadataMapper, LanguageModelFileMetadataMapper>();
+        services.TryAddTransient<ILogoContractMapper, LogoContractMapper>();
         services.TryAddTransient<ILogoGroupContractMapper, LogoGroupContractMapper>();
         services.TryAddTransient<ILogoGroupLinkMapper, LogoGroupLinkMapper>();
+        services.TryAddTransient<ILogoGroupLinkedLogosMapper, LogoGroupLinkedLogosMapper>();
         services.TryAddTransient<ILogoGroupRequestMapper, LogoGroupRequestMapper>();
         services.TryAddTransient<ILogoGroupResponseMapper, LogoGroupResponseMapper>();
         services.TryAddTransient<ILogoRequestMapper, LogoRequestMapper>();
         services.TryAddTransient<ILogoResponseMapper, LogoResponseMapper>();
         services.TryAddTransient<ILogoTextVariationMapper, LogoTextVariationMapper>();
+        services.TryAddTransient<ILogoUpdateRequestMapper, LogoUpdateRequestMapper>();
+        services.TryAddTransient<ILogoGroupUpdateRequestMapper, LogoGroupUpdateRequestMapper>();
         services.TryAddTransient<INamedLocationMapper, NamedLocationMapper>();
         services.TryAddTransient<INamedPeopleMapper, NamedPeopleMapper>();
         services.TryAddTransient<IOcrMapper, OcrMapper>();
@@ -151,7 +155,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IBrandsRepository, BrandsRepository>();
         services.TryAddTransient<IClassicLanguageCustomizationRepository, ClassicLanguageCustomizationRepository>();
         services.TryAddTransient<ICustomLanguageRequestMapper, CustomLanguageRequestMapper>();
-        services.TryAddTransient<ICreateLogoRepository, CreateLogoRepository>();
+        services.TryAddTransient<ICustomLogoRepository, CustomLogoRepository>();
         services.TryAddTransient<IIndexingRepository, IndexingRepository>();
         services.TryAddTransient<IJobsRepository, JobsRepository>();
         services.TryAddTransient<IProjectsRepository, ProjectsRepository>();

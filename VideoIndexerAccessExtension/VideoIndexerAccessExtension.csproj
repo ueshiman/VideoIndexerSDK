@@ -30,8 +30,11 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.73.1" />
-    <PackageReference Include="VideoIndexerAccess" Version="1.0.1-alpha06-00" />
     <PackageReference Include="VideoIndexerAccessCoreExtension" Version="1.0.1-alpha06-00" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VideoIndexerAccess\VideoIndexerAccess.csproj" />
   </ItemGroup>
 
 

@@ -11,7 +11,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
     /// </summary>
     public class ApiLogoGroupContractModel
     {
-        public string id { get; set; } = "";
+        public Guid id { get; set; }
         public DateTimeOffset creationTime { get; set; }
         public DateTimeOffset lastUpdateTime { get; set; }
         public string lastUpdatedBy { get; set; } = "";
