@@ -14,14 +14,14 @@ public interface IPersonModelsApiAccess
     /// <param name="imageUrls">追加する顔画像のURLリスト</param>
     /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
     /// <returns>APIからのレスポンスJSON (成功時は追加された顔データのリスト)</returns>
-    Task<string> FetchPersonFacesJsonAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null);
+    Task<string> CreateCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null);
 
     /// <summary>
     /// JSONレスポンスをパースして、顔データのリストを取得する
     /// </summary>
     /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
     /// <returns>顔データのリスト (失敗時はnull)</returns>
-    List<string>? ParsePersonFacesJson(string jsonResponse);
+    List<string>? ParseCreateCustomFacesJson(string jsonResponse);
 
     /// <summary>
     /// 顔データをAPIに登録する
@@ -33,12 +33,12 @@ public interface IPersonModelsApiAccess
     /// <param name="imageUrls">追加する顔画像のURLリスト</param>
     /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
     /// <returns>成功時は追加された顔データのリスト、エラー時は例外をスロー</returns>
-    Task<List<string>?> CreatePersonFacesAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null);
+    Task<List<string>?> CreateCustomFacesAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null);
 
     /// <summary>
     /// API へリクエストを送信し、新しい Person を作成する
     /// </summary>
-    Task<string> FetchCreatePersonJsonAsync(
+    Task<string> CreatePersonJsonAsync(
         string location, string accountId, string personModelId, string? name = null, string? description = null, string? accessToken = null);
 
     /// <summary>
@@ -60,7 +60,7 @@ public interface IPersonModelsApiAccess
     /// <param name="accessToken">API への認証用アクセストークン (オプション)</param>
     /// <returns>API からの JSON レスポンス文字列</returns>
     /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
-    Task<string> FetchCreatePersonModelJsonAsync(
+    Task<string> GetCreatePersonModelJsonAsync(
         string location, string accountId, string? name = null, string? accessToken = null);
 
     /// <summary>
@@ -161,7 +161,7 @@ public interface IPersonModelsApiAccess
     /// <param name="sourceType">Face のソースタイプ (UploadedPicture / UploadedVideo, オプション)</param>
     /// <param name="accessToken">アクセストークン (オプション)</param>
     /// <returns>取得した JSON 文字列</returns>
-    Task<string> FetchCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null);
+    Task<string> GetCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null);
 
     /// <summary>
     /// JSON をパースし、Face のリストを返す

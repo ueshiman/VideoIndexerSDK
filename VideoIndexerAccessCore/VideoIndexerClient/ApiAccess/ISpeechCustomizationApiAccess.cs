@@ -17,13 +17,13 @@ public interface ISpeechCustomizationApiAccess
     Task<string> FetchCreateSpeechDatasetJsonAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null);
 
     /// <summary>
-    /// 取得した JSON をパースして ApiSpeechDatasetUpdateModel オブジェクトに変換します。
+    /// 取得した JSON をパースして ApiCustomSpeechModel オブジェクトに変換します。
     /// Create Speech Dataset
     /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Speech-Dataset
     /// </summary>
     /// <param name="json">API から取得した JSON 文字列</param>
-    /// <returns>パースした ApiSpeechDatasetUpdateModel オブジェクト、エラー時は null</returns>
-    ApiModel.ApiSpeechDatasetResponseModel? ParseSpeechDatasetResponseJson(string json);
+    /// <returns>パースした ApiCustomSpeechModel オブジェクト、エラー時は null</returns>
+    ApiCustomSpeechModel? ParseSpeechModelJson(string json);
 
     /// <summary>
     /// API を呼び出してスピーチデータセットを作成します。
@@ -35,7 +35,7 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="request">スピーチデータセットのリクエストオブジェクト</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>作成したスピーチデータセット情報、エラー時は null</returns>
-    Task<ApiModel.ApiSpeechDatasetResponseModel?> CreateSpeechDatasetAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null);
+    Task<ApiSpeechDatasetModel?> CreateSpeechDatasetAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null);
 
     /// <summary>
     /// API からスピーチモデル作成の JSON データを取得します。
@@ -59,7 +59,7 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="request">スピーチモデルのリクエストオブジェクト</param>
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>作成したスピーチモデル情報、エラー時は null</returns>
-    Task<ApiSpeechModelResponseModel?> CreateSpeechModelAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null);
+    Task<ApiCustomSpeechModel?> CreateSpeechModelAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null);
 
     /// <summary>
     /// JSON をパースして ApiSpeechModelResponseModel オブジェクトに変換します。
@@ -68,7 +68,7 @@ public interface ISpeechCustomizationApiAccess
     /// </summary>
     /// <param name="json">API から取得した JSON 文字列</param>
     /// <returns>パースした ApiSpeechModelResponseModel オブジェクト、エラー時は null</returns>
-    ApiSpeechModelResponseModel? ParseSpeechModelJson(string json);
+    ApiCustomSpeechModel? ParseCustomSpeechModelJson(string json);
 
     /// <summary>
     /// API からスピーチデータセット削除リクエストを送信します。
@@ -187,7 +187,7 @@ public interface ISpeechCustomizationApiAccess
     Task<string?> FetchSpeechDatasetsJsonAsync(string location, string accountId, string? locale, string? accessToken);
 
     /// <summary>
-    /// JSON を List＜ApiSpeechDatasetUpdateModel＞? にパースするメソッド。
+    /// JSON を List＜ApiSpeechDatasetModel＞? にパースするメソッド。
     /// Get Speech Datasets
     /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Datasets
     /// </summary>
@@ -218,15 +218,6 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="accessToken">アクセストークン（オプション）</param>
     /// <returns>JSON 形式のレスポンスを文字列として返す。取得できなかった場合は null。</returns>
     Task<string?> FetchSpeechModelJsonAsync(string location, string accountId, string modelId, string? accessToken);
-
-    /// <summary>
-    /// JSON を ApiCustomSpeechModel にパースするメソッド。
-    /// Get Speech Model
-    /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
-    /// </summary>
-    /// <param name="jsonContent">JSON 形式のレスポンス</param>
-    /// <returns>パースしたスピーチモデル情報。パースに失敗した場合は null。</returns>
-    ApiModel.ApiCustomSpeechModel? ParseCustomSpeechModelJson(string jsonContent);
 
     /// <summary>
     /// APIからスピーチモデルを取得します。
@@ -286,7 +277,7 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="customProperties">更新するデータセットのカスタムプロパティ。</param>
     /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
     /// <returns>更新された <see cref="ApiSpeechDatasetUpdateModel"/> を含む非同期タスク。</returns>
-    Task<ApiSpeechDatasetUpdateModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null);
+    Task<ApiSpeechDatasetModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null);
 
     /// <summary>
     /// スピーチデータセットを更新します。
@@ -296,10 +287,10 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="location">リクエストをルーティングするAzureリージョン。</param>
     /// <param name="accountId">アカウントのグローバル一意識別子（GUID）。</param>
     /// <param name="datasetId">更新するスピーチデータセットのID。</param>
-    /// <param name="updateRequestModelData">更新するデータセットの情報。</param>
+    /// <param name="modelData">更新するデータセットの情報。</param>
     /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
     /// <returns>更新された <see cref="ApiSpeechDatasetUpdateModel"/> を含む非同期タスク。</returns>
-    Task<ApiSpeechDatasetUpdateModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, ApiSpeechDatasetUpdateRequestModel updateRequestModelData, string? accessToken = null);
+    Task<ApiSpeechDatasetModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, ApiUpdateSpeechDatasetModel modelData, string? accessToken = null);
 
     /// <summary>
     /// スピーチデータセットの更新APIを呼び出し、JSONレスポンスを取得します。
@@ -309,10 +300,10 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="location">リクエストをルーティングするAzureリージョン。</param>
     /// <param name="accountId">アカウントのグローバル一意識別子（GUID）。</param>
     /// <param name="datasetId">更新対象のスピーチデータセットのID（GUID）。</param>
-    /// <param name="updateRequestModelData">更新内容を含むオブジェクト。</param>
+    /// <param name="modelData">更新内容を含むオブジェクト。</param>
     /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
     /// <returns>APIのレスポンスとして返されるJSON文字列。</returns>
-    Task<string> FetchUpdateJsonAsync(string location, string accountId, string datasetId, ApiSpeechDatasetUpdateRequestModel updateRequestModelData, string? accessToken);
+    Task<string> FetchUpdateJsonAsync(string location, string accountId, string datasetId, ApiUpdateSpeechDatasetModel modelData, string? accessToken);
 
     /// <summary>
     /// スピーチモデルの更新APIを呼び出し、JSONレスポンスを取得します。
@@ -334,7 +325,7 @@ public interface ISpeechCustomizationApiAccess
     /// </summary>
     /// <param name="jsonResponse">APIから返されたJSON文字列。</param>
     /// <returns>解析されたSpeechDatasetオブジェクト。</returns>
-    ApiSpeechDatasetUpdateModel? ParseSpeechDataset(string jsonResponse);
+    ApiSpeechDatasetModel? ParseSpeechDataset(string jsonResponse);
 
     /// <summary>
     /// スピーチモデルを更新します。
@@ -349,7 +340,7 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="customProperties">更新するモデルのカスタムプロパティ。</param>
     /// <param name="accessToken">（オプション）認証のためのアクセストークン。指定しない場合、デフォルトの認証が使用される。</param>
     /// <returns>更新されたスピーチモデル情報を含む非同期タスク。</returns>
-    Task<ApiCustomSpeechUpdateModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null);
+    Task<ApiCustomSpeechModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null);
 
     /// <summary>
     /// スピーチモデルを更新します。
@@ -362,7 +353,7 @@ public interface ISpeechCustomizationApiAccess
     /// <param name="updateRequestModelData">更新するモデルの情報（表示名、説明、カスタムプロパティなど）。</param>
     /// <param name="accessToken">（オプション）認証のためのアクセストークン。指定しない場合、デフォルトの認証が使用される。</param>
     /// <returns>更新されたスピーチモデル情報を含む非同期タスク。</returns>
-    Task<ApiCustomSpeechUpdateModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, ApiCustomSpeechModelUpdateRequestModel updateRequestModelData, string? accessToken = null);
+    Task<ApiCustomSpeechModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, ApiCustomSpeechModelUpdateRequestModel updateRequestModelData, string? accessToken = null);
 
     /// <summary>
     /// APIから取得したスピーチモデルのJSONレスポンスを解析し、ApiCustomSpeechUpdateModelオブジェクトに変換します。
@@ -371,5 +362,5 @@ public interface ISpeechCustomizationApiAccess
     /// </summary>
     /// <param name="jsonResponse">APIから返されたJSON文字列。</param>
     /// <returns>解析されたCustomSpeechModelオブジェクト。</returns>
-    ApiCustomSpeechUpdateModel? ParseSpeechModels(string jsonResponse);
+    ApiCustomSpeechModel? ParseSpeechModels(string jsonResponse);
 }

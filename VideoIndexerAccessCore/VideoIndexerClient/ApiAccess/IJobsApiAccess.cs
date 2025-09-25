@@ -19,7 +19,7 @@ public interface IJobsApiAccess
     /// </summary>
     /// <param name="url">API のエンドポイント URL</param>
     /// <returns>ジョブステータスの JSON 文字列</returns>
-    Task<string> FetchJobStatusJsonAsync(string url);
+    Task<string> GetJobStatusJsonAsync(string url);
 
     /// <summary>
     /// API から取得した JSON を解析し、JobStatusResponse オブジェクトに変換する

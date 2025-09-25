@@ -1,33 +1,39 @@
-﻿namespace VideoIndexerAccessCore.VideoIndexerClient.ApiModel
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace VideoIndexerAccess.Repositories.DataModel
 {
     /// <summary>
-    /// API のレスポンスをマッピングするための ApiCustomPersonModel クラス
+    /// 
     /// </summary>
-    public class ApiCustomPersonModel
+    public class CustomPersonModel
     {
         /// <summary>
         /// Person Model の ID (GUID 形式)
         /// </summary>
-        public Guid? id { get; set; }
+        public Guid? Id { get; set; }
 
         /// <summary>
         /// Person Model の名前
         /// </summary>
-        public string? name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// デフォルトの Person Model であるかどうか
         /// </summary>
-        public bool isDefault { get; set; }
+        public bool IsDefault { get; set; }
 
         /// <summary>
         /// Person Model に登録されている Person の数
         /// </summary>
-        public int personsCount { get; set; }
+        public int PersonsCount { get; set; }
 
         /// <summary>
         /// Person の識別スコアのしきい値
         /// </summary>
-        public decimal personIdentificationThreshold { get; set; }
+        public decimal PersonIdentificationThreshold { get; set; }
     }
 }

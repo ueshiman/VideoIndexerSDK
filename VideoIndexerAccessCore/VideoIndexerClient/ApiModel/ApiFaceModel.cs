@@ -5,7 +5,7 @@
     /// </summary>
     public class ApiFaceModel
     {
-        public string? id { get; set; }
+        public Guid? id { get; set; }
         public string? state { get; set; } // 例: "Ok"
         public string? sourceType { get; set; } // 例: "UploadedPicture"
         public string? sourceVideoId { get; set; }

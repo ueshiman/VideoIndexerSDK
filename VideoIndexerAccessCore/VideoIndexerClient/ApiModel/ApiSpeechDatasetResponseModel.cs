@@ -5,7 +5,7 @@
     /// </summary>
     public class ApiSpeechDatasetResponseModel
     {
-        public string? id { get; set; } // データセットの ID
+        public Guid? id { get; set; } // データセットの ID
         public ApiSpeechDatasetPropertiesModel? properties { get; set; } // データセットのプロパティ
         public string? displayName { get; set; } // データセットの表示名
         public string? description { get; set; } // データセットの説明

@@ -3,7 +3,7 @@
     /// <summary>
     /// スピーチデータセットの更新情報を格納するクラス。
     /// </summary>
-    public class ApiSpeechDatasetUpdateRequestModel
+    public class ApiUpdateSpeechDatasetModel
     {
         public string? displayName { get; set; }
 

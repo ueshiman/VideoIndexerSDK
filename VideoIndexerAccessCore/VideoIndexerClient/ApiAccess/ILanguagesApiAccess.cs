@@ -9,7 +9,7 @@ public interface ILanguagesApiAccess
     /// </summary>
     /// <param name="location">API のリクエストを送る Azure のリージョン (例: "trial")</param>
     /// <returns>取得した JSON データ（文字列）</returns>
-    Task<string> FetchSupportedLanguagesJsonAsync(string location);
+    Task<string> GetSupportedLanguagesJsonAsync(string location);
 
     /// <summary>
     /// JSON データをパースして言語リストに変換する

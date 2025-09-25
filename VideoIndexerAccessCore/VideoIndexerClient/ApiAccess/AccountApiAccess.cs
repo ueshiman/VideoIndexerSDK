@@ -133,7 +133,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accountName">アカウント名</param>
         private void VerifyValidAccount(ApiAccountModel account, string? accountName)
         {
-            if (string.IsNullOrWhiteSpace(account?.location) || account.properties == null || string.IsNullOrWhiteSpace(account.properties.id))
+            if (string.IsNullOrWhiteSpace(account.location) || account.properties == null || string.IsNullOrWhiteSpace(account.properties.id))
             {
                 _logger.LogError("{nameof(accountName)} {accountName} not found. Check {nameof(_apiResourceConfigurations.SubscriptionId)}, {nameof(_apiResourceConfigurations.ResourceGroup)}, {nameof(accountName)} are valid."
                     , nameof(accountName), accountName, nameof(_apiResourceConfigurations.SubscriptionId), nameof(_apiResourceConfigurations.ResourceGroup), nameof(accountName));

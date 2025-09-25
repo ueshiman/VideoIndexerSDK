@@ -4,6 +4,7 @@ using VideoIndexerAccess.Repositories.AuthorizAccess;
 using VideoIndexerAccess.Repositories.DataModel;
 using VideoIndexerAccess.Repositories.DataModelMapper;
 using VideoIndexerAccess.Repositories.VideoItemRepository;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiAccess;
 using VideoIndexerAccessCoreExtension.Service;
 
 namespace VideoIndexerAccessExtension.Service;
@@ -41,14 +42,17 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IBrandsMapper, BrandsMapper>();
         services.TryAddTransient<ICustomLanguageMapper, CustomLanguageMapper>();
         services.TryAddTransient<ICustomLanguageModelTrainingDataFileMapper, CustomLanguageModelTrainingDataFileMapper>();
-        services.TryAddTransient<ICustomLanguageRequestMapper, CustomLanguageRequestMapper>();
+        services.TryAddTransient<ICustomPersonMapper, CustomPersonMapper>();
+        services.TryAddTransient<ICustomSpeechMapper, CustomSpeechMapper>();
         services.TryAddTransient<IDeleteVideoResultMapper, DeleteVideoResultMapper>();
         services.TryAddTransient<IDurationMapper, DurationMapper>();
         services.TryAddTransient<IEmotionsMapper, EmotionsMapper>();
         services.TryAddTransient<IErrorResponseMapper, ErrorResponseMapper>();
         services.TryAddTransient<IFaceFilterMapper, FaceFilterMapper>();
         services.TryAddTransient<IFaceMapper, FaceMapper>();
+        services.TryAddTransient<IFaceModelMapper, FaceModelMapper>();
         services.TryAddTransient<IFaceRedactionMapper, FaceRedactionMapper>();
+        services.TryAddTransient<IFilePropertiesMapper, FilePropertiesMapper>();
         services.TryAddTransient<IFramePatternsMapper, FramePatternsMapper>();
         services.TryAddTransient<IInsightsMapper, InsightsMapper>();
         services.TryAddTransient<IInstanceMapper, InstanceMapper>();
@@ -78,7 +82,8 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<INamedPeopleMapper, NamedPeopleMapper>();
         services.TryAddTransient<IOcrMapper, OcrMapper>();
         services.TryAddTransient<IPagingInfoMapper, PagingInfoMapper>();
-        services.TryAddTransient<IPatchOperationMapper, PatchOperationMapper>();
+        services.TryAddTransient<IPatchOperationMapper, PatchOperationMapper>(); 
+        services.TryAddTransient<IPersonMapper, PersonMapper>();
         services.TryAddTransient<IProjectMapper, ProjectMapper>();
         services.TryAddTransient<IProjectMigrationMapper, ProjectMigrationMapper>();
         services.TryAddTransient<IProjectMigrationStateMapper, ProjectMigrationStateMapper>();
@@ -110,11 +115,15 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<ISpeakertalktolistenratio1Mapper, Speakertalktolistenratio1Mapper>();
         services.TryAddTransient<ISpeakerTalkToListenRatioMapper, SpeakerTalkToListenRatioMapper>();
         services.TryAddTransient<ISpeakerwordcount1Mapper, Speakerwordcount1Mapper>();
-        services.TryAddTransient<ISpeakerWordCountMapper, SpeakerWordCountMapper>();
+        services.TryAddTransient<ISpeakerWordCountMapper, SpeakerWordCountMapper>(); 
+        services.TryAddTransient<ISpeechDatasetMapper, SpeechDatasetMapper>();
+        services.TryAddTransient<ISpeechDatasetPropertiesMapper, SpeechDatasetPropertiesMapper>();
+        services.TryAddTransient<ISpeechDatasetFileMapper, SpeechDatasetFileMapper>();
         services.TryAddTransient<IStatistics1Mapper, Statistics1Mapper>();
         services.TryAddTransient<IStatisticsMapper, StatisticsMapper>();
         services.TryAddTransient<IStreamingUrlMapper, StreamingUrlMapper>();
         services.TryAddTransient<ISummarizedInsightsMapper, SummarizedInsightsMapper>();
+        services.TryAddTransient<ISupportedLanguageMapper, SupportedLanguageMapper>();
         services.TryAddTransient<ITextualcontentmoderationMapper, TextualcontentmoderationMapper>();
         services.TryAddTransient<ITextVariationMapper, TextVariationMapper>();
         services.TryAddTransient<ITimeRangeMapper, TimeRangeMapper>();
@@ -158,12 +167,12 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<ICustomLogoRepository, CustomLogoRepository>();
         services.TryAddTransient<IIndexingRepository, IndexingRepository>();
         services.TryAddTransient<IJobsRepository, JobsRepository>();
+        services.TryAddTransient<ILanguagesApiAccess, LanguagesApiAccess>();
         services.TryAddTransient<IProjectsRepository, ProjectsRepository>();
         services.TryAddTransient<IPromptContentRepository, PromptContentRepository>();
         services.TryAddTransient<IRedactVideoRepository, RedactVideoRepository>();
         services.TryAddTransient<ITrialAccountAccessTokensRepository, TrialAccountAccessTokensRepository>();
         services.TryAddTransient<ITrialAccountsRepository, TrialAccountsRepository>();
-
         services.TryAddTransient<IVideoDataRepository, VideoDataRepository>();
         services.TryAddTransient<IVideoIndexRepository, VideoIndexRepository>();
         services.TryAddTransient<IVideoListRepository, VideoListRepository>();

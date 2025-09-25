@@ -24,7 +24,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="location">API のリクエストを送る Azure のリージョン (例: "trial")</param>
         /// <returns>取得した JSON データ（文字列）</returns>
-        public async Task<string> FetchSupportedLanguagesJsonAsync(string location)
+        public async Task<string> GetSupportedLanguagesJsonAsync(string location)
         {
             var apiBaseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/SupportedLanguages"; // location を動的に設定
 
@@ -75,7 +75,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         {
             try
             {
-                string json = await FetchSupportedLanguagesJsonAsync(location);
+                string json = await GetSupportedLanguagesJsonAsync(location);
                 return ParseSupportedLanguagesJson(json);
             }
             catch (Exception ex)

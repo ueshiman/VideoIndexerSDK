@@ -36,7 +36,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             try
             {
                 // API から JSON レスポンスを取得
-                string jsonResponse = await FetchJobStatusJsonAsync(endpoint);
+                string jsonResponse = await GetJobStatusJsonAsync(endpoint);
                 return ParseJobStatusJson(jsonResponse);
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="url">API のエンドポイント URL</param>
         /// <returns>ジョブステータスの JSON 文字列</returns>
-        public async Task<string> FetchJobStatusJsonAsync(string url)
+        public async Task<string> GetJobStatusJsonAsync(string url)
         {
             HttpResponseMessage? response;
             try

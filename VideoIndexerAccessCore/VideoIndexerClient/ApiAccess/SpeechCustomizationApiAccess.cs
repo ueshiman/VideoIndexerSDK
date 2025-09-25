@@ -77,17 +77,17 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// 取得した JSON をパースして ApiSpeechDatasetUpdateModel オブジェクトに変換します。
+        /// 取得した JSON をパースして ApiCustomSpeechModel オブジェクトに変換します。
         /// Create Speech Dataset
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Create-Speech-Dataset
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
-        /// <returns>パースした ApiSpeechDatasetUpdateModel オブジェクト、エラー時は null</returns>
-        public ApiModel.ApiSpeechDatasetResponseModel? ParseSpeechDatasetResponseJson(string json)
+        /// <returns>パースした ApiCustomSpeechModel オブジェクト、エラー時は null</returns>
+        public ApiCustomSpeechModel? ParseSpeechModelJson(string json)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiModel.ApiSpeechDatasetResponseModel>(json);
+                return JsonSerializer.Deserialize<ApiCustomSpeechModel>(json);
             }
             catch (JsonException ex)
             {
@@ -106,10 +106,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="request">スピーチデータセットのリクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>作成したスピーチデータセット情報、エラー時は null</returns>
-        public async Task<ApiModel.ApiSpeechDatasetResponseModel?> CreateSpeechDatasetAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null)
+        public async Task<ApiSpeechDatasetModel?> CreateSpeechDatasetAsync(string location, string accountId, ApiSpeechDatasetRequestModel request, string? accessToken = null)
         {
             var json = await FetchCreateSpeechDatasetJsonAsync(location, accountId, request, accessToken);
-            return ParseSpeechDatasetResponseJson(json);
+            return ParseSpeechDatasetJson(json);
         }
 
 
@@ -180,10 +180,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="request">スピーチモデルのリクエストオブジェクト</param>
         /// <param name="accessToken">アクセストークン（オプション）</param>
         /// <returns>作成したスピーチモデル情報、エラー時は null</returns>
-        public async Task<ApiSpeechModelResponseModel?> CreateSpeechModelAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null)
+        public async Task<ApiCustomSpeechModel?> CreateSpeechModelAsync(string location, string accountId, ApiSpeechModelRequestModel request, string? accessToken = null)
         {
             var json = await FetchCreateSpeechModelJsonAsync(location, accountId, request, accessToken);
-            return ParseSpeechModelJson(json);
+            return ParseCustomSpeechModelJson(json);
         }
 
         /// <summary>
@@ -193,11 +193,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースした ApiSpeechModelResponseModel オブジェクト、エラー時は null</returns>
-        public ApiSpeechModelResponseModel? ParseSpeechModelJson(string json)
+        public ApiCustomSpeechModel? ParseCustomSpeechModelJson(string json)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiSpeechModelResponseModel>(json);
+                return JsonSerializer.Deserialize<ApiCustomSpeechModel>(json);
             }
             catch (JsonException ex)
             {
@@ -552,7 +552,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         }
 
         /// <summary>
-        /// JSON を List＜ApiSpeechDatasetUpdateModel＞? にパースするメソッド。
+        /// JSON を List＜ApiSpeechDatasetModel＞? にパースするメソッド。
         /// Get Speech Datasets
         /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Datasets
         /// </summary>
@@ -635,25 +635,25 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
             }
         }
 
-        /// <summary>
-        /// JSON を ApiCustomSpeechModel にパースするメソッド。
-        /// Get Speech Model
-        /// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
-        /// </summary>
-        /// <param name="jsonContent">JSON 形式のレスポンス</param>
-        /// <returns>パースしたスピーチモデル情報。パースに失敗した場合は null。</returns>
-        public ApiModel.ApiCustomSpeechModel? ParseCustomSpeechModelJson(string jsonContent)
-        {
-            try
-            {
-                return JsonSerializer.Deserialize<ApiModel.ApiCustomSpeechModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError("Failed to parse speech model JSON: {ex.Message}", ex.Message);
-                return null;
-            }
-        }
+        ///// <summary>
+        ///// JSON を ApiCustomSpeechModel にパースするメソッド。
+        ///// Get Speech Model
+        ///// https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Get-Speech-Model
+        ///// </summary>
+        ///// <param name="jsonContent">JSON 形式のレスポンス</param>
+        ///// <returns>パースしたスピーチモデル情報。パースに失敗した場合は null。</returns>
+        //public ApiModel.ApiCustomSpeechModel? ParseCustomSpeechModelJson(string jsonContent)
+        //{
+        //    try
+        //    {
+        //        return JsonSerializer.Deserialize<ApiModel.ApiCustomSpeechModel>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        //    }
+        //    catch (JsonException ex)
+        //    {
+        //        _logger.LogError("Failed to parse speech model JSON: {ex.Message}", ex.Message);
+        //        return null;
+        //    }
+        //}
 
         // Get Speech Models
 
@@ -754,9 +754,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="customProperties">更新するデータセットのカスタムプロパティ。</param>
         /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
         /// <returns>更新された <see cref="ApiSpeechDatasetUpdateModel"/> を含む非同期タスク。</returns>
-        public async Task<ApiSpeechDatasetUpdateModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null)
+        public async Task<ApiSpeechDatasetModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null)
         {
-            var updateRequestModelData = new ApiSpeechDatasetUpdateRequestModel
+            var updateRequestModelData = new ApiUpdateSpeechDatasetModel
             {
                 displayName = displayName,
                 description = description,
@@ -774,13 +774,13 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="location">リクエストをルーティングするAzureリージョン。</param>
         /// <param name="accountId">アカウントのグローバル一意識別子（GUID）。</param>
         /// <param name="datasetId">更新するスピーチデータセットのID。</param>
-        /// <param name="updateRequestModelData">更新するデータセットの情報。</param>
+        /// <param name="modelData">更新するデータセットの情報。</param>
         /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
         /// <returns>更新された <see cref="ApiSpeechDatasetUpdateModel"/> を含む非同期タスク。</returns>
-        public async Task<ApiSpeechDatasetUpdateModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, ApiSpeechDatasetUpdateRequestModel updateRequestModelData, string? accessToken = null)
+        public async Task<ApiSpeechDatasetModel?> UpdateSpeechDatasetAsync(string location, string accountId, string datasetId, ApiUpdateSpeechDatasetModel modelData, string? accessToken = null)
         {
             _logger.LogInformation("Starting speech dataset update. Dataset ID: {DatasetId}", datasetId);
-            var jsonResponse = await FetchUpdateJsonAsync(location, accountId, datasetId, updateRequestModelData, accessToken);
+            var jsonResponse = await FetchUpdateJsonAsync(location, accountId, datasetId, modelData, accessToken);
             _logger.LogInformation("Speech dataset update completed. Dataset ID: {DatasetId}", datasetId);
             return ParseSpeechDataset(jsonResponse);
         }
@@ -793,10 +793,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="location">リクエストをルーティングするAzureリージョン。</param>
         /// <param name="accountId">アカウントのグローバル一意識別子（GUID）。</param>
         /// <param name="datasetId">更新対象のスピーチデータセットのID（GUID）。</param>
-        /// <param name="updateRequestModelData">更新内容を含むオブジェクト。</param>
+        /// <param name="modelData">更新内容を含むオブジェクト。</param>
         /// <param name="accessToken">（オプション）認証のためのアクセストークン。</param>
         /// <returns>APIのレスポンスとして返されるJSON文字列。</returns>
-        public async Task<string> FetchUpdateJsonAsync(string location, string accountId, string datasetId, ApiSpeechDatasetUpdateRequestModel updateRequestModelData, string? accessToken)
+        public async Task<string> FetchUpdateJsonAsync(string location, string accountId, string datasetId, ApiUpdateSpeechDatasetModel modelData, string? accessToken)
         {
             var requestUri = $"https://api.videoindexer.ai/{location}/Accounts/{accountId}/Customization/Speech/datasets/{datasetId}";
             if (!string.IsNullOrEmpty(accessToken))
@@ -806,7 +806,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
             _logger.LogDebug("Sending speech dataset update request: {RequestUri}", requestUri);
 
-            var content = new StringContent(JsonSerializer.Serialize(updateRequestModelData), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(modelData), Encoding.UTF8, "application/json");
             try
             {
                 HttpClient httpClient = _durableHttpClient?.HttpClient ?? new HttpClient();
@@ -831,10 +831,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIから返されたJSON文字列。</param>
         /// <returns>解析されたSpeechDatasetオブジェクト。</returns>
-        public ApiSpeechDatasetUpdateModel? ParseSpeechDataset(string jsonResponse)
+        public ApiSpeechDatasetModel? ParseSpeechDataset(string jsonResponse)
         {
             _logger.LogDebug("Parsing speech dataset response...");
-            return JsonSerializer.Deserialize<ApiSpeechDatasetUpdateModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            return JsonSerializer.Deserialize<ApiSpeechDatasetModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         }
 
         // Update Speech Model
@@ -852,7 +852,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="customProperties">更新するモデルのカスタムプロパティ。</param>
         /// <param name="accessToken">（オプション）認証のためのアクセストークン。指定しない場合、デフォルトの認証が使用される。</param>
         /// <returns>更新されたスピーチモデル情報を含む非同期タスク。</returns>
-        public async Task<ApiCustomSpeechUpdateModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null)
+        public async Task<ApiCustomSpeechModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, string? displayName, string? description, Dictionary<string, string>? customProperties, string? accessToken = null)
         {
             var updateRequestModelData = new ApiCustomSpeechModelUpdateRequestModel
             {
@@ -875,7 +875,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="updateRequestModelData">更新するモデルの情報（表示名、説明、カスタムプロパティなど）。</param>
         /// <param name="accessToken">（オプション）認証のためのアクセストークン。指定しない場合、デフォルトの認証が使用される。</param>
         /// <returns>更新されたスピーチモデル情報を含む非同期タスク。</returns>
-        public async Task<ApiCustomSpeechUpdateModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, ApiCustomSpeechModelUpdateRequestModel updateRequestModelData, string? accessToken = null)
+        public async Task<ApiCustomSpeechModel?> UpdateSpeechModelAsync(string location, string accountId, string modelId, ApiCustomSpeechModelUpdateRequestModel updateRequestModelData, string? accessToken = null)
         {
             _logger.LogInformation("Starting speech model update. Model ID: {ModelId}", modelId);
             var jsonResponse = await FetchUpdateJsonAsync(location, accountId, modelId, updateRequestModelData, accessToken);
@@ -929,10 +929,10 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIから返されたJSON文字列。</param>
         /// <returns>解析されたCustomSpeechModelオブジェクト。</returns>
-        public ApiCustomSpeechUpdateModel? ParseSpeechModels(string jsonResponse)
+        public ApiCustomSpeechModel? ParseSpeechModels(string jsonResponse)
         {
             _logger.LogDebug("Parsing speech model response...");
-            return JsonSerializer.Deserialize<ApiCustomSpeechUpdateModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            return JsonSerializer.Deserialize<ApiCustomSpeechModel>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         }
     }
 }

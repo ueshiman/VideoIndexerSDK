@@ -23,6 +23,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// APIにリクエストを送信し、顔データの追加処理を実行する
+        /// Create Custom Faces API
         /// </summary>
         /// <param name="location">Azureのリージョン (例: trial, westus, eastasia)</param>
         /// <param name="accountId">Video IndexerのアカウントID (GUID形式)</param>
@@ -31,7 +32,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="imageUrls">追加する顔画像のURLリスト</param>
         /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
         /// <returns>APIからのレスポンスJSON (成功時は追加された顔データのリスト)</returns>
-        public async Task<string> FetchPersonFacesJsonAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null)
+        public async Task<string> CreateCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null)
         {
             // APIエンドポイントのURLを組み立てる
             var baseUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces";
@@ -71,7 +72,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="jsonResponse">APIから取得したJSONレスポンス</param>
         /// <returns>顔データのリスト (失敗時はnull)</returns>
-        public List<string>? ParsePersonFacesJson(string jsonResponse)
+        public List<string>? ParseCreateCustomFacesJson(string jsonResponse)
         {
             try
             {
@@ -95,15 +96,15 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="imageUrls">追加する顔画像のURLリスト</param>
         /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
         /// <returns>成功時は追加された顔データのリスト、エラー時は例外をスロー</returns>
-        public async Task<List<string>?> CreatePersonFacesAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null)
+        public async Task<List<string>?> CreateCustomFacesAsync(string location, string accountId, string personModelId, string personId, List<string> imageUrls, string? accessToken = null)
         {
             try
             {
                 // APIからJSONレスポンスを取得
-                var jsonResponse = await FetchPersonFacesJsonAsync(location, accountId, personModelId, personId, imageUrls, accessToken);
+                var jsonResponse = await CreateCustomFacesJsonAsync(location, accountId, personModelId, personId, imageUrls, accessToken);
 
                 // JSONをパースして、顔データのリストを返す
-                return ParsePersonFacesJson(jsonResponse);
+                return ParseCreateCustomFacesJson(jsonResponse);
             }
             catch (Exception ex)
             {
@@ -114,9 +115,17 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
 
         /// <summary>
         /// API へリクエストを送信し、新しい Person を作成する
+        /// Create Person
+        /// Creates a new person in the specified person model.
         /// </summary>
-        public async Task<string> FetchCreatePersonJsonAsync(
-            string location, string accountId, string personModelId, string? name = null, string? description = null, string? accessToken = null)
+        /// <param name="location">Azureのリージョン (例: trial, westus, eastasia)</param>
+        /// <param name="accountId">Video IndexerのアカウントID (GUID形式)</param>
+        /// <param name="personModelId">Person ModelのID (GUID形式)</param>
+        /// <param name="name">作成するPersonの名前 (省略可能)</param>
+        /// <param name="description">作成するPersonの説明 (省略可能)</param>
+        /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
+        /// <returns>成功時はAPIからのJSONレスポンス、エラー時は例外をスロー</returns>
+        public async Task<string> CreatePersonJsonAsync(string location, string accountId, string personModelId, string? name = null, string? description = null, string? accessToken = null)
         {
             try
             {
@@ -152,6 +161,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// JSON レスポンスを解析し、新しく作成された Person の情報を取得する
         /// </summary>
+        /// <param name="jsonResponse">API から取得した JSON レスポンス</param>
+        /// <returns>作成された Person の情報を含む ApiPersonModel オブジェクト</returns>
+        /// <exception cref="JsonException">JSON の解析に失敗した場合</exception>
         public ApiPersonModel? ParseCreatePersonJson(string jsonResponse)
         {
             try
@@ -168,11 +180,18 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// API を呼び出し、新しい Person を作成する
         /// </summary>
+        /// <param name="location">Azureのリージョン (例: trial, westus, eastasia)</param>
+        /// <param name="accountId">Video IndexerのアカウントID (GUID形式)</param>
+        /// <param name="personModelId">Person ModelのID (GUID形式)</param>
+        /// <param name="name">作成するPersonの名前 (省略可能)</param>
+        /// <param name="description">作成するPersonの説明 (省略可能)</param>
+        /// <param name="accessToken">オプションのアクセストークン (省略可能)</param>
+        /// <returns>成功時はAPIからのJSONレスポンス、エラー時は例外をスロー</returns>
         public async Task<ApiPersonModel?> CreatePersonAsync(string location, string accountId, string personModelId, string? name = null, string? description = null, string? accessToken = null)
         {
             try
             {
-                var jsonResponse = await FetchCreatePersonJsonAsync(location, accountId, personModelId, name, description, accessToken);
+                var jsonResponse = await CreatePersonJsonAsync(location, accountId, personModelId, name, description, accessToken);
                 return ParseCreatePersonJson(jsonResponse);
             }
             catch (Exception ex)
@@ -191,8 +210,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="accessToken">API への認証用アクセストークン (オプション)</param>
         /// <returns>API からの JSON レスポンス文字列</returns>
         /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
-        public async Task<string> FetchCreatePersonModelJsonAsync(
-            string location, string accountId, string? name = null, string? accessToken = null)
+        public async Task<string> GetCreatePersonModelJsonAsync(string location, string accountId, string? name = null, string? accessToken = null)
         {
             try
             {
@@ -254,12 +272,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <exception cref="HttpRequestException">HTTP リクエストが失敗した場合</exception>
         /// <exception cref="JsonException">JSON の解析に失敗した場合</exception>
         /// <exception cref="Exception">予期しないエラーが発生した場合</exception>
-        public async Task<ApiCustomPersonModel?> CreatePersonModelAsync(
-            string location, string accountId, string? name = null, string? accessToken = null)
+        public async Task<ApiCustomPersonModel?> CreatePersonModelAsync(string location, string accountId, string? name = null, string? accessToken = null)
         {
             try
             {
-                var jsonResponse = await FetchCreatePersonModelJsonAsync(location, accountId, name, accessToken);
+                var jsonResponse = await GetCreatePersonModelJsonAsync(location, accountId, name, accessToken);
                 return ParseCreatePersonModelJson(jsonResponse);
             }
             catch (Exception ex)
@@ -355,8 +372,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <exception cref="UnauthorizedAccessException">認証エラーが発生した場合</exception>
         /// <exception cref="KeyNotFoundException">指定された Person が見つからない場合</exception>
         /// <exception cref="Exception">予期しないエラーが発生した場合</exception>
-        public async Task<bool> DeletePersonAsync(
-            string location, string accountId, string personModelId, string personId, string? accessToken = null)
+        public async Task<bool> DeletePersonAsync(string location, string accountId, string personModelId, string personId, string? accessToken = null)
         {
             try
             {
@@ -429,8 +445,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <exception cref="UnauthorizedAccessException">認証エラーが発生した場合</exception>
         /// <exception cref="KeyNotFoundException">指定された Person Model が見つからない場合</exception>
         /// <exception cref="Exception">予期しないエラーが発生した場合</exception>
-        public async Task<bool> DeletePersonModelAsync(
-            string location, string accountId, string personModelId, string? accessToken = null)
+        public async Task<bool> DeletePersonModelAsync(string location, string accountId, string personModelId, string? accessToken = null)
         {
             try
             {
@@ -502,8 +517,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <exception cref="UnauthorizedAccessException">認証エラーが発生した場合</exception>
         /// <exception cref="KeyNotFoundException">指定された Face Picture が見つからない場合</exception>
         /// <exception cref="Exception">予期しないエラーが発生した場合</exception>
-        public async Task<string> GetCustomFacePictureAsync(
-            string location, string accountId, string personModelId, string personId, string faceId, string? accessToken = null)
+        public async Task<string> GetCustomFacePictureAsync(string location, string accountId, string personModelId, string personId, string faceId, string? accessToken = null)
         {
             try
             {
@@ -573,7 +587,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="sourceType">Face のソースタイプ (UploadedPicture / UploadedVideo, オプション)</param>
         /// <param name="accessToken">アクセストークン (オプション)</param>
         /// <returns>取得した JSON 文字列</returns>
-        public async Task<string> FetchCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null)
+        public async Task<string> GetCustomFacesJsonAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null)
         {
             var requestUrl = $"{_apiResourceConfigurations.ApiEndpoint}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}/Faces";
 
@@ -633,7 +647,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <returns>Face のリスト</returns>
         public async Task<List<ApiFaceModel>> GetCustomFacesAsync(string location, string accountId, string personModelId, string personId, int? pageSize = null, int? skip = null, string? sourceType = null, string? accessToken = null)
         {
-            var json = await FetchCustomFacesJsonAsync(location, accountId, personModelId, personId, pageSize, skip, sourceType, accessToken);
+            var json = await GetCustomFacesJsonAsync(location, accountId, personModelId, personId, pageSize, skip, sourceType, accessToken);
             return ParseCustomFacesJson(json);
         }
 
@@ -1027,7 +1041,14 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// Video Indexer API に PUT リクエストを送信し、JSON レスポンスを取得します。
         /// </summary>
-        /// <returns>JSON レスポンスを文字列として返します。</returns>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="personModelId">人物モデルの一意の識別子。</param>
+        /// <param name="personId">人物の一意の識別子。</param>
+        /// <param name="name">任意の新しい名前。</param>
+        /// <param name="description">任意の説明。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。</param>
+        /// <returns>更新が成功した場合は API からの JSON レスポンス、それ以外は例外をスローします。</returns>
         public async Task<string> SendPutRequestAsync(string location, string accountId, string personModelId, string personId, string? name, string? description, string? accessToken)
         {
             string url = $"{_apiResourceConfigurations}/{location}/Accounts/{accountId}/Customization/PersonModels/{personModelId}/Persons/{personId}";
@@ -1098,6 +1119,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <summary>
         /// Video Indexer API に PUT リクエストを送信し、JSON レスポンスを取得します。
         /// </summary>
+        /// <param name="location">API 呼び出しの Azure リージョン。</param>
+        /// <param name="accountId">アカウントの一意の識別子。</param>
+        /// <param name="personModelId">人物モデルの一意の識別子。</param>
+        /// <param name="name">任意の新しい名前。</param>
+        /// <param name="accessToken">認証用のアクセストークン（オプション）。</param>
         /// <returns>JSON レスポンスを文字列として返します。</returns>
         public async Task<string> SendPutRequestForPersonModelAsync(string location, string accountId, string personModelId, string? name, string? accessToken)
         {

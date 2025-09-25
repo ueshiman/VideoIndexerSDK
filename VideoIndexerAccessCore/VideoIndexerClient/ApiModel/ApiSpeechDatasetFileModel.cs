@@ -2,8 +2,8 @@
 {
     public class ApiSpeechDatasetFileModel
     {
-        public string datasetId { get; set; }
-        public string fileId { get; set; }
+        public Guid datasetId { get; set; }
+        public Guid fileId { get; set; }
         public string name { get; set; }
         public string contentUrl { get; set; }
         public int kind { get; set; }
