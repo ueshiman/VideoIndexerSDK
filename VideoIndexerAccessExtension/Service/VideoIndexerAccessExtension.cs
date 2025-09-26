@@ -174,6 +174,7 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IProjectsRepository, ProjectsRepository>();
         services.TryAddTransient<IPromptContentRepository, PromptContentRepository>();
         services.TryAddTransient<IRedactVideoRepository, RedactVideoRepository>();
+        services.TryAddTransient<ITextualSummarizationRepository, TextualSummarizationRepository>();
         services.TryAddTransient<ITrialAccountAccessTokensRepository, TrialAccountAccessTokensRepository>();
         services.TryAddTransient<ITrialAccountsRepository, TrialAccountsRepository>();
         services.TryAddTransient<IVideoDataRepository, VideoDataRepository>();

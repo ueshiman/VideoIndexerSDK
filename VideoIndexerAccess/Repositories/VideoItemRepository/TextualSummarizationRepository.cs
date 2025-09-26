@@ -8,7 +8,7 @@ using VideoIndexerAccessCore.VideoIndexerClient.Configuration;
 
 namespace VideoIndexerAccess.Repositories.VideoItemRepository
 {
-    public class TextualSummarizationRepository
+    public class TextualSummarizationRepository : ITextualSummarizationRepository
     {
         // ロガーインスタンス
         private readonly ILogger<TextualSummarizationRepository> _logger;
