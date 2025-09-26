@@ -1,0 +1,10 @@
+﻿using VideoIndexerAccess.Repositories.DataModel;
+using VideoIndexerAccessCore.VideoIndexerClient.ApiModel;
+
+namespace VideoIndexerAccess.Repositories.DataModelMapper;
+
+public interface ITextualSummarizationJobContractMapper
+{
+    TextualSummarizationJobContractModel MapFrom(ApiAOAITextualSummarizationJobContractModel apiModel);
+    ApiAOAITextualSummarizationJobContractModel MapTo(TextualSummarizationJobContractModel model);
+}

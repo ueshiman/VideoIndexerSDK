@@ -124,7 +124,10 @@ public static class VideoIndexerAccessExtension
         services.TryAddTransient<IStreamingUrlMapper, StreamingUrlMapper>();
         services.TryAddTransient<ISummarizedInsightsMapper, SummarizedInsightsMapper>();
         services.TryAddTransient<ISupportedLanguageMapper, SupportedLanguageMapper>();
-        services.TryAddTransient<ITextualcontentmoderationMapper, TextualcontentmoderationMapper>();
+        services.TryAddTransient<ITextualcontentmoderationMapper, TextualcontentmoderationMapper>(); 
+        services.TryAddTransient<ITextualSummarizationContractPageMapper, TextualSummarizationContractPageMapper>();
+        services.TryAddTransient<ITextualSummarizationJobContractMapper, TextualSummarizationJobContractMapper>();
+        services.TryAddTransient<ITextualSummarizationJobWithSummaryContentContractMapper, TextualSummarizationJobWithSummaryContentContractMapper>();
         services.TryAddTransient<ITextVariationMapper, TextVariationMapper>();
         services.TryAddTransient<ITimeRangeMapper, TimeRangeMapper>();
         services.TryAddTransient<ITopic1Mapper, Topic1Mapper>();

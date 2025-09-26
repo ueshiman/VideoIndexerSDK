@@ -12,14 +12,12 @@ public interface ITextualSummarizationApiAccess
     /// <param name="location">API のリージョン名 (例: "trial")</param>
     /// <param name="accountId">Azure Video Indexer のアカウント ID (GUID 形式)</param>
     /// <param name="videoId">対象のビデオ ID (GUID 形式)</param>
-    /// <param name="accessToken">API のアクセストークン (オプション、null の場合は未指定)</param>
     /// <param name="length">要約の長さ (Short, Medium, Long のいずれか)</param>
     /// <param name="style">要約のスタイル (Neutral, Casual, Formal のいずれか)</param>
     /// <param name="includedFrames">含めるフレーム (None, Keyframes のいずれか)</param>
+    /// <param name="accessToken">API のアクセストークン (オプション、null の場合は未指定)</param>
     /// <returns>ビデオ要約のレスポンスモデル `ApiVideoSummaryModel` を返す。失敗時は null。</returns>
-    Task<ApiVideoSummaryModel?> GetVideoSummaryAsync(
-        string location, string accountId, string videoId, string? accessToken = null,
-        string? length = null, string? style = null, string? includedFrames = null);
+    Task<ApiAOAITextualSummarizationJobContractModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string? length = null, string? style = null, string? includedFrames = null, string? accessToken = null);
 
     /// <summary>
     /// Video Indexer API を使用して動画の要約情報を取得します。
@@ -32,7 +30,7 @@ public interface ITextualSummarizationApiAccess
     /// <param name="summaryId">取得するサマリー ID（GUID）</param>
     /// <param name="accessToken">（オプション）アクセストークン。URL クエリに付加されます</param>
     /// <returns>動画要約情報を格納した ApiVideoSummaryResponseModel オブジェクト。失敗時は null。</returns>
-    Task<ApiVideoSummaryResponseModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null);
+    Task<ApiAOAITextualSummarizationJobWithSummaryContentContractModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null);
 
     /// <summary>
     /// API のエンドポイント URL を構築する。
@@ -59,7 +57,7 @@ public interface ITextualSummarizationApiAccess
     /// </summary>
     /// <param name="json">API から取得した JSON 文字列</param>
     /// <returns>パースされた `ApiVideoSummaryModel` オブジェクト。失敗時は null。</returns>
-    ApiVideoSummaryModel? ParseVideoSummaryJson(string json);
+    ApiAOAITextualSummarizationJobContractModel? ParseVideoSummaryJson(string json);
 
     /// <summary>
     /// ビデオのテキスト要約を削除する非同期メソッド。
@@ -92,7 +90,7 @@ public interface ITextualSummarizationApiAccess
     /// </summary>
     /// <param name="json">動画要約の JSON データ</param>
     /// <returns>ApiVideoSummaryModel オブジェクト</returns>
-    ApiVideoSummaryResponseModel? ParseVideoSummaryResponseJson(string json);
+    ApiAOAITextualSummarizationJobWithSummaryContentContractModel? ParseVideoSummaryResponseJson(string json);
 
     /// <summary>
     /// 動画に紐づくすべてのテキスト要約メタ情報をリスト形式で取得します。

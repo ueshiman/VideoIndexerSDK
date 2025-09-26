@@ -30,14 +30,12 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="location">API のリージョン名 (例: "trial")</param>
         /// <param name="accountId">Azure Video Indexer のアカウント ID (GUID 形式)</param>
         /// <param name="videoId">対象のビデオ ID (GUID 形式)</param>
-        /// <param name="accessToken">API のアクセストークン (オプション、null の場合は未指定)</param>
         /// <param name="length">要約の長さ (Short, Medium, Long のいずれか)</param>
         /// <param name="style">要約のスタイル (Neutral, Casual, Formal のいずれか)</param>
         /// <param name="includedFrames">含めるフレーム (None, Keyframes のいずれか)</param>
+        /// <param name="accessToken">API のアクセストークン (オプション、null の場合は未指定)</param>
         /// <returns>ビデオ要約のレスポンスモデル `ApiVideoSummaryModel` を返す。失敗時は null。</returns>
-        public async Task<ApiVideoSummaryModel?> GetVideoSummaryAsync(
-            string location, string accountId, string videoId, string? accessToken = null,
-            string? length = null, string? style = null, string? includedFrames = null)
+        public async Task<ApiAOAITextualSummarizationJobContractModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string? length = null, string? style = null, string? includedFrames = null, string? accessToken = null)
         {
             try
             {
@@ -115,11 +113,11 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">API から取得した JSON 文字列</param>
         /// <returns>パースされた `ApiVideoSummaryModel` オブジェクト。失敗時は null。</returns>
-        public ApiVideoSummaryModel? ParseVideoSummaryJson(string json)
+        public ApiAOAITextualSummarizationJobContractModel? ParseVideoSummaryJson(string json)
         {
             try
             {
-                return JsonSerializer.Deserialize<ApiVideoSummaryModel>(json, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<ApiAOAITextualSummarizationJobContractModel>(json, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     PropertyNameCaseInsensitive = true
@@ -193,7 +191,7 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// <param name="summaryId">取得するサマリー ID（GUID）</param>
         /// <param name="accessToken">（オプション）アクセストークン。URL クエリに付加されます</param>
         /// <returns>動画要約情報を格納した ApiVideoSummaryResponseModel オブジェクト。失敗時は null。</returns>
-        public async Task<ApiVideoSummaryResponseModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
+        public async Task<ApiAOAITextualSummarizationJobWithSummaryContentContractModel?> GetVideoSummaryAsync(string location, string accountId, string videoId, string summaryId, string? accessToken = null)
         {
             try
             {
@@ -253,9 +251,9 @@ namespace VideoIndexerAccessCore.VideoIndexerClient.ApiAccess
         /// </summary>
         /// <param name="json">動画要約の JSON データ</param>
         /// <returns>ApiVideoSummaryModel オブジェクト</returns>
-        public ApiVideoSummaryResponseModel? ParseVideoSummaryResponseJson(string json)
+        public ApiAOAITextualSummarizationJobWithSummaryContentContractModel? ParseVideoSummaryResponseJson(string json)
         {
-            return JsonSerializer.Deserialize<ApiVideoSummaryResponseModel>(json, new JsonSerializerOptions
+            return JsonSerializer.Deserialize<ApiAOAITextualSummarizationJobWithSummaryContentContractModel>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
