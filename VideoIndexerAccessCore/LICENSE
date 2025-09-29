@@ -1,21 +1,51 @@
-﻿MIT License
+﻿
+MIT License with Commercial Use Restriction
 
 Copyright (c) 2025 LLC Beans
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+本ソフトウェアおよび関連ドキュメントファイル（以下「本ソフトウェア」）のソースコードは、
+以下の条件のもとで使用、複製、改変、マージ、公開、配布、サブライセンス、販売が可能です。
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. 上記の著作権表示および本許諾表示は、本ソフトウェアのすべてのコピーまたは重要な部分に含める必要があります。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. 【商用利用制限】
+   本ソースコードの商用利用は許可されていません。
+   「商用利用」とは、次を含みます（ただしこれらに限りません）：
+     - 業務システム、SaaS、API、アプリ、受託開発など法人・営利目的での利用
+     - 本ソースコードを基にした製品・サービスの販売、提供、配布
+
+3. 【例外：NuGet配布版】
+   公式にNuGetにて配布されたビルド済みパッケージ（バイナリ）のみ、
+   別途ライセンスにより商用利用が許可されています。
+   詳細は NuGet パッケージに含まれる LICENSE.txt をご確認ください。
+
+4. 免責事項：
+   本ソフトウェアは「現状有姿」で提供され、明示または黙示を問わず、
+   商品性、特定目的適合性、権利非侵害について一切保証しません。
+   本ソフトウェアの使用または使用不能に起因する一切の責任は負いません。
+
+
+This software and associated documentation files (the "Software") are provided under the following conditions:
+
+1. Permission is hereby granted, free of charge, to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, 
+   subject to the following conditions:
+
+   - The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. **Commercial Use Restriction**
+   Commercial use of this source code is strictly prohibited.
+   “Commercial use” includes, but is not limited to:
+     - Using the Software for business operations or services
+     - Embedding the Software in commercial products or paid services
+     - Using the Software for client work, enterprise development, or resale
+
+3. **Exception: NuGet Binary Distribution**
+   Only the compiled binary version of the Software, officially distributed via NuGet, is exempt from this restriction and may be used for commercial purposes.
+   See the LICENSE.txt included in the NuGet package for details.
+
+4. Disclaimer:
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+   THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
