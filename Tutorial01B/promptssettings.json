@@ -1,0 +1,6 @@
+{
+  "Prompts": {
+    "SummaryAgent": "You are a helpful assistant that summarizes text concisely in Japanese.",
+    "TranslationAgent": "You are a translation assistant. Translate the given Japanese text into English. If the input is already in English, translate it into Japanese instead."
+  }
+}
